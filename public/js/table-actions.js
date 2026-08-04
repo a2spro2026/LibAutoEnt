@@ -14,7 +14,8 @@
             delete: { title: 'Supprimer', svg: '<path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14H6L5 6"/>' },
             import: { title: 'Importer', svg: '<path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/>' },
             pdf: { title: 'PDF', svg: '<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V9l-5-6Z"/><path d="M14 3v6h6"/><path d="M8 13h8M8 17h5"/>' },
-            print: { title: 'Imprimer', svg: '<path d="M6 9V3h12v6"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v7H6z"/>' }
+            print: { title: 'Imprimer', svg: '<path d="M6 9V3h12v6"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v7H6z"/>' },
+            suspend: { title: 'Suspendre', svg: '<circle cx="12" cy="12" r="9"/><path d="M10 9v6M14 9v6"/>' }
         };
 
         var html = '<div class="actions">';

@@ -222,6 +222,48 @@
             box-shadow: 0 0 0 3px rgba(139, 195, 74, 0.18), 0 0 18px rgba(139, 195, 74, 0.2);
         }
 
+        .password-wrap {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .password-wrap input {
+            width: 100%;
+            padding-right: 2.75rem;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 0.55rem;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 36px;
+            height: 36px;
+            border: none;
+            border-radius: 8px;
+            background: transparent;
+            color: rgba(255, 255, 255, 0.7);
+            cursor: pointer;
+            display: grid;
+            place-items: center;
+            padding: 0;
+        }
+        .toggle-password:hover {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.08);
+        }
+        .toggle-password svg {
+            width: 18px;
+            height: 18px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 1.8;
+        }
+        .toggle-password .icon-hide { display: none; }
+        .toggle-password.is-visible .icon-show { display: none; }
+        .toggle-password.is-visible .icon-hide { display: block; }
+
         .submit-btn {
             width: 100%;
             margin-top: 0.5rem;
@@ -361,7 +403,7 @@
         <div class="brand-mark">
             <img src="{{ asset('images/brand-logo.png') }}" alt="7ssabHani — La Solution qui Gère" width="520" height="420">
         </div>
-        <form class="login-panel" method="POST" action="{{ url('/login') }}" autocomplete="on">
+        <form class="login-panel" method="POST" action="{{ url('/login') }}" autocomplete="off">
             @csrf
             <header class="panel-header">
                 <h1>Connexion <span>7ssabHani</span></h1>
@@ -370,9 +412,9 @@
 
             <div class="field">
                 <label for="statut">Statut</label>
-                <select id="statut" name="statut" required>
-                    <option value="" disabled>Sélectionner un statut</option>
-                    <option value="admin" selected>Administrateur</option>
+                <select id="statut" name="statut" required autocomplete="off">
+                    <option value="" selected disabled></option>
+                    <option value="admin">Administrateur</option>
                     <option value="gerant">Gérant</option>
                     <option value="vendeur">Vendeur</option>
                     <option value="caissier">Caissier</option>
@@ -385,24 +427,28 @@
                     type="text"
                     id="login"
                     name="login"
-                    value="admin@7ssabhani.com"
-                    placeholder="Votre identifiant"
+                    value=""
                     required
-                    autocomplete="username"
+                    autocomplete="off"
                 >
             </div>
 
             <div class="field">
                 <label for="password">Mot de passe</label>
-                <input
-                    type="password"
-                    id="password"
-                    name="password"
-                    value="password"
-                    placeholder="••••••••"
-                    required
-                    autocomplete="current-password"
-                >
+                <div class="password-wrap">
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        value=""
+                        required
+                        autocomplete="new-password"
+                    >
+                    <button type="button" class="toggle-password" id="togglePassword" aria-label="Afficher le mot de passe" title="Afficher / masquer">
+                        <svg class="icon-show" viewBox="0 0 24 24"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg>
+                        <svg class="icon-hide" viewBox="0 0 24 24"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 19c-6 0-10-7-10-7a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c6 0 10 7 10 7a18.5 18.5 0 0 1-2.16 3.19"/><path d="M14.12 14.12a3 3 0 1 1-4.24-4.24"/><path d="M1 1l22 22"/></svg>
+                    </button>
+                </div>
             </div>
 
             <button type="submit" class="submit-btn">Se connecter</button>
@@ -410,5 +456,18 @@
             <p class="panel-footer">La solution qui gère votre commerce</p>
         </form>
     </main>
+    <script>
+        (function () {
+            var input = document.getElementById('password');
+            var btn = document.getElementById('togglePassword');
+            if (!input || !btn) return;
+            btn.addEventListener('click', function () {
+                var show = input.type === 'password';
+                input.type = show ? 'text' : 'password';
+                btn.classList.toggle('is-visible', show);
+                btn.setAttribute('aria-label', show ? 'Masquer le mot de passe' : 'Afficher le mot de passe');
+            });
+        })();
+    </script>
 </body>
 </html>

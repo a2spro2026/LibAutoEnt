@@ -53,3 +53,7 @@ Route::get('/stock/categorie-produit', function () {
 Route::get('/stock/etat-produit', function () {
     return view('stock.etat-produit');
 })->name('etat-produit');
+
+Route::get('/configuration/utilisateurs', function () {
+    return view('configuration.utilisateurs');
+})->name('utilisateurs');

@@ -111,7 +111,7 @@
                 <svg class="chevron" viewBox="0 0 24 24" fill="none"><path d="m6 9 6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
             </button>
             <div class="submenu">
-                <a href="#">Utilisateurs</a>
+                <a href="{{ route('utilisateurs') }}" class="{{ $activePage === 'utilisateurs' ? 'is-active' : '' }}">Utilisateurs</a>
                 <a href="#">Paramètres Système</a>
             </div>
         </div>
