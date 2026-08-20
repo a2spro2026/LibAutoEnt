@@ -4,28 +4,28 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="google" content="notranslate">
-    <title>Tableau de bord — 7ssabHani</title>
+    <title>Tableau de bord — LibAutoEnt</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet">
     <style>
         :root {
-            --green: #4f9228;
-            --green-bright: #8bc34a;
-            --green-deep: #2e5c18;
-            --green-soft: rgba(139, 195, 74, 0.16);
-            --green-glow: rgba(139, 195, 74, 0.45);
-            --gold: #c9a227;
-            --gold-soft: rgba(201, 162, 39, 0.28);
-            --ink: #152014;
-            --ink-soft: #3d4a38;
-            --muted: #6b7a66;
-            --paper: #f3f6ef;
-            --paper-2: #e8eee2;
+            --green: #14213d;
+            --green-bright: #fca311;
+            --green-deep: #07111c;
+            --green-soft: rgba(252, 163, 17, 0.16);
+            --green-glow: rgba(252, 163, 17, 0.45);
+            --gold: #fca311;
+            --gold-soft: rgba(252, 163, 17, 0.28);
+            --ink: #0d1b2a;
+            --ink-soft: #3d4f63;
+            --muted: #6b7c8f;
+            --paper: #f0f3f7;
+            --paper-2: #e4e9f0;
             --white: #ffffff;
             --sidebar-w: 280px;
-            --shadow-card: 0 10px 28px rgba(21, 32, 20, 0.12), 0 2px 8px rgba(21, 32, 20, 0.06);
-            --shadow-glow: 0 0 0 1px rgba(139, 195, 74, 0.18), 0 12px 32px rgba(79, 146, 40, 0.18), 0 0 40px rgba(139, 195, 74, 0.12);
+            --shadow-card: 0 10px 28px rgba(13, 27, 42, 0.12), 0 2px 8px rgba(13, 27, 42, 0.06);
+            --shadow-glow: 0 0 0 1px rgba(252, 163, 17, 0.18), 0 12px 32px rgba(13, 27, 42, 0.18), 0 0 40px rgba(252, 163, 17, 0.12);
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -36,9 +36,9 @@
             font-family: 'DM Sans', sans-serif;
             color: var(--ink);
             background:
-                radial-gradient(ellipse 80% 50% at 100% -10%, rgba(139, 195, 74, 0.18), transparent 55%),
-                radial-gradient(ellipse 60% 40% at 0% 100%, rgba(201, 162, 39, 0.12), transparent 50%),
-                linear-gradient(165deg, #eef3e8 0%, var(--paper) 45%, #e4ebdc 100%);
+                radial-gradient(ellipse 80% 50% at 100% -10%, rgba(252, 163, 17, 0.18), transparent 55%),
+                radial-gradient(ellipse 60% 40% at 0% 100%, rgba(252, 163, 17, 0.12), transparent 50%),
+                linear-gradient(165deg, #eef2f7 0%, var(--paper) 45%, #e0e6ef 100%);
             min-height: 100vh;
             overflow-x: hidden;
         }
@@ -51,8 +51,8 @@
             z-index: 0;
             opacity: 0.35;
             background-image:
-                radial-gradient(circle at 20% 30%, rgba(139, 195, 74, 0.08) 0 1px, transparent 1.5px),
-                radial-gradient(circle at 80% 70%, rgba(201, 162, 39, 0.07) 0 1px, transparent 1.5px);
+                radial-gradient(circle at 20% 30%, rgba(252, 163, 17, 0.08) 0 1px, transparent 1.5px),
+                radial-gradient(circle at 80% 70%, rgba(252, 163, 17, 0.07) 0 1px, transparent 1.5px);
             background-size: 28px 28px, 36px 36px;
         }
 
@@ -69,7 +69,7 @@
             width: var(--sidebar-w);
             flex-shrink: 0;
             background:
-                linear-gradient(185deg, #1c2a18 0%, #152014 55%, #10180e 100%);
+                linear-gradient(185deg, #14213d 0%, #0d1b2a 55%, #07111c 100%);
             color: #fff;
             display: flex;
             flex-direction: column;
@@ -77,8 +77,8 @@
             top: 0;
             height: 100vh;
             box-shadow:
-                8px 0 32px rgba(16, 24, 14, 0.28),
-                inset -1px 0 0 rgba(139, 195, 74, 0.12);
+                8px 0 32px rgba(7, 17, 28, 0.28),
+                inset -1px 0 0 rgba(252, 163, 17, 0.12);
             z-index: 50;
         }
 
@@ -90,7 +90,7 @@
             width: 160px;
             height: 160px;
             border-radius: 50%;
-            background: radial-gradient(circle, rgba(139, 195, 74, 0.22), transparent 70%);
+            background: radial-gradient(circle, rgba(252, 163, 17, 0.22), transparent 70%);
             pointer-events: none;
         }
 
@@ -110,9 +110,9 @@
             border-radius: 50%;
             display: grid;
             place-items: center;
-            background: linear-gradient(145deg, rgba(139, 195, 74, 0.25), rgba(201, 162, 39, 0.15));
-            border: 1.5px solid rgba(139, 195, 74, 0.45);
-            box-shadow: 0 0 18px rgba(139, 195, 74, 0.25);
+            background: linear-gradient(145deg, rgba(252, 163, 17, 0.25), rgba(252, 163, 17, 0.15));
+            border: 1.5px solid rgba(252, 163, 17, 0.45);
+            box-shadow: 0 0 18px rgba(252, 163, 17, 0.25);
             flex-shrink: 0;
         }
 
@@ -145,7 +145,7 @@
 
         .side-nav::-webkit-scrollbar { width: 5px; }
         .side-nav::-webkit-scrollbar-thumb {
-            background: rgba(139, 195, 74, 0.35);
+            background: rgba(252, 163, 17, 0.35);
             border-radius: 99px;
         }
 
@@ -160,7 +160,7 @@
             margin-bottom: 0.7rem;
             border-radius: 14px;
             text-decoration: none;
-            color: #102008;
+            color: #0d1b2a;
             font-family: 'Outfit', sans-serif;
             font-size: 0.95rem;
             font-weight: 700;
@@ -169,11 +169,11 @@
             overflow: hidden;
             isolation: isolate;
             background:
-                linear-gradient(135deg, #b6e85f 0%, #8bc34a 42%, #6fad35 78%, #c9a227 160%);
+                linear-gradient(135deg, #ffc857 0%, #fca311 42%, #e8920a 78%, #fca311 160%);
             box-shadow:
-                0 0 0 1px rgba(201, 162, 39, 0.35),
-                0 8px 22px rgba(79, 146, 40, 0.35),
-                0 0 28px rgba(139, 195, 74, 0.25),
+                0 0 0 1px rgba(252, 163, 17, 0.35),
+                0 8px 22px rgba(13, 27, 42, 0.35),
+                0 0 28px rgba(252, 163, 17, 0.25),
                 inset 0 1px 0 rgba(255, 255, 255, 0.45);
             transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
         }
@@ -185,8 +185,8 @@
             top: 0;
             bottom: 0;
             width: 4px;
-            background: linear-gradient(180deg, #f0d56a, #c9a227);
-            box-shadow: 0 0 12px rgba(201, 162, 39, 0.65);
+            background: linear-gradient(180deg, #ffb83a, #fca311);
+            box-shadow: 0 0 12px rgba(252, 163, 17, 0.65);
             z-index: 1;
         }
 
@@ -205,9 +205,9 @@
             transform: translateY(-2px);
             filter: brightness(1.05);
             box-shadow:
-                0 0 0 1px rgba(201, 162, 39, 0.5),
-                0 12px 28px rgba(79, 146, 40, 0.42),
-                0 0 36px rgba(139, 195, 74, 0.35),
+                0 0 0 1px rgba(252, 163, 17, 0.5),
+                0 12px 28px rgba(13, 27, 42, 0.42),
+                0 0 36px rgba(252, 163, 17, 0.35),
                 inset 0 1px 0 rgba(255, 255, 255, 0.55);
         }
 
@@ -216,12 +216,12 @@
         }
 
         .menu-link .menu-ico {
-            background: rgba(16, 32, 8, 0.18);
-            border-color: rgba(16, 32, 8, 0.12);
+            background: rgba(13, 27, 42, 0.18);
+            border-color: rgba(13, 27, 42, 0.12);
             box-shadow:
                 0 0 0 1px rgba(255, 255, 255, 0.2),
-                0 4px 12px rgba(16, 32, 8, 0.15);
-            color: #102008;
+                0 4px 12px rgba(13, 27, 42, 0.15);
+            color: #0d1b2a;
             position: relative;
             z-index: 1;
         }
@@ -251,14 +251,14 @@
         }
 
         .menu-btn:hover {
-            background: rgba(139, 195, 74, 0.12);
+            background: rgba(252, 163, 17, 0.12);
             color: #fff;
         }
 
         .menu-group.open .menu-btn {
-            background: linear-gradient(135deg, rgba(139, 195, 74, 0.22), rgba(201, 162, 39, 0.1));
+            background: linear-gradient(135deg, rgba(252, 163, 17, 0.22), rgba(252, 163, 17, 0.1));
             color: #fff;
-            box-shadow: inset 0 0 0 1px rgba(139, 195, 74, 0.28);
+            box-shadow: inset 0 0 0 1px rgba(252, 163, 17, 0.28);
         }
 
         .menu-ico {
@@ -273,9 +273,9 @@
         }
 
         .menu-group.open .menu-ico {
-            background: rgba(139, 195, 74, 0.2);
-            border-color: rgba(139, 195, 74, 0.35);
-            box-shadow: 0 0 12px rgba(139, 195, 74, 0.25);
+            background: rgba(252, 163, 17, 0.2);
+            border-color: rgba(252, 163, 17, 0.35);
+            box-shadow: 0 0 12px rgba(252, 163, 17, 0.25);
         }
 
         .menu-ico svg { width: 17px; height: 17px; stroke: currentColor; fill: none; stroke-width: 1.8; }
@@ -327,8 +327,8 @@
             width: 6px;
             height: 6px;
             border-radius: 50%;
-            background: rgba(139, 195, 74, 0.45);
-            box-shadow: 0 0 8px rgba(139, 195, 74, 0.35);
+            background: rgba(252, 163, 17, 0.45);
+            box-shadow: 0 0 8px rgba(252, 163, 17, 0.35);
         }
 
         .submenu a:hover {
@@ -360,8 +360,8 @@
             font-weight: 700;
             font-size: 0.85rem;
             color: var(--ink);
-            background: linear-gradient(135deg, #a8d85a, var(--green-bright));
-            box-shadow: 0 0 14px rgba(139, 195, 74, 0.4);
+            background: linear-gradient(135deg, #ffb83a, var(--green-bright));
+            box-shadow: 0 0 14px rgba(252, 163, 17, 0.4);
         }
 
         .user-meta { flex: 1; min-width: 0; }
@@ -422,9 +422,9 @@
             border-radius: 18px;
             background:
                 linear-gradient(135deg, rgba(255,255,255,0.92) 0%, rgba(243,246,239,0.88) 100%);
-            border: 1px solid rgba(139, 195, 74, 0.22);
+            border: 1px solid rgba(252, 163, 17, 0.22);
             box-shadow:
-                0 10px 28px rgba(21, 32, 20, 0.08),
+                0 10px 28px rgba(13, 27, 42, 0.08),
                 inset 0 1px 0 rgba(255,255,255,0.9);
             backdrop-filter: blur(10px);
             position: relative;
@@ -470,7 +470,7 @@
         }
 
         .topbar-left .welcome-line span {
-            background: linear-gradient(120deg, #6fad35 0%, #8bc34a 40%, #c9a227 100%);
+            background: linear-gradient(120deg, #e8920a 0%, #fca311 40%, #fca311 100%);
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
@@ -483,7 +483,7 @@
             width: 42px;
             height: 42px;
             border-radius: 12px;
-            border: 1px solid rgba(21, 32, 20, 0.1);
+            border: 1px solid rgba(13, 27, 42, 0.1);
             background: var(--white);
             box-shadow: var(--shadow-card);
             cursor: pointer;
@@ -500,9 +500,9 @@
             gap: 0.45rem;
             padding: 0.55rem 1rem;
             border-radius: 999px;
-            background: linear-gradient(135deg, rgba(139, 195, 74, 0.16), rgba(201, 162, 39, 0.1));
-            border: 1px solid rgba(139, 195, 74, 0.35);
-            box-shadow: 0 6px 16px rgba(79, 146, 40, 0.12);
+            background: linear-gradient(135deg, rgba(252, 163, 17, 0.16), rgba(252, 163, 17, 0.1));
+            border: 1px solid rgba(252, 163, 17, 0.35);
+            box-shadow: 0 6px 16px rgba(13, 27, 42, 0.12);
             font-family: 'Outfit', sans-serif;
             font-size: 0.8rem;
             font-weight: 700;
@@ -515,7 +515,7 @@
             height: 9px;
             border-radius: 50%;
             background: var(--green-bright);
-            box-shadow: 0 0 0 3px rgba(139, 195, 74, 0.25), 0 0 10px var(--green-glow);
+            box-shadow: 0 0 0 3px rgba(252, 163, 17, 0.25), 0 0 10px var(--green-glow);
             display: block;
             animation: pulse-dot 1.8s ease-in-out infinite;
         }
@@ -535,10 +535,10 @@
             flex-shrink: 0;
             border-radius: 20px;
             background:
-                linear-gradient(145deg, rgba(28, 42, 24, 0.96), rgba(16, 24, 14, 0.94));
-            border: 1px solid rgba(139, 195, 74, 0.28);
+                linear-gradient(145deg, rgba(28, 42, 24, 0.96), rgba(7, 17, 28, 0.94));
+            border: 1px solid rgba(252, 163, 17, 0.28);
             box-shadow:
-                0 16px 40px rgba(16, 24, 14, 0.22),
+                0 16px 40px rgba(7, 17, 28, 0.22),
                 inset 0 1px 0 rgba(255,255,255,0.06);
         }
 
@@ -582,7 +582,7 @@
             width: 120px;
             height: 120px;
             border-radius: 50%;
-            background: radial-gradient(circle, var(--accent-glow, rgba(139, 195, 74, 0.35)), transparent 68%);
+            background: radial-gradient(circle, var(--accent-glow, rgba(252, 163, 17, 0.35)), transparent 68%);
             z-index: -1;
             transition: transform 0.35s ease;
             opacity: 0.85;
@@ -605,11 +605,40 @@
             outline-offset: 3px;
         }
 
-        .kpi-card[data-tone="suppliers"] { --accent: #8bc34a; --accent-glow: rgba(139, 195, 74, 0.4); }
+        .kpi-card[data-tone="suppliers"] { --accent: #3b82c4; --accent-glow: rgba(59, 130, 196, 0.4); }
         .kpi-card[data-tone="clients"]   { --accent: #4db6ac; --accent-glow: rgba(77, 182, 172, 0.4); }
-        .kpi-card[data-tone="stock"]     { --accent: #c9a227; --accent-glow: rgba(201, 162, 39, 0.45); }
+        .kpi-card[data-tone="stock"]     { --accent: #fca311; --accent-glow: rgba(252, 163, 17, 0.45); }
         .kpi-card[data-tone="caisse"]    { --accent: #64b5f6; --accent-glow: rgba(100, 181, 246, 0.4); }
         .kpi-card[data-tone="charges"]   { --accent: #e07a4f; --accent-glow: rgba(224, 122, 79, 0.4); }
+
+        .kpi-card.is-muted {
+            --accent: #8a94a0;
+            --accent-glow: transparent;
+            filter: grayscale(1);
+            opacity: 0.48;
+            cursor: default;
+            pointer-events: none;
+            box-shadow: inset 0 0 0 1px rgba(255,255,255,0.05);
+        }
+        .kpi-card.is-muted:hover {
+            transform: none;
+            box-shadow: inset 0 0 0 1px rgba(255,255,255,0.05);
+        }
+
+        .menu-group.is-muted {
+            opacity: 0.42;
+            filter: grayscale(1);
+            pointer-events: none;
+            cursor: default;
+        }
+        .menu-group.is-muted .menu-btn {
+            color: rgba(255, 255, 255, 0.45);
+        }
+        .menu-group.is-muted .menu-ico {
+            background: rgba(255, 255, 255, 0.04);
+            border-color: rgba(255, 255, 255, 0.06);
+            box-shadow: none;
+        }
 
         .kpi-head {
             display: flex;
@@ -676,7 +705,7 @@
             overflow: hidden;
             border: none;
             box-shadow: none;
-            background: #e8eee2;
+            background: #e4e9f0;
             position: relative;
         }
 
@@ -705,12 +734,12 @@
             border-radius: 22px;
             padding: clamp(1.5rem, 3vw, 2.25rem);
             background:
-                linear-gradient(125deg, rgba(28, 42, 24, 0.94) 0%, rgba(21, 32, 20, 0.9) 50%, rgba(36, 48, 22, 0.92) 100%);
+                linear-gradient(125deg, rgba(28, 42, 24, 0.94) 0%, rgba(13, 27, 42, 0.9) 50%, rgba(36, 48, 22, 0.92) 100%);
             color: #fff;
             box-shadow:
-                0 16px 40px rgba(16, 24, 14, 0.22),
-                0 0 0 1px rgba(139, 195, 74, 0.2),
-                0 0 48px rgba(139, 195, 74, 0.12);
+                0 16px 40px rgba(7, 17, 28, 0.22),
+                0 0 0 1px rgba(252, 163, 17, 0.2),
+                0 0 48px rgba(252, 163, 17, 0.12);
             min-height: 220px;
             display: flex;
             flex-direction: column;
@@ -725,7 +754,7 @@
             right: -40px;
             top: -80px;
             border-radius: 50%;
-            background: radial-gradient(circle, rgba(139, 195, 74, 0.28), transparent 68%);
+            background: radial-gradient(circle, rgba(252, 163, 17, 0.28), transparent 68%);
             pointer-events: none;
         }
 
@@ -737,7 +766,7 @@
             left: 35%;
             bottom: -90px;
             border-radius: 50%;
-            background: radial-gradient(circle, rgba(201, 162, 39, 0.18), transparent 70%);
+            background: radial-gradient(circle, rgba(252, 163, 17, 0.18), transparent 70%);
             pointer-events: none;
         }
 
@@ -784,8 +813,8 @@
             font-size: 0.9rem;
             cursor: pointer;
             color: var(--ink);
-            background: linear-gradient(135deg, #a8d85a, var(--green-bright) 50%, #6fad35);
-            box-shadow: 0 0 20px rgba(139, 195, 74, 0.4), 0 8px 18px rgba(0, 0, 0, 0.2);
+            background: linear-gradient(135deg, #ffb83a, var(--green-bright) 50%, #e8920a);
+            box-shadow: 0 0 20px rgba(252, 163, 17, 0.4), 0 8px 18px rgba(0, 0, 0, 0.2);
             text-decoration: none;
             transition: transform 0.2s, filter 0.2s;
         }
@@ -900,15 +929,14 @@
             <div class="brand">
                 <div class="brand-icon" aria-hidden="true">
                     <svg viewBox="0 0 24 24" fill="none">
-                        <path d="M3 5h2l1.2 9.2a2 2 0 0 0 2 1.8h8.5a2 2 0 0 0 2-1.6L20 8H7" stroke="#c9a227" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-                        <circle cx="10" cy="19" r="1.2" fill="#c9a227"/>
-                        <circle cx="17" cy="19" r="1.2" fill="#c9a227"/>
-                        <path d="M16 3c-1.2 0-2 .9-2.2 2.1C15.2 5.4 16.4 6 17.5 5.6 17.2 4 16.6 3 16 3Z" fill="#8bc34a"/>
-                        <path d="M18.2 4.2c-.7-.2-1.4.3-1.6 1.1.9.4 1.9.3 2.5-.2-.2-.5-.5-.8-.9-.9Z" fill="#6fad35"/>
+                        <path d="M4 5.2A2.2 2.2 0 0 1 6.2 3H12v18H6.2A2.2 2.2 0 0 1 4 18.8V5.2Z" stroke="#fca311" stroke-width="1.7" stroke-linejoin="round"/>
+                        <path d="M20 5.2A2.2 2.2 0 0 0 17.8 3H12v18h5.8A2.2 2.2 0 0 0 20 18.8V5.2Z" stroke="#fca311" stroke-width="1.7" stroke-linejoin="round"/>
+                        <path d="M12 3v18" stroke="#ffb83a" stroke-width="1.7"/>
+                        <path d="M7.2 8h2.8M7.2 11h2.8" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round"/>
                     </svg>
                 </div>
                 <div class="brand-text">
-                    <strong>7ssab<span class="gold">Hani</span></strong>
+                    <strong>LibAuto<span class="gold">Ent</span></strong>
                     <span>La Solution qui Gère</span>
                 </div>
                 <button type="button" class="sidebar-close" id="sidebarClose" aria-label="Fermer le menu">
@@ -924,8 +952,8 @@
                     <span class="menu-label">Tableau de Bord</span>
                 </a>
 
-                <div class="menu-group" data-menu="fournisseur">
-                    <button type="button" class="menu-btn" aria-expanded="false">
+                <div class="menu-group is-muted" data-menu="fournisseur" aria-disabled="true">
+                    <button type="button" class="menu-btn" aria-expanded="false" disabled tabindex="-1">
                         <span class="menu-ico">
                             <svg viewBox="0 0 24 24"><path d="M3 10.5 12 4l9 6.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1v-9.5Z" stroke-linejoin="round"/></svg>
                         </span>
@@ -933,9 +961,9 @@
                         <svg class="chevron" viewBox="0 0 24 24" fill="none"><path d="m6 9 6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
                     </button>
                     <div class="submenu">
-                        <a href="{{ route('bon-achat') }}">Bon Achat</a>
-                        <a href="{{ route('reglement-achat') }}">Règlement Achat</a>
-                        <a href="{{ route('balance-achat') }}">Balance Achat</a>
+                        <a href="{{ route('bon-achat') }}" tabindex="-1">Bon Achat</a>
+                        <a href="{{ route('reglement-achat') }}" tabindex="-1">Règlement Achat</a>
+                        <a href="{{ route('balance-achat') }}" tabindex="-1">Balance Achat</a>
                     </div>
                 </div>
 
@@ -1016,7 +1044,7 @@
                 <div class="avatar">AD</div>
                 <div class="user-meta">
                     <strong>Administrateur</strong>
-                    <span>admin@7ssabhani.com</span>
+                    <span>admin@libautoent.com</span>
                 </div>
                 <a href="{{ route('login') }}" class="logout-btn" title="Déconnexion" aria-label="Déconnexion">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M10 7V5a2 2 0 0 1 2-2h7v18h-7a2 2 0 0 1-2-2v-2"/><path d="M15 12H3m0 0 3-3m-3 3 3 3" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -1032,14 +1060,14 @@
                     </button>
                     <div class="topbar-left">
                         <h1>Tableau de bord</h1>
-                        <p class="welcome-line">Bienvenue sur <span>7ssabHani</span></p>
+                        <p class="welcome-line">Bienvenue sur <span>LibAutoEnt</span></p>
                     </div>
                 </div>
                 <div class="topbar-badge"><i></i> Session active</div>
             </header>
 
             <nav class="kpi-grid notranslate" aria-label="Indicateurs rapides" translate="no">
-                <button type="button" class="kpi-card" data-tone="suppliers">
+                <button type="button" class="kpi-card is-muted" data-tone="suppliers" disabled aria-disabled="true" title="Indisponible">
                     <div class="kpi-head">
                         <span class="kpi-ico">
                             <svg viewBox="0 0 24 24"><path d="M3 10.5 12 4l9 6.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1v-9.5Z" stroke-linejoin="round"/></svg>
@@ -1091,7 +1119,7 @@
             </nav>
 
             <figure class="dash-hero">
-                <img src="{{ asset('images/dashboard-hero.png') }}" alt="Rayon fruits et légumes — 7ssabHani" width="1600" height="900">
+                <img src="{{ asset('images/dashboard-hero.png') }}" alt="Rayon fruits et légumes — LibAutoEnt" width="1600" height="900">
             </figure>
 
             <section class="content">
@@ -1099,7 +1127,7 @@
         </div>
     </div>
 
-    <script src="{{ asset('js/sidebar-menu.js') }}?v=1"></script>
+    <script src="{{ asset('js/sidebar-menu.js') }}?v=2"></script>
     <script src="{{ asset('js/achat-store.js') }}?v=7"></script>
     <script src="{{ asset('js/vente-store.js') }}?v=7"></script>
     <script>

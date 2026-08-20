@@ -5,15 +5,14 @@
     <div class="brand">
         <div class="brand-icon" aria-hidden="true">
             <svg viewBox="0 0 24 24" fill="none">
-                <path d="M3 5h2l1.2 9.2a2 2 0 0 0 2 1.8h8.5a2 2 0 0 0 2-1.6L20 8H7" stroke="#c9a227" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-                <circle cx="10" cy="19" r="1.2" fill="#c9a227"/>
-                <circle cx="17" cy="19" r="1.2" fill="#c9a227"/>
-                <path d="M16 3c-1.2 0-2 .9-2.2 2.1C15.2 5.4 16.4 6 17.5 5.6 17.2 4 16.6 3 16 3Z" fill="#8bc34a"/>
-                <path d="M18.2 4.2c-.7-.2-1.4.3-1.6 1.1.9.4 1.9.3 2.5-.2-.2-.5-.5-.8-.9-.9Z" fill="#6fad35"/>
+                <path d="M4 5.2A2.2 2.2 0 0 1 6.2 3H12v18H6.2A2.2 2.2 0 0 1 4 18.8V5.2Z" stroke="#fca311" stroke-width="1.7" stroke-linejoin="round"/>
+                <path d="M20 5.2A2.2 2.2 0 0 0 17.8 3H12v18h5.8A2.2 2.2 0 0 0 20 18.8V5.2Z" stroke="#fca311" stroke-width="1.7" stroke-linejoin="round"/>
+                <path d="M12 3v18" stroke="#ffb83a" stroke-width="1.7"/>
+                <path d="M7.2 8h2.8M7.2 11h2.8" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round"/>
             </svg>
         </div>
         <div class="brand-text">
-            <strong>7ssab<span class="gold">Hani</span></strong>
+            <strong>LibAuto<span class="gold">Ent</span></strong>
             <span>La Solution qui Gère</span>
         </div>
         <button type="button" class="sidebar-close" id="sidebarClose" aria-label="Fermer le menu">
@@ -29,8 +28,8 @@
             <span class="menu-label">Tableau de Bord</span>
         </a>
 
-        <div class="menu-group" data-menu="fournisseur">
-            <button type="button" class="menu-btn" aria-expanded="false">
+        <div class="menu-group is-muted" data-menu="fournisseur" aria-disabled="true">
+            <button type="button" class="menu-btn" aria-expanded="false" disabled tabindex="-1">
                 <span class="menu-ico">
                     <svg viewBox="0 0 24 24"><path d="M3 10.5 12 4l9 6.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1v-9.5Z" stroke-linejoin="round"/></svg>
                 </span>
@@ -38,9 +37,9 @@
                 <svg class="chevron" viewBox="0 0 24 24" fill="none"><path d="m6 9 6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
             </button>
             <div class="submenu">
-                <a href="{{ route('bon-achat') }}" class="{{ $activePage === 'bon-achat' ? 'is-active' : '' }}">Bon Achat</a>
-                <a href="{{ route('reglement-achat') }}" class="{{ $activePage === 'reglement-achat' ? 'is-active' : '' }}">Règlement Achat</a>
-                <a href="{{ route('balance-achat') }}" class="{{ $activePage === 'balance-achat' ? 'is-active' : '' }}">Balance Achat</a>
+                <a href="{{ route('bon-achat') }}" tabindex="-1">Bon Achat</a>
+                <a href="{{ route('reglement-achat') }}" tabindex="-1">Règlement Achat</a>
+                <a href="{{ route('balance-achat') }}" tabindex="-1">Balance Achat</a>
             </div>
         </div>
 
@@ -121,11 +120,11 @@
         <div class="avatar">AD</div>
         <div class="user-meta">
             <strong>Administrateur</strong>
-            <span>admin@7ssabhani.com</span>
+            <span>admin@libautoent.com</span>
         </div>
         <a href="{{ route('login') }}" class="logout-btn" title="Déconnexion" aria-label="Déconnexion">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M10 7V5a2 2 0 0 1 2-2h7v18h-7a2 2 0 0 1-2-2v-2"/><path d="M15 12H3m0 0 3-3m-3 3 3 3" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </a>
     </div>
 </aside>
-<script src="{{ asset('js/sidebar-menu.js') }}?v=1"></script>
+<script src="{{ asset('js/sidebar-menu.js') }}?v=2"></script>

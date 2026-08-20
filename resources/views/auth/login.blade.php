@@ -4,23 +4,25 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="google" content="notranslate">
-    <title>Connexion — 7ssabHani</title>
+    <title>Connexion — LibAutoEnt</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet">
     <style>
         :root {
-            --green: #5a9e2f;
-            --green-bright: #8bc34a;
-            --green-glow: rgba(139, 195, 74, 0.55);
-            --gold: #c9a227;
-            --gold-soft: rgba(201, 162, 39, 0.45);
-            --ink: #1a1f16;
-            --muted: rgba(255, 255, 255, 0.72);
-            --glass: rgba(18, 28, 14, 0.52);
-            --glass-border: rgba(255, 255, 255, 0.18);
-            --field: rgba(255, 255, 255, 0.08);
-            --field-focus: rgba(139, 195, 74, 0.18);
+            --navy: #0d1b2a;
+            --navy-deep: #07111c;
+            --navy-soft: #14213d;
+            --gold: #fca311;
+            --gold-bright: #ffb83a;
+            --gold-deep: #e8920a;
+            --gold-soft: rgba(252, 163, 17, 0.35);
+            --ink: #0d1b2a;
+            --muted: rgba(13, 27, 42, 0.62);
+            --panel: #ffffff;
+            --panel-border: rgba(13, 27, 42, 0.08);
+            --field: #f4f6f9;
+            --field-focus: #fffaf0;
         }
 
         * {
@@ -35,10 +37,10 @@
 
         body {
             font-family: 'DM Sans', sans-serif;
-            color: #fff;
+            color: var(--ink);
             min-height: 100vh;
             overflow-x: hidden;
-            background: #0d120a;
+            background: var(--navy-deep);
         }
 
         .login-page {
@@ -58,8 +60,7 @@
             z-index: -2;
             background:
                 url('{{ asset('images/login-bg.png') }}') center center / cover no-repeat;
-            transform: scale(1.02);
-            animation: bg-breathe 18s ease-in-out infinite alternate;
+            animation: bg-breathe 20s ease-in-out infinite alternate;
         }
 
         .login-page::after {
@@ -70,42 +71,55 @@
             background:
                 linear-gradient(
                     105deg,
-                    rgba(8, 14, 6, 0.15) 0%,
-                    rgba(8, 14, 6, 0.28) 42%,
-                    rgba(6, 12, 5, 0.55) 70%,
-                    rgba(5, 10, 4, 0.68) 100%
-                ),
-                radial-gradient(
-                    ellipse 80% 60% at 75% 50%,
-                    rgba(0, 0, 0, 0.25) 0%,
-                    transparent 70%
+                    rgba(7, 17, 28, 0.12) 0%,
+                    rgba(7, 17, 28, 0.05) 48%,
+                    rgba(255, 255, 255, 0.08) 72%,
+                    transparent 100%
                 );
             pointer-events: none;
         }
 
         @keyframes bg-breathe {
-            from { transform: scale(1.02); }
-            to { transform: scale(1.06); }
+            from { transform: scale(1); }
+            to { transform: scale(1.03); }
         }
 
         .login-panel {
-            width: min(100%, 420px);
-            margin-right: clamp(0rem, 6vw, 5rem);
-            padding: clamp(1.75rem, 3.5vw, 2.5rem);
-            border-radius: 22px;
-            background: var(--glass);
-            backdrop-filter: blur(22px) saturate(1.25);
-            -webkit-backdrop-filter: blur(22px) saturate(1.25);
-            border: 1px solid var(--glass-border);
+            width: min(100%, 400px);
+            margin-right: clamp(0.5rem, 5vw, 4.5rem);
+            padding: clamp(1.75rem, 3.5vw, 2.4rem);
+            border-radius: 28px 28px 36px 28px;
+            background: var(--panel);
+            border: 1px solid var(--panel-border);
             box-shadow:
-                0 0 0 1px rgba(139, 195, 74, 0.12),
-                0 0 28px var(--green-glow),
-                0 0 64px rgba(139, 195, 74, 0.22),
-                0 0 100px var(--gold-soft),
-                0 24px 48px rgba(0, 0, 0, 0.45),
-                inset 0 1px 0 rgba(255, 255, 255, 0.12);
+                0 0 0 1px rgba(252, 163, 17, 0.12),
+                0 18px 40px rgba(7, 17, 28, 0.28),
+                0 0 48px var(--gold-soft);
             animation: panel-in 0.7s cubic-bezier(0.22, 1, 0.36, 1) both,
-                       glow-pulse 4.5s ease-in-out infinite;
+                       glow-pulse 5s ease-in-out infinite;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .login-panel::before {
+            content: '';
+            position: absolute;
+            left: 1.25rem;
+            right: 1.25rem;
+            top: 0;
+            height: 3px;
+            border-radius: 0 0 4px 4px;
+            background: linear-gradient(90deg, var(--navy) 0%, var(--gold) 55%, var(--gold-bright) 100%);
+        }
+
+        .login-panel::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            height: 6px;
+            background: linear-gradient(90deg, var(--navy-soft), var(--navy));
         }
 
         @keyframes panel-in {
@@ -122,21 +136,15 @@
         @keyframes glow-pulse {
             0%, 100% {
                 box-shadow:
-                    0 0 0 1px rgba(139, 195, 74, 0.12),
-                    0 0 28px var(--green-glow),
-                    0 0 64px rgba(139, 195, 74, 0.22),
-                    0 0 100px var(--gold-soft),
-                    0 24px 48px rgba(0, 0, 0, 0.45),
-                    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+                    0 0 0 1px rgba(252, 163, 17, 0.12),
+                    0 18px 40px rgba(7, 17, 28, 0.28),
+                    0 0 40px rgba(252, 163, 17, 0.22);
             }
             50% {
                 box-shadow:
-                    0 0 0 1px rgba(139, 195, 74, 0.22),
-                    0 0 36px rgba(139, 195, 74, 0.7),
-                    0 0 80px rgba(139, 195, 74, 0.32),
-                    0 0 120px rgba(201, 162, 39, 0.35),
-                    0 24px 48px rgba(0, 0, 0, 0.45),
-                    inset 0 1px 0 rgba(255, 255, 255, 0.16);
+                    0 0 0 1px rgba(252, 163, 17, 0.28),
+                    0 20px 48px rgba(7, 17, 28, 0.32),
+                    0 0 64px rgba(252, 163, 17, 0.38);
             }
         }
 
@@ -150,6 +158,7 @@
             font-weight: 700;
             letter-spacing: -0.02em;
             line-height: 1.15;
+            color: var(--navy);
         }
 
         .panel-header h1 span {
@@ -174,7 +183,7 @@
             font-weight: 600;
             letter-spacing: 0.04em;
             text-transform: uppercase;
-            color: rgba(255, 255, 255, 0.78);
+            color: rgba(13, 27, 42, 0.72);
         }
 
         .field input,
@@ -182,9 +191,9 @@
             width: 100%;
             appearance: none;
             -webkit-appearance: none;
-            border: 1px solid rgba(255, 255, 255, 0.16);
+            border: 1px solid rgba(13, 27, 42, 0.14);
             background: var(--field);
-            color: #fff;
+            color: var(--navy);
             border-radius: 12px;
             padding: 0.85rem 1rem;
             font-family: inherit;
@@ -195,8 +204,8 @@
 
         .field select {
             background-image:
-                linear-gradient(45deg, transparent 50%, rgba(255,255,255,0.7) 50%),
-                linear-gradient(135deg, rgba(255,255,255,0.7) 50%, transparent 50%);
+                linear-gradient(45deg, transparent 50%, var(--navy) 50%),
+                linear-gradient(135deg, var(--navy) 50%, transparent 50%);
             background-position:
                 calc(100% - 18px) calc(50% - 3px),
                 calc(100% - 12px) calc(50% - 3px);
@@ -207,19 +216,19 @@
         }
 
         .field select option {
-            color: #1a1f16;
-            background: #f5f7f2;
+            color: var(--navy);
+            background: #fff;
         }
 
         .field input::placeholder {
-            color: rgba(255, 255, 255, 0.38);
+            color: rgba(13, 27, 42, 0.35);
         }
 
         .field input:focus,
         .field select:focus {
-            border-color: rgba(139, 195, 74, 0.65);
+            border-color: var(--gold);
             background: var(--field-focus);
-            box-shadow: 0 0 0 3px rgba(139, 195, 74, 0.18), 0 0 18px rgba(139, 195, 74, 0.2);
+            box-shadow: 0 0 0 3px rgba(252, 163, 17, 0.22), 0 0 16px rgba(252, 163, 17, 0.18);
         }
 
         .password-wrap {
@@ -243,15 +252,15 @@
             border: none;
             border-radius: 8px;
             background: transparent;
-            color: rgba(255, 255, 255, 0.7);
+            color: rgba(13, 27, 42, 0.55);
             cursor: pointer;
             display: grid;
             place-items: center;
             padding: 0;
         }
         .toggle-password:hover {
-            color: #fff;
-            background: rgba(255, 255, 255, 0.08);
+            color: var(--navy);
+            background: rgba(13, 27, 42, 0.06);
         }
         .toggle-password svg {
             width: 18px;
@@ -274,12 +283,12 @@
             font-size: 1rem;
             font-weight: 600;
             letter-spacing: 0.02em;
-            color: #102008;
+            color: var(--navy-deep);
             cursor: pointer;
-            background: linear-gradient(135deg, #a8d85a 0%, var(--green-bright) 45%, #6fad35 100%);
+            background: linear-gradient(135deg, var(--gold-bright) 0%, var(--gold) 48%, var(--gold-deep) 100%);
             box-shadow:
-                0 0 20px rgba(139, 195, 74, 0.45),
-                0 8px 20px rgba(0, 0, 0, 0.25);
+                0 0 20px rgba(252, 163, 17, 0.4),
+                0 8px 20px rgba(7, 17, 28, 0.18);
             transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
         }
 
@@ -287,8 +296,8 @@
             transform: translateY(-1px);
             filter: brightness(1.05);
             box-shadow:
-                0 0 28px rgba(139, 195, 74, 0.6),
-                0 10px 24px rgba(0, 0, 0, 0.3);
+                0 0 28px rgba(252, 163, 17, 0.55),
+                0 10px 24px rgba(7, 17, 28, 0.22);
         }
 
         .submit-btn:active {
@@ -297,9 +306,10 @@
 
         .panel-footer {
             margin-top: 1.35rem;
+            margin-bottom: 0.35rem;
             text-align: center;
             font-size: 0.82rem;
-            color: rgba(255, 255, 255, 0.45);
+            color: rgba(13, 27, 42, 0.45);
         }
 
         .brand-mark {
@@ -309,35 +319,20 @@
         @media (max-width: 768px) {
             .login-page {
                 flex-direction: column;
-                justify-content: flex-start;
+                justify-content: flex-end;
                 align-items: center;
                 min-height: 100dvh;
                 min-height: 100svh;
                 padding: max(0.65rem, env(safe-area-inset-top)) 1.15rem max(1.35rem, env(safe-area-inset-bottom));
-                gap: clamp(1.75rem, 7vh, 3.25rem);
+                gap: 0;
             }
 
             .brand-mark {
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                flex: 0 0 auto;
-                width: min(100%, 300px);
-                margin-top: 0.35rem;
-                z-index: 1;
-            }
-
-            .brand-mark img {
-                width: 100%;
-                height: auto;
-                display: block;
-                object-fit: contain;
-                filter: drop-shadow(0 8px 24px rgba(0, 0, 0, 0.45));
+                display: none;
             }
 
             .login-page::before {
-                /* Magasin visible derrière, logo géré par .brand-mark */
-                background-position: 72% center;
+                background-position: left center;
                 background-size: cover;
                 transform: none;
                 animation: none;
@@ -346,9 +341,9 @@
             .login-page::after {
                 background: linear-gradient(
                     180deg,
-                    rgba(8, 14, 6, 0.35) 0%,
-                    rgba(6, 12, 5, 0.4) 40%,
-                    rgba(5, 10, 4, 0.55) 100%
+                    rgba(7, 17, 28, 0.15) 0%,
+                    rgba(7, 17, 28, 0.35) 45%,
+                    rgba(7, 17, 28, 0.72) 100%
                 );
             }
 
@@ -356,8 +351,8 @@
                 flex-shrink: 0;
                 margin-right: 0;
                 width: min(100%, 380px);
-                padding: 1.25rem 1.2rem 1.4rem;
-                background: rgba(18, 28, 14, 0.58);
+                padding: 1.35rem 1.25rem 1.5rem;
+                background: rgba(255, 255, 255, 0.96);
             }
 
             .panel-header {
@@ -369,7 +364,7 @@
             }
 
             .panel-header h1 span {
-                display: none;
+                display: inline;
             }
 
             .panel-header p {
@@ -401,12 +396,12 @@
 <body class="notranslate" translate="no">
     <main class="login-page">
         <div class="brand-mark">
-            <img src="{{ asset('images/brand-logo.png') }}" alt="7ssabHani — La Solution qui Gère" width="520" height="420">
+            <img src="{{ asset('images/brand-logo.png') }}" alt="LibAutoEnt — La Solution qui Gère" width="520" height="420">
         </div>
         <form class="login-panel" method="POST" action="{{ url('/login') }}" autocomplete="off">
             @csrf
             <header class="panel-header">
-                <h1>Connexion <span>7ssabHani</span></h1>
+                <h1>Connexion <span>LibAutoEnt</span></h1>
                 <p>Accédez à votre espace de gestion</p>
             </header>
 
@@ -427,7 +422,7 @@
                     type="text"
                     id="login"
                     name="login"
-                    value=""
+                    value="bilal@autolib.com"
                     required
                     autocomplete="off"
                 >
@@ -440,7 +435,7 @@
                         type="password"
                         id="password"
                         name="password"
-                        value=""
+                        value="0661755048"
                         required
                         autocomplete="new-password"
                     >
@@ -453,7 +448,7 @@
 
             <button type="submit" class="submit-btn">Se connecter</button>
 
-            <p class="panel-footer">La solution qui gère votre commerce</p>
+            <p class="panel-footer">Gestion du stock et des ventes</p>
         </form>
     </main>
     <script>

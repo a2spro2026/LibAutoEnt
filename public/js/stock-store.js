@@ -4,10 +4,10 @@
 (function (window) {
     'use strict';
 
-    var KEY_META = '7ssabhani_stock_meta';
-    var KEY_CAT = '7ssabhani_stock_categories';
-    var KEY_BONS_ACHAT = '7ssabhani_bons_achat';
-    var KEY_BONS_VENTE = '7ssabhani_bons_vente';
+    var KEY_META = 'libautoent_stock_meta';
+    var KEY_CAT = 'libautoent_stock_categories';
+    var KEY_BONS_ACHAT = 'libautoent_bons_achat';
+    var KEY_BONS_VENTE = 'libautoent_bons_vente';
     var FAIBLE_SEUIL = 5;
 
     function read(key) {

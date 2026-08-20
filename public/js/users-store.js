@@ -4,8 +4,8 @@
 (function (window) {
     'use strict';
 
-    var KEY = '7ssabhani_utilisateurs';
-    var LOGIN_SUFFIX = '@7ssabHani.com';
+    var KEY = 'libautoent_utilisateurs';
+    var LOGIN_SUFFIX = '@LibAutoEnt.com';
 
     function read() {
         try {

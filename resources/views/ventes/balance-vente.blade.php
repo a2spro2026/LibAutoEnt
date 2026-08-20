@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="google" content="notranslate">
-    <title>Balance Vente — 7ssabHani</title>
+    <title>Balance Vente — LibAutoEnt</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet">
@@ -16,7 +16,7 @@
             color: rgba(255, 255, 255, 0.82);
         }
         .menu-link--quiet:hover {
-            background: rgba(139, 195, 74, 0.12);
+            background: rgba(252, 163, 17, 0.12);
             color: #fff;
             transform: none;
         }
@@ -27,7 +27,7 @@
         }
         .submenu a.is-active {
             color: #fff;
-            background: rgba(139, 195, 74, 0.16);
+            background: rgba(252, 163, 17, 0.16);
         }
         .submenu a.is-active::before { background: var(--green-bright); }
 
@@ -49,7 +49,7 @@
             padding: 1.15rem 1.25rem 1.2rem;
             border-radius: 18px;
             background: var(--white);
-            border: 1px solid rgba(139, 195, 74, 0.16);
+            border: 1px solid rgba(252, 163, 17, 0.16);
             box-shadow: var(--shadow-card);
             overflow: hidden;
             transition: transform 0.18s ease, box-shadow 0.18s ease;
@@ -63,9 +63,9 @@
         }
         .ana-card:hover {
             transform: translateY(-2px);
-            box-shadow: 0 14px 28px rgba(16, 24, 14, 0.12);
+            box-shadow: 0 14px 28px rgba(7, 17, 28, 0.12);
         }
-        .ana-card[data-tone="achats"] { --tone: #8bc34a; }
+        .ana-card[data-tone="achats"] { --tone: #fca311; }
         .ana-card[data-tone="paye"] { --tone: #3d7ea6; }
         .ana-card[data-tone="solde"] { --tone: #c62828; }
 
@@ -132,7 +132,7 @@
             background: var(--white);
             border-radius: 18px;
             box-shadow: var(--shadow-card);
-            border: 1px solid rgba(139, 195, 74, 0.14);
+            border: 1px solid rgba(252, 163, 17, 0.14);
             overflow: hidden;
         }
 
@@ -147,13 +147,13 @@
         .data-table td {
             padding: 0.8rem 0.75rem;
             font-size: 0.88rem;
-            border-bottom: 1px solid rgba(21, 32, 20, 0.06);
+            border-bottom: 1px solid rgba(13, 27, 42, 0.06);
             color: var(--ink);
             vertical-align: middle;
             text-align: center;
         }
 
-        .data-table tbody tr:hover { background: rgba(139, 195, 74, 0.06); }
+        .data-table tbody tr:hover { background: rgba(252, 163, 17, 0.06); }
 
         .data-table .empty {
             text-align: center;
@@ -174,7 +174,7 @@
             width: 32px;
             height: 32px;
             border-radius: 9px;
-            border: 1px solid rgba(21, 32, 20, 0.1);
+            border: 1px solid rgba(13, 27, 42, 0.1);
             background: #f4f7f0;
             color: var(--ink-soft);
             display: inline-grid;
@@ -221,7 +221,7 @@
             margin: 1.5rem auto;
             background: var(--white);
             border-radius: 20px;
-            box-shadow: 0 24px 60px rgba(16, 24, 14, 0.35), 0 0 0 1px rgba(139, 195, 74, 0.2);
+            box-shadow: 0 24px 60px rgba(7, 17, 28, 0.35), 0 0 0 1px rgba(252, 163, 17, 0.2);
             overflow: hidden;
         }
         .modal-head {
@@ -230,7 +230,7 @@
             justify-content: space-between;
             gap: 1rem;
             padding: 1.1rem 1.35rem;
-            background: linear-gradient(125deg, #1c2a18, #152014 60%, #243016);
+            background: linear-gradient(125deg, #14213d, #0d1b2a 60%, #243016);
             color: #fff;
         }
         .modal-head h2 {
@@ -494,9 +494,9 @@
             }
             w.document.write(
                 '<!DOCTYPE html><html lang="fr"><head><meta charset="utf-8"><title>Balance — ' + currentClient + '</title>' +
-                '<style>body{font-family:Arial,sans-serif;padding:24px;color:#152014}h1{font-size:18px;margin:0 0 16px}' +
+                '<style>body{font-family:Arial,sans-serif;padding:24px;color:#0d1b2a}h1{font-size:18px;margin:0 0 16px}' +
                 'table{width:100%;border-collapse:collapse}th,td{border:1px solid #ccc;padding:8px;text-align:center;font-size:13px}' +
-                'th{background:#1c2a18;color:#fff}.solde{color:#c62828;font-weight:700}</style></head><body>' +
+                'th{background:#14213d;color:#fff}.solde{color:#c62828;font-weight:700}</style></head><body>' +
                 '<h1>Détail Balance Vente — ' + currentClient + '</h1>' +
                 '<table><thead><tr><th>Client</th><th>Bon N°</th><th>Montant Bon</th><th>Montant Payé</th><th>Solde</th></tr></thead>' +
                 '<tbody>' + rows + '</tbody></table>' +

@@ -5,7 +5,7 @@
 (function (window, document) {
     'use strict';
 
-    var STORAGE_KEY = '7ssabhani_sidebar_open';
+    var STORAGE_KEY = 'libautoent_sidebar_open';
 
     function readOpen() {
         try {
@@ -41,6 +41,14 @@
         var map = readOpen();
         document.querySelectorAll('.menu-group[data-menu]').forEach(function (group) {
             var key = menuKey(group);
+            if (group.classList.contains('is-muted')) {
+                setOpen(group, false);
+                if (key && map[key]) {
+                    delete map[key];
+                    writeOpen(map);
+                }
+                return;
+            }
             setOpen(group, !!(key && map[key]));
         });
     }
@@ -52,7 +60,7 @@
             btn.addEventListener('click', function (e) {
                 e.preventDefault();
                 var group = btn.closest('.menu-group');
-                if (!group) return;
+                if (!group || group.classList.contains('is-muted') || btn.disabled) return;
                 var key = menuKey(group);
                 var willOpen = !group.classList.contains('open');
                 setOpen(group, willOpen);

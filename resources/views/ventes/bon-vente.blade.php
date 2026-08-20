@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="google" content="notranslate">
-    <title>Bon Vente — 7ssabHani</title>
+    <title>Bon Vente — LibAutoEnt</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet">
@@ -16,7 +16,7 @@
             color: rgba(255, 255, 255, 0.82);
         }
         .menu-link--quiet:hover {
-            background: rgba(139, 195, 74, 0.12);
+            background: rgba(252, 163, 17, 0.12);
             color: #fff;
             transform: none;
         }
@@ -27,7 +27,7 @@
         }
         .submenu a.is-active {
             color: #fff;
-            background: rgba(139, 195, 74, 0.16);
+            background: rgba(252, 163, 17, 0.16);
         }
         .submenu a.is-active::before { background: var(--green-bright); }
 
@@ -74,8 +74,8 @@
 
         .btn-add {
             color: var(--ink);
-            background: linear-gradient(135deg, #a8d85a, var(--green-bright) 50%, #6fad35);
-            box-shadow: 0 0 18px rgba(139, 195, 74, 0.35), 0 6px 14px rgba(0,0,0,0.12);
+            background: linear-gradient(135deg, #ffb83a, var(--green-bright) 50%, #e8920a);
+            box-shadow: 0 0 18px rgba(252, 163, 17, 0.35), 0 6px 14px rgba(0,0,0,0.12);
         }
         .btn-close {
             color: #fff;
@@ -84,25 +84,25 @@
         }
         .btn-validate {
             color: var(--ink);
-            background: linear-gradient(135deg, #a8d85a, var(--green-bright));
-            box-shadow: 0 0 16px rgba(139, 195, 74, 0.35);
+            background: linear-gradient(135deg, #ffb83a, var(--green-bright));
+            box-shadow: 0 0 16px rgba(252, 163, 17, 0.35);
         }
         .btn-pay {
             color: #1a1408;
-            background: linear-gradient(135deg, #e2c45a, var(--gold));
-            box-shadow: 0 0 16px rgba(201, 162, 39, 0.35);
+            background: linear-gradient(135deg, #ffb83a, var(--gold));
+            box-shadow: 0 0 16px rgba(252, 163, 17, 0.35);
         }
         .btn-ghost-dark {
             color: var(--ink-soft);
             background: var(--white);
-            border: 1px solid rgba(21, 32, 20, 0.12);
+            border: 1px solid rgba(13, 27, 42, 0.12);
         }
 
         .table-card {
             background: var(--white);
             border-radius: 18px;
             box-shadow: var(--shadow-card);
-            border: 1px solid rgba(139, 195, 74, 0.14);
+            border: 1px solid rgba(252, 163, 17, 0.14);
             overflow: hidden;
         }
 
@@ -123,22 +123,22 @@
             letter-spacing: 0.08em;
             text-transform: uppercase;
             color: #f4f9ee;
-            background: linear-gradient(145deg, #1c2a18 0%, #2e5c18 48%, #3f7a22 100%);
+            background: linear-gradient(145deg, #14213d 0%, #07111c 48%, #3f7a22 100%);
             border-bottom: none;
             white-space: nowrap;
-            box-shadow: inset 0 -1px 0 rgba(201, 162, 39, 0.35);
+            box-shadow: inset 0 -1px 0 rgba(252, 163, 17, 0.35);
         }
 
         .data-table th + th {
             box-shadow:
                 inset 1px 0 0 rgba(255, 255, 255, 0.08),
-                inset 0 -1px 0 rgba(201, 162, 39, 0.35);
+                inset 0 -1px 0 rgba(252, 163, 17, 0.35);
         }
 
         .data-table td {
             padding: 0.85rem 1rem;
             font-size: 0.9rem;
-            border-bottom: 1px solid rgba(21, 32, 20, 0.06);
+            border-bottom: 1px solid rgba(13, 27, 42, 0.06);
             color: var(--ink);
             vertical-align: middle;
             text-align: center;
@@ -150,7 +150,7 @@
             font-weight: 700;
         }
 
-        .data-table tbody tr:hover { background: rgba(139, 195, 74, 0.06); }
+        .data-table tbody tr:hover { background: rgba(252, 163, 17, 0.06); }
 
         .data-table .empty {
             text-align: center;
@@ -168,7 +168,7 @@
             width: 34px;
             height: 34px;
             border-radius: 9px;
-            border: 1px solid rgba(21, 32, 20, 0.1);
+            border: 1px solid rgba(13, 27, 42, 0.1);
             background: #f4f7f0;
             color: var(--ink-soft);
             display: inline-grid;
@@ -185,7 +185,7 @@
         }
         .icon-btn:hover { box-shadow: 0 4px 12px rgba(21,32,20,0.1); }
         .icon-btn.view:hover { background: rgba(61, 126, 166, 0.12); color: #3d7ea6; }
-        .icon-btn.edit:hover { background: rgba(201, 162, 39, 0.15); color: #a8861a; }
+        .icon-btn.edit:hover { background: rgba(252, 163, 17, 0.15); color: #a8861a; }
         .icon-btn.delete:hover { background: rgba(184, 92, 56, 0.12); color: #b85c38; }
 
         /* Modal */
@@ -213,9 +213,9 @@
             background: var(--white);
             border-radius: 20px;
             box-shadow:
-                0 24px 60px rgba(16, 24, 14, 0.35),
-                0 0 0 1px rgba(139, 195, 74, 0.2),
-                0 0 40px rgba(139, 195, 74, 0.12);
+                0 24px 60px rgba(7, 17, 28, 0.35),
+                0 0 0 1px rgba(252, 163, 17, 0.2),
+                0 0 40px rgba(252, 163, 17, 0.12);
             overflow: hidden;
             animation: modal-in 0.28s ease;
         }
@@ -231,7 +231,7 @@
             justify-content: space-between;
             gap: 1rem;
             padding: 1.1rem 1.35rem;
-            background: linear-gradient(125deg, #1c2a18, #152014 60%, #243016);
+            background: linear-gradient(125deg, #14213d, #0d1b2a 60%, #243016);
             color: #fff;
         }
         .modal-head h2 {
@@ -265,7 +265,7 @@
             width: 100%;
             padding: 0.7rem 0.85rem;
             border-radius: 10px;
-            border: 1px solid rgba(21, 32, 20, 0.12);
+            border: 1px solid rgba(13, 27, 42, 0.12);
             background: #f7faf3;
             font-family: inherit;
             font-size: 0.92rem;
@@ -276,20 +276,20 @@
 
         .field input:focus,
         .field select:focus {
-            border-color: rgba(139, 195, 74, 0.65);
-            box-shadow: 0 0 0 3px rgba(139, 195, 74, 0.15);
+            border-color: rgba(252, 163, 17, 0.65);
+            box-shadow: 0 0 0 3px rgba(252, 163, 17, 0.15);
             background: #fff;
         }
 
         .field input.readonly {
-            background: #eef3e8;
+            background: #eef2f7;
             font-weight: 600;
             color: var(--ink);
             cursor: default;
         }
 
         .lines-wrap {
-            border: 1px solid rgba(21, 32, 20, 0.08);
+            border: 1px solid rgba(13, 27, 42, 0.08);
             border-radius: 14px;
             overflow: hidden;
             margin-bottom: 1rem;
@@ -307,14 +307,14 @@
             text-transform: uppercase;
             letter-spacing: 0.03em;
             color: var(--muted);
-            background: #eef3e8;
+            background: #eef2f7;
             text-align: center;
             white-space: nowrap;
         }
 
         .lines-table td {
             padding: 0.45rem 0.5rem;
-            border-top: 1px solid rgba(21, 32, 20, 0.06);
+            border-top: 1px solid rgba(13, 27, 42, 0.06);
             vertical-align: middle;
             text-align: center;
         }
@@ -324,7 +324,7 @@
             width: 100%;
             padding: 0.55rem 0.6rem;
             border-radius: 8px;
-            border: 1px solid rgba(21, 32, 20, 0.1);
+            border: 1px solid rgba(13, 27, 42, 0.1);
             background: #fff;
             font-family: inherit;
             font-size: 0.85rem;
@@ -334,12 +334,12 @@
 
         .lines-table input:focus,
         .lines-table select:focus {
-            border-color: rgba(139, 195, 74, 0.65);
+            border-color: rgba(252, 163, 17, 0.65);
         }
 
         .lines-table .subtotal,
         .lines-table .readonly {
-            background: #f3f6ef;
+            background: #f0f3f7;
             font-weight: 600;
         }
 
@@ -349,9 +349,9 @@
             border-radius: 10px;
             border: none;
             cursor: pointer;
-            color: #102008 !important;
-            background: linear-gradient(135deg, #b6e85f 0%, #8bc34a 45%, #6fad35 100%) !important;
-            box-shadow: 0 0 14px rgba(139, 195, 74, 0.45), 0 4px 10px rgba(0, 0, 0, 0.12);
+            color: #0d1b2a !important;
+            background: linear-gradient(135deg, #ffc857 0%, #fca311 45%, #e8920a 100%) !important;
+            box-shadow: 0 0 14px rgba(252, 163, 17, 0.45), 0 4px 10px rgba(0, 0, 0, 0.12);
             display: grid;
             place-items: center;
             font-size: 1.35rem;
@@ -369,15 +369,15 @@
         .btn-plus:active {
             opacity: 1 !important;
             filter: brightness(1.06) !important;
-            color: #102008 !important;
+            color: #0d1b2a !important;
             background: linear-gradient(135deg, #c5f06e 0%, #98d655 45%, #7aba3c 100%) !important;
         }
 
         .btn-plus:disabled {
             opacity: 1 !important;
             cursor: pointer;
-            color: #102008 !important;
-            background: linear-gradient(135deg, #b6e85f 0%, #8bc34a 45%, #6fad35 100%) !important;
+            color: #0d1b2a !important;
+            background: linear-gradient(135deg, #ffc857 0%, #fca311 45%, #e8920a 100%) !important;
         }
 
         .add-line-bar {
@@ -385,7 +385,7 @@
             justify-content: flex-end;
             padding: 0.65rem 0.75rem;
             background: #f7faf3;
-            border-top: 1px solid rgba(21, 32, 20, 0.06);
+            border-top: 1px solid rgba(13, 27, 42, 0.06);
         }
 
         .btn-add-line {
@@ -399,9 +399,9 @@
             font-family: 'Outfit', sans-serif;
             font-weight: 700;
             font-size: 0.88rem;
-            color: #102008;
-            background: linear-gradient(135deg, #b6e85f, #8bc34a);
-            box-shadow: 0 0 14px rgba(139, 195, 74, 0.4);
+            color: #0d1b2a;
+            background: linear-gradient(135deg, #ffc857, #fca311);
+            box-shadow: 0 0 14px rgba(252, 163, 17, 0.4);
         }
 
         .btn-row-del {
@@ -425,8 +425,8 @@
             margin-bottom: 1.15rem;
             padding: 0.85rem 1rem;
             border-radius: 12px;
-            background: linear-gradient(135deg, rgba(139, 195, 74, 0.12), rgba(201, 162, 39, 0.1));
-            border: 1px solid rgba(139, 195, 74, 0.22);
+            background: linear-gradient(135deg, rgba(252, 163, 17, 0.12), rgba(252, 163, 17, 0.1));
+            border: 1px solid rgba(252, 163, 17, 0.22);
         }
 
         .total-bar span {

@@ -4,16 +4,16 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="google" content="notranslate">
-    <title>État Produit — 7ssabHani</title>
+    <title>État Produit — LibAutoEnt</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('css/shell.css') }}">
     <style>
         .menu-link--quiet { background: transparent; box-shadow: none; color: rgba(255,255,255,0.82); }
-        .menu-link--quiet:hover { background: rgba(139,195,74,0.12); color: #fff; transform: none; }
+        .menu-link--quiet:hover { background: rgba(252,163,17,0.12); color: #fff; transform: none; }
         .menu-link--quiet .menu-ico { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.08); box-shadow: none; }
-        .submenu a.is-active { color: #fff; background: rgba(139,195,74,0.16); }
+        .submenu a.is-active { color: #fff; background: rgba(252,163,17,0.16); }
         .submenu a.is-active::before { background: var(--green-bright); }
 
         .page-wrap { flex: 1; padding: 0 1.5rem 1.5rem; min-width: 0; }
@@ -31,7 +31,7 @@
 
         .table-card {
             background: var(--white); border-radius: 18px; box-shadow: var(--shadow-card);
-            border: 1px solid rgba(139,195,74,0.14); overflow: hidden;
+            border: 1px solid rgba(252,163,17,0.14); overflow: hidden;
         }
         .table-scroll { overflow-x: auto; }
         table.data-table { width: 100%; border-collapse: collapse; min-width: 980px; }
@@ -40,15 +40,15 @@
             border-bottom: 1px solid rgba(21,32,20,0.06); color: var(--ink);
             vertical-align: middle; text-align: center;
         }
-        .data-table tbody tr:hover { background: rgba(139,195,74,0.06); }
+        .data-table tbody tr:hover { background: rgba(252,163,17,0.06); }
         .data-table .empty { text-align: center; color: var(--muted); padding: 2.5rem 1rem; }
         .nom-cell { font-weight: 600; text-align: left !important; }
 
         .ref-badge {
             display: inline-block; padding: 0.25rem 0.65rem; border-radius: 999px;
             font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 0.75rem;
-            background: rgba(139,195,74,0.15); color: var(--green-deep);
-            border: 1px solid rgba(139,195,74,0.3);
+            background: rgba(252,163,17,0.15); color: var(--green-deep);
+            border: 1px solid rgba(252,163,17,0.3);
         }
 
         .qty-input {
@@ -57,8 +57,8 @@
             font-family: inherit; font-size: 0.88rem; text-align: center; outline: none;
         }
         .qty-input:focus {
-            border-color: rgba(139,195,74,0.65);
-            box-shadow: 0 0 0 3px rgba(139,195,74,0.15); background: #fff;
+            border-color: rgba(252,163,17,0.65);
+            box-shadow: 0 0 0 3px rgba(252,163,17,0.15); background: #fff;
         }
 
         .etat-badge, .statut-select {

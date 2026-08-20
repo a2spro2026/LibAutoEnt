@@ -1,5 +1,5 @@
 /**
- * Actions tableaux 7ssabHani — onclick direct (fiable sur tous navigateurs)
+ * Actions tableaux LibAutoEnt — onclick direct (fiable sur tous navigateurs)
  */
 (function (window, document) {
     'use strict';

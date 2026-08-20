@@ -4,8 +4,8 @@
 (function (window) {
     'use strict';
 
-    var KEY_REGLEMENTS = '7ssabhani_reglements_achat';
-    var KEY_BONS = '7ssabhani_bons_achat';
+    var KEY_REGLEMENTS = 'libautoent_reglements_achat';
+    var KEY_BONS = 'libautoent_bons_achat';
 
     function read(key) {
         try {
