@@ -64,7 +64,27 @@
 
         .toolbar {
             display: flex; flex-wrap: wrap; gap: 0.65rem;
-            margin-bottom: 1rem; justify-content: flex-end;
+            margin-bottom: 1rem; align-items: flex-end; justify-content: space-between;
+        }
+        .search-bar {
+            display: flex; flex-wrap: wrap; gap: 0.65rem; align-items: flex-end; flex: 1; min-width: 0;
+        }
+        .search-field label {
+            display: block; margin-bottom: 0.3rem; font-size: 0.72rem; font-weight: 700;
+            letter-spacing: 0.03em; text-transform: uppercase; color: var(--muted);
+        }
+        .search-field input {
+            width: min(100%, 180px); padding: 0.65rem 0.85rem; border-radius: 10px;
+            border: 1px solid rgba(13,27,42,0.12); background: #fff;
+            font-family: inherit; font-size: 0.92rem; color: var(--ink); outline: none;
+        }
+        .search-field input:focus {
+            border-color: rgba(252,163,17,0.65);
+            box-shadow: 0 0 0 3px rgba(252,163,17,0.15);
+        }
+        .toolbar-actions { display: flex; flex-wrap: wrap; gap: 0.65rem; }
+        .period-hint {
+            margin: -0.35rem 0 0.85rem; font-size: 0.85rem; color: var(--muted); font-weight: 500;
         }
         .btn {
             display: inline-flex; align-items: center; gap: 0.45rem;
@@ -111,9 +131,12 @@
         @media (max-width: 900px) {
             .balance-stats { grid-template-columns: 1fr; }
             .page-wrap { padding: 0 1rem 1.25rem; }
+            .toolbar { flex-direction: column; align-items: stretch; }
+            .search-field input { width: 100%; }
+            .toolbar-actions { justify-content: flex-end; }
         }
         @media print {
-            .sidebar, .topbar, .toolbar, .overlay, .menu-toggle, .topbar-badge, .balance-stats { display: none !important; }
+            .sidebar, .topbar, .toolbar, .overlay, .menu-toggle, .topbar-badge, .balance-stats, .period-hint { display: none !important; }
             .app { display: block !important; }
             .main { margin: 0 !important; width: 100% !important; }
             .page-wrap { padding: 0 !important; }
@@ -160,15 +183,28 @@
                 </div>
 
                 <div class="toolbar">
-                    <button type="button" class="btn btn-print" id="btnImprimer">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V3h12v6"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v7H6z"/></svg>
-                        Imprimer
-                    </button>
-                    <a href="{{ route('dashboard') }}" class="btn btn-close">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6 6 18" stroke-linecap="round"/></svg>
-                        Fermer
-                    </a>
+                    <div class="search-bar">
+                        <div class="search-field">
+                            <label for="filterDateDe">De</label>
+                            <input type="date" id="filterDateDe" autocomplete="off">
+                        </div>
+                        <div class="search-field">
+                            <label for="filterDateA">À</label>
+                            <input type="date" id="filterDateA" autocomplete="off">
+                        </div>
+                    </div>
+                    <div class="toolbar-actions">
+                        <button type="button" class="btn btn-print" id="btnImprimer">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V3h12v6"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v7H6z"/></svg>
+                            Imprimer
+                        </button>
+                        <a href="{{ route('dashboard') }}" class="btn btn-close">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6 6 18" stroke-linecap="round"/></svg>
+                            Fermer
+                        </a>
+                    </div>
                 </div>
+                <p class="period-hint" id="periodHint" hidden></p>
 
                 <div class="table-card">
                     <div class="table-scroll">
@@ -195,10 +231,10 @@
         </div>
     </div>
 
-    <script src="{{ asset('js/data-sync.js') }}?v=4"></script>
+    <script src="{{ asset('js/data-sync.js') }}?v=5"></script>
     <script src="{{ asset('js/stock-store.js') }}?v=10"></script>
     <script src="{{ asset('js/achat-store.js') }}?v=8"></script>
-    <script src="{{ asset('js/vente-store.js') }}?v=10"></script>
+    <script src="{{ asset('js/vente-store.js') }}?v=12"></script>
     <script>
         const sidebar = document.getElementById('sidebar');
         const overlay = document.getElementById('overlay');
@@ -219,11 +255,79 @@
         sidebarClose?.addEventListener('click', closeSidebar);
         overlay?.addEventListener('click', closeSidebar);
 
+        const filterDateDe = document.getElementById('filterDateDe');
+        const filterDateA = document.getElementById('filterDateA');
+        const periodHint = document.getElementById('periodHint');
+
         function money(n) {
             return (Number(n) || 0).toFixed(2) + ' DH';
         }
         function fmtMoneyHtml(n) {
             return (Number(n) || 0).toFixed(2) + ' <small>DH</small>';
+        }
+
+        function parseBonDateTs(dateStr) {
+            if (!dateStr || typeof dateStr !== 'string') return 0;
+            if (dateStr.indexOf('-') !== -1) {
+                var iso = dateStr.slice(0, 10).split('-');
+                if (iso.length !== 3) return 0;
+                return new Date(Number(iso[0]), Number(iso[1]) - 1, Number(iso[2])).getTime() || 0;
+            }
+            var p = dateStr.split('/');
+            if (p.length !== 3) return 0;
+            return new Date(Number(p[2]), Number(p[1]) - 1, Number(p[0])).getTime() || 0;
+        }
+
+        function isoToTs(iso) {
+            if (!iso) return 0;
+            var p = iso.split('-');
+            if (p.length !== 3) return 0;
+            return new Date(Number(p[0]), Number(p[1]) - 1, Number(p[2])).getTime() || 0;
+        }
+
+        function formatIsoFr(iso) {
+            if (!iso) return '';
+            var p = iso.split('-');
+            if (p.length !== 3) return iso;
+            return p[2] + '/' + p[1] + '/' + p[0];
+        }
+
+        function getDateRange() {
+            var from = (filterDateDe && filterDateDe.value) || '';
+            var to = (filterDateA && filterDateA.value) || '';
+            if (from && to && from > to) {
+                var tmp = from;
+                from = to;
+                to = tmp;
+            }
+            return { from: from, to: to };
+        }
+
+        function periodLabel() {
+            var range = getDateRange();
+            if (!range.from && !range.to) return '';
+            if (range.from && range.to) {
+                if (range.from === range.to) return 'Période : ' + formatIsoFr(range.from);
+                return 'Période : De ' + formatIsoFr(range.from) + ' à ' + formatIsoFr(range.to);
+            }
+            if (range.from) return 'Période : À partir du ' + formatIsoFr(range.from);
+            return 'Période : Jusqu’au ' + formatIsoFr(range.to);
+        }
+
+        function bonInDateRange(bon, range) {
+            if (!range.from && !range.to) return true;
+            var ts = parseBonDateTs(bon && bon.date);
+            if (!ts) return false;
+            if (range.from) {
+                var fromTs = isoToTs(range.from);
+                if (ts < fromTs) return false;
+            }
+            if (range.to) {
+                var toTs = isoToTs(range.to);
+                // inclusif jusqu’à la fin de la journée
+                if (ts > toTs) return false;
+            }
+            return true;
         }
 
         function catalogMap() {
@@ -258,8 +362,11 @@
 
         function getBalanceRows() {
             var map = catalogMap();
+            var range = getDateRange();
             var bons = (window.VenteStore && VenteStore.getBons) ? VenteStore.getBons() : [];
-            return bons.map(function (b) {
+            return bons.filter(function (b) {
+                return bonInDateRange(b, range);
+            }).map(function (b) {
                 var achat = montantAchatBon(b, map);
                 var vente = Number(b.montant) || 0;
                 var paye = Number(b.montantPaye) || 0;
@@ -273,6 +380,18 @@
                     solde: solde
                 };
             });
+        }
+
+        function updatePeriodHint() {
+            if (!periodHint) return;
+            var label = periodLabel();
+            if (label) {
+                periodHint.hidden = false;
+                periodHint.textContent = label;
+            } else {
+                periodHint.hidden = true;
+                periodHint.textContent = '';
+            }
         }
 
         function refreshBalanceStats(rows) {
@@ -291,10 +410,16 @@
         function renderBalance() {
             var body = document.getElementById('balanceBody');
             if (!body) return;
+            updatePeriodHint();
             var rows = getBalanceRows();
             refreshBalanceStats(rows);
+            var filtered = !!(getDateRange().from || getDateRange().to);
             if (!rows.length) {
-                body.innerHTML = '<tr class="empty-row"><td colspan="6" class="empty">Aucun bon — les bons de vente apparaîtront ici</td></tr>';
+                body.innerHTML = '<tr class="empty-row"><td colspan="6" class="empty">' +
+                    (filtered
+                        ? 'Aucun bon sur cette période'
+                        : 'Aucun bon — les bons de vente apparaîtront ici') +
+                    '</td></tr>';
                 return;
             }
             body.innerHTML = rows.map(function (r) {
@@ -310,6 +435,9 @@
             }).join('');
         }
 
+        filterDateDe.addEventListener('change', renderBalance);
+        filterDateA.addEventListener('change', renderBalance);
+
         document.getElementById('btnImprimer').addEventListener('click', function () {
             var rows = getBalanceRows();
             var htmlRows = rows.map(function (r) {
@@ -322,6 +450,7 @@
                     '<td>' + money(r.solde) + '</td>' +
                     '</tr>';
             }).join('');
+            var periode = periodLabel();
 
             var w = window.open('', '_blank', 'width=960,height=720');
             if (!w) {
@@ -330,10 +459,12 @@
             }
             w.document.write(
                 '<!DOCTYPE html><html lang="fr"><head><meta charset="utf-8"><title>Balance des Ventes</title>' +
-                '<style>body{font-family:Arial,sans-serif;padding:24px;color:#0d1b2a}h1{font-size:18px;margin:0 0 16px}' +
+                '<style>body{font-family:Arial,sans-serif;padding:24px;color:#0d1b2a}h1{font-size:18px;margin:0 0 8px}' +
+                '.periode{margin:0 0 16px;color:#555;font-size:13px}' +
                 'table{width:100%;border-collapse:collapse}th,td{border:1px solid #ccc;padding:8px;text-align:center;font-size:13px}' +
                 'th{background:#14213d;color:#fff}</style></head><body>' +
                 '<h1>Balance des Ventes</h1>' +
+                (periode ? '<p class="periode">' + periode + '</p>' : '') +
                 '<table><thead><tr><th>Date</th><th>N° Bn</th><th>Montant d\'Achat</th><th>Montant de Vente</th><th>Montant Payé</th><th>Solde</th></tr></thead>' +
                 '<tbody>' + (htmlRows || '<tr><td colspan="6">Aucune donnée</td></tr>') + '</tbody></table>' +
                 '</body></html>'
@@ -352,6 +483,9 @@
         }
         if (window.AchatStore && AchatStore.initFromServer) {
             AchatStore.initFromServer().then(renderBalance);
+        }
+        if (window.StockStore && StockStore.initCatalogFromServer) {
+            StockStore.initCatalogFromServer().then(renderBalance);
         }
     </script>
 </body>

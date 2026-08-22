@@ -26,6 +26,19 @@
         libautoent_reglements_vente: true
     };
 
+    // File d'attente : un pull ne doit jamais écraser un push de suppression en cours
+    var syncChain = Promise.resolve();
+
+    function enqueue(task) {
+        var run = function () {
+            return Promise.resolve().then(task).catch(function () {
+                return null;
+            });
+        };
+        syncChain = syncChain.then(run, run);
+        return syncChain;
+    }
+
     function getSyncHeaders(isJson) {
         var headers = {
             Accept: 'application/json',
@@ -85,7 +98,8 @@
         });
     }
 
-    function pullKey(key) {
+    function pullKeyRaw(key) {
+        var localAtStart = readLocal(key);
         return fetch(API + '/' + encodeURIComponent(key), {
             headers: { Accept: 'application/json' },
             credentials: 'same-origin'
@@ -95,13 +109,23 @@
                 return r.json();
             })
             .then(function (data) {
-                var local = readLocal(key);
+                // Si le local a changé pendant le fetch (ex: suppression), ne pas l’écraser
+                var localNow = readLocal(key);
+                try {
+                    if (JSON.stringify(localNow) !== JSON.stringify(localAtStart) && localNow != null) {
+                        return pushKeyRaw(key, localNow).then(function () {
+                            return localNow;
+                        });
+                    }
+                } catch (e) { /* ignore */ }
+
+                var local = localNow;
 
                 if (data === null || data === undefined) {
                     if (local != null && JSON.stringify(local) !== '[]' && JSON.stringify(local) !== '{}') {
                         var normalizedLocal = normalizePulled(key, local);
                         if (normalizedLocal == null) return null;
-                        return pushKey(key, normalizedLocal).then(function () {
+                        return pushKeyRaw(key, normalizedLocal).then(function () {
                             return normalizedLocal;
                         });
                     }
@@ -114,9 +138,27 @@
                 if (key === 'libautoent_catalogue_produits' &&
                     Array.isArray(normalized) && normalized.length === 0 &&
                     Array.isArray(local) && local.length > 0) {
-                    return pushKey(key, local).then(function () {
+                    return pushKeyRaw(key, local).then(function () {
                         return local;
                     });
+                }
+
+                // Suppressions locales non encore sur le serveur
+                if ((key === 'libautoent_bons_vente' || key === 'libautoent_bons_achat') &&
+                    Array.isArray(normalized) && Array.isArray(local) &&
+                    local.length > 0 && local.length < normalized.length) {
+                    var remoteIds = {};
+                    normalized.forEach(function (b) {
+                        if (b && b.id) remoteIds[String(b.id)] = true;
+                    });
+                    var localAllOnRemote = local.every(function (b) {
+                        return b && b.id && remoteIds[String(b.id)];
+                    });
+                    if (localAllOnRemote) {
+                        return pushKeyRaw(key, local).then(function () {
+                            return local;
+                        });
+                    }
                 }
 
                 if (key === 'libautoent_catalogue_produits' && Array.isArray(normalized)) {
@@ -146,7 +188,7 @@
         return data;
     }
 
-    function pushKey(key, data) {
+    function pushKeyRaw(key, data) {
         var body = sanitizeForPush(key, data);
         return fetch(API + '/' + encodeURIComponent(key), {
             method: 'PUT',
@@ -162,6 +204,18 @@
             return { ok: true };
         }).catch(function () {
             return { ok: false };
+        });
+    }
+
+    function pullKey(key) {
+        return enqueue(function () {
+            return pullKeyRaw(key);
+        });
+    }
+
+    function pushKey(key, data) {
+        return enqueue(function () {
+            return pushKeyRaw(key, data);
         });
     }
 

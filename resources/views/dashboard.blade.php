@@ -1837,11 +1837,11 @@
         </div>
     </div>
 
-    <script src="{{ asset('js/data-sync.js') }}?v=4"></script>
+    <script src="{{ asset('js/data-sync.js') }}?v=5"></script>
     <script src="{{ asset('js/sidebar-menu.js') }}?v=3"></script>
     <script src="{{ asset('js/table-actions.js') }}?v=7"></script>
     <script src="{{ asset('js/stock-store.js') }}?v=11"></script>
-    <script src="{{ asset('js/vente-store.js') }}?v=11"></script>
+    <script src="{{ asset('js/vente-store.js') }}?v=12"></script>
     <script>
         const sidebar = document.getElementById('sidebar');
         const overlay = document.getElementById('overlay');
@@ -2596,8 +2596,12 @@
                     var id = tr.getAttribute('data-id');
                     var b = VenteStore.getBon(id);
                     if (!confirm('Supprimer le bon ' + ((b && b.numero) || '') + ' ?')) return;
-                    VenteStore.deleteBon(id);
-                    refreshDashboard();
+                    Promise.resolve(VenteStore.deleteBon(id)).then(function (res) {
+                        refreshDashboard();
+                        if (res && res.ok === false) {
+                            alert('Le bon a été retiré ici, mais la sync serveur a échoué. Réessayez dans un instant.');
+                        }
+                    });
                 }
             });
             TableActions.bind('#bonsBody');

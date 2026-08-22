@@ -282,7 +282,7 @@
         </div>
     </div>
 
-    <script src="{{ asset('js/data-sync.js') }}?v=4"></script>
+    <script src="{{ asset('js/data-sync.js') }}?v=5"></script>
     <script src="{{ asset('js/table-actions.js') }}?v=7"></script>
     <script src="{{ asset('js/stock-store.js') }}?v=11"></script>
     <script>

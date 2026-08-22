@@ -634,10 +634,10 @@
         </div>
     </div>
 
-    <script src="{{ asset('js/data-sync.js') }}?v=4"></script>
+    <script src="{{ asset('js/data-sync.js') }}?v=5"></script>
     <script src="{{ asset('js/table-actions.js') }}?v=7"></script>
     <script src="{{ asset('js/stock-store.js') }}?v=10"></script>
-    <script src="{{ asset('js/vente-store.js') }}?v=10"></script>
+    <script src="{{ asset('js/vente-store.js') }}?v=12"></script>
     <script>
 
         const sidebar = document.getElementById('sidebar');
@@ -1148,7 +1148,13 @@
                     var num = tr.cells[1] ? tr.cells[1].textContent.trim() : '';
                     var id = tr.getAttribute('data-id');
                     if (!confirm('Supprimer le bon ' + num + ' ?')) return;
-                    if (id && window.VenteStore) VenteStore.deleteBon(id);
+                    if (id && window.VenteStore) {
+                        Promise.resolve(VenteStore.deleteBon(id)).then(function () {
+                            if (tr.parentNode) tr.parentNode.removeChild(tr);
+                            ensureBonsEmptyState();
+                        });
+                        return;
+                    }
                     tr.parentNode.removeChild(tr);
                     ensureBonsEmptyState();
                 }

@@ -21,8 +21,9 @@
         var safe = Array.isArray(data) ? data : [];
         localStorage.setItem(key, JSON.stringify(safe));
         if (window.DataSync) {
-            DataSync.pushKey(key, safe);
+            return DataSync.pushKey(key, safe);
         }
+        return Promise.resolve({ ok: true });
     }
 
     function initFromServer() {
@@ -146,7 +147,7 @@
         var list = read(KEY_BONS);
         var updated = null;
         list = list.map(function (b) {
-            if (b.id !== id) return b;
+            if (String(b.id) !== String(id)) return b;
             updated = Object.assign({}, b, {
                 date: payload.date != null ? payload.date : b.date,
                 numero: payload.numero != null ? payload.numero : b.numero,
@@ -164,17 +165,22 @@
     }
 
     function getBon(id) {
+        var sid = String(id || '');
         var list = read(KEY_BONS);
         for (var i = 0; i < list.length; i++) {
-            if (list[i].id === id) return list[i];
+            if (String(list[i].id) === sid) return list[i];
         }
         return null;
     }
 
     function deleteBon(id) {
-        var list = read(KEY_BONS).filter(function (b) { return b.id !== id; });
-        write(KEY_BONS, list);
-        return list;
+        var sid = String(id || '');
+        var list = read(KEY_BONS).filter(function (b) {
+            return String(b.id) !== sid;
+        });
+        return write(KEY_BONS, list).then(function (res) {
+            return { ok: !res || res.ok !== false, list: list, sync: res };
+        });
     }
 
     function getBonsNonSoldes() {

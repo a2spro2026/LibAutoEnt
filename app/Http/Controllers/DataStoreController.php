@@ -85,12 +85,13 @@ class DataStoreController extends Controller
 
         $payload = $this->normalizePayload($safe, $decoded);
 
-        // Ne jamais écraser un catalogue existant par un tableau vide accidentel
+        // Ne jamais écraser le catalogue par une liste vide accidentelle
+        // (les bons / règlements peuvent être volontairement vidés après suppression)
         $path = $this->filePath($safe);
-        if (in_array($safe, self::ARRAY_KEYS, true) && $payload === [] && is_file($path)) {
+        if ($safe === 'libautoent_catalogue_produits' && $payload === [] && is_file($path)) {
             $existing = json_decode((string) file_get_contents($path), true);
             if (is_array($existing) && count($existing) > 0) {
-                return response()->json(['message' => 'Refus d’écraser des données par une liste vide'], Response::HTTP_UNPROCESSABLE_ENTITY);
+                return response()->json(['message' => 'Refus d’écraser le catalogue par une liste vide'], Response::HTTP_UNPROCESSABLE_ENTITY);
             }
         }
 
