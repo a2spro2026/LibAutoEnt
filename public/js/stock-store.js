@@ -6,6 +6,7 @@
 
     var KEY_META = 'libautoent_stock_meta';
     var KEY_CAT = 'libautoent_stock_categories';
+    var KEY_CATALOG = 'libautoent_catalogue_produits';
     var KEY_BONS_ACHAT = 'libautoent_bons_achat';
     var KEY_BONS_VENTE = 'libautoent_bons_vente';
     var FAIBLE_SEUIL = 5;
@@ -131,14 +132,27 @@
     /** Agrège qté achat / vente depuis les bons (par produit) */
     function collectMovements() {
         var map = {};
+        var year = new Date().getFullYear();
 
-        function bump(nom, field, qte) {
+        function ensure(nom) {
             var name = normName(nom);
-            if (!name) return;
+            if (!name) return null;
             var k = keyOf(name);
             if (!map[k]) {
-                map[k] = { nom: name, achat: 0, vente: 0, venteMois: 0 };
+                map[k] = {
+                    nom: name,
+                    achat: 0,
+                    vente: 0,
+                    venteMois: 0,
+                    ventesParMois: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+                };
             }
+            return k;
+        }
+
+        function bump(nom, field, qte) {
+            var k = ensure(nom);
+            if (!k) return;
             map[k][field] += Number(qte) || 0;
         }
 
@@ -149,10 +163,16 @@
         });
 
         read(KEY_BONS_VENTE).forEach(function (bon) {
-            var mois = isCurrentMonth(bon.date);
+            var d = parseDateFR(bon.date);
+            var moisCourant = isCurrentMonth(bon.date);
+            var moisIdx = (d && !isNaN(d.getTime()) && d.getFullYear() === year) ? d.getMonth() : -1;
             (bon.lignes || []).forEach(function (l) {
-                bump(l.produit, 'vente', l.qte);
-                if (mois) bump(l.produit, 'venteMois', l.qte);
+                var k = ensure(l.produit);
+                if (!k) return;
+                var q = Number(l.qte) || 0;
+                map[k].vente += q;
+                if (moisCourant) map[k].venteMois += q;
+                if (moisIdx >= 0) map[k].ventesParMois[moisIdx] += q;
             });
         });
 
@@ -252,13 +272,163 @@
         return meta[key];
     }
 
+    function readCatalog() {
+        try {
+            var raw = localStorage.getItem(KEY_CATALOG);
+            return raw ? JSON.parse(raw) : [];
+        } catch (e) {
+            return [];
+        }
+    }
+
+    function writeCatalog(list) {
+        localStorage.setItem(KEY_CATALOG, JSON.stringify(list));
+    }
+
+    function uid() {
+        return 'p_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 8);
+    }
+
+    function numOrZero(v) {
+        var n = parseFloat(String(v == null ? '' : v).replace(',', '.'));
+        return isNaN(n) ? 0 : n;
+    }
+
+    function fmtMoney(n) {
+        return (Math.round((Number(n) || 0) * 100) / 100).toFixed(2);
+    }
+
+    function nextCatalogRef() {
+        var list = readCatalog();
+        var max = 0;
+        list.forEach(function (p) {
+            var ref = p && p.ref;
+            if (!ref) return;
+            var m = String(ref).match(/(\d+)$/);
+            if (m) max = Math.max(max, parseInt(m[1], 10) || 0);
+        });
+        return 'PR-' + String(max + 1).padStart(4, '0');
+    }
+
+    function normalizeProduit(payload, existing) {
+        var base = existing || {};
+        var ref = String(payload.ref || base.ref || '').trim();
+        if (!ref) ref = nextCatalogRef();
+        var photo = payload.photo;
+        if (photo === undefined) photo = base.photo || '';
+        else photo = String(photo || '');
+        return {
+            id: base.id || uid(),
+            ref: ref,
+            codeBarre: String(payload.codeBarre || '').trim(),
+            designation: normName(payload.designation || payload.nom || ''),
+            categorie: normName(payload.categorie || ''),
+            famille: normName(payload.famille || ''),
+            quantite: Math.max(0, numOrZero(payload.quantite)),
+            pa: Math.max(0, numOrZero(payload.pa)),
+            pv: Math.max(0, numOrZero(payload.pv)),
+            photo: photo
+        };
+    }
+
+    function getCatalogue() {
+        return readCatalog().slice().sort(function (a, b) {
+            return (a.ref || '').localeCompare(b.ref || '', 'fr');
+        });
+    }
+
+    function getProduit(id) {
+        var list = readCatalog();
+        for (var i = 0; i < list.length; i++) {
+            if (list[i].id === id) return list[i];
+        }
+        return null;
+    }
+
+    function saveProduit(payload) {
+        var list = readCatalog();
+        var id = payload && payload.id ? String(payload.id) : '';
+        var idx = -1;
+        if (id) {
+            for (var i = 0; i < list.length; i++) {
+                if (list[i].id === id) { idx = i; break; }
+            }
+        }
+        var item = normalizeProduit(payload || {}, idx >= 0 ? list[idx] : null);
+        if (!item.designation) return null;
+        if (idx >= 0) list[idx] = item;
+        else list.push(item);
+        writeCatalog(list);
+        return item;
+    }
+
+    function deleteProduit(id) {
+        var list = readCatalog();
+        var next = list.filter(function (p) { return p.id !== id; });
+        if (next.length === list.length) return false;
+        writeCatalog(next);
+        return true;
+    }
+
+    /** État Produit : Réf, Désignation, Stock Initial, ventes Jan–Déc, Qte Actuel */
+    function getEtatResume() {
+        var emptyMois = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+        var moves = collectMovements();
+        var catalog = getCatalogue();
+        var seen = {};
+        var list = [];
+
+        function rowFrom(id, ref, designation, stockInitial, mv) {
+            mv = mv || {};
+            var ventesParMois = (mv.ventesParMois || emptyMois).slice();
+            var achat = Number(mv.achat) || 0;
+            var vente = Number(mv.vente) || 0;
+            var stock = Number(stockInitial) || 0;
+            return {
+                id: id,
+                ref: ref || '',
+                designation: designation || '',
+                stockInitial: stock,
+                ventesParMois: ventesParMois,
+                venteTousMois: vente,
+                qteActuel: stock + achat - vente
+            };
+        }
+
+        catalog.forEach(function (p) {
+            var k = keyOf(p.designation);
+            seen[k] = true;
+            list.push(rowFrom(p.id, p.ref, p.designation, p.quantite, moves[k]));
+        });
+
+        syncProducts();
+        var meta = getMeta();
+        Object.keys(meta).forEach(function (k) {
+            if (seen[k]) return;
+            var m = meta[k];
+            list.push(rowFrom(m.ref || k, m.ref, m.nom, m.qteInitial, moves[k]));
+        });
+
+        return list.sort(function (a, b) {
+            return (a.ref || '').localeCompare(b.ref || '', 'fr');
+        });
+    }
+
     window.StockStore = {
         getCategories: getCategories,
         getEtatProduits: getEtatProduits,
+        getEtatResume: getEtatResume,
         setQteInitial: setQteInitial,
         setStatut: setStatut,
         syncProducts: syncProducts,
         syncCategories: syncCategories,
-        FAIBLE_SEUIL: FAIBLE_SEUIL
+        getCatalogue: getCatalogue,
+        getProduit: getProduit,
+        saveProduit: saveProduit,
+        deleteProduit: deleteProduit,
+        nextCatalogRef: nextCatalogRef,
+        fmtMoney: fmtMoney,
+        FAIBLE_SEUIL: FAIBLE_SEUIL,
+        MOIS_LABELS: ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc']
     };
 })(window);

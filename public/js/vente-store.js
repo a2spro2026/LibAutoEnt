@@ -119,6 +119,35 @@
         return item;
     }
 
+    function updateBon(id, payload) {
+        var list = read(KEY_BONS);
+        var updated = null;
+        list = list.map(function (b) {
+            if (b.id !== id) return b;
+            updated = Object.assign({}, b, {
+                date: payload.date != null ? payload.date : b.date,
+                numero: payload.numero != null ? payload.numero : b.numero,
+                client: payload.client != null ? payload.client : b.client,
+                montant: payload.montant != null ? Number(payload.montant) : b.montant,
+                typePaie: payload.typePaie != null ? payload.typePaie : b.typePaie,
+                montantPaye: payload.montantPaye != null ? Number(payload.montantPaye) : b.montantPaye,
+                solde: payload.solde != null ? Number(payload.solde) : b.solde,
+                lignes: payload.lignes != null ? payload.lignes : b.lignes
+            });
+            return updated;
+        });
+        write(KEY_BONS, list);
+        return updated;
+    }
+
+    function getBon(id) {
+        var list = read(KEY_BONS);
+        for (var i = 0; i < list.length; i++) {
+            if (list[i].id === id) return list[i];
+        }
+        return null;
+    }
+
     function deleteBon(id) {
         var list = read(KEY_BONS).filter(function (b) { return b.id !== id; });
         write(KEY_BONS, list);
@@ -251,6 +280,19 @@
         return getBalanceTotals().solde;
     }
 
+    function getDashboardStats() {
+        var bons = getBons();
+        var totalVentes = 0;
+        bons.forEach(function (b) {
+            totalVentes += Number(b.montant) || 0;
+        });
+        return {
+            nbrBonsLivres: bons.length,
+            totalVentes: totalVentes,
+            totalSolde: getTotalSolde()
+        };
+    }
+
     window.VenteStore = {
         getReglements: getReglements,
         saveReglements: saveReglements,
@@ -261,6 +303,8 @@
         getBons: getBons,
         saveBons: saveBons,
         addBon: addBon,
+        updateBon: updateBon,
+        getBon: getBon,
         deleteBon: deleteBon,
         getBonsNonSoldes: getBonsNonSoldes,
         getClientsNonSoldes: getClientsNonSoldes,
@@ -269,6 +313,7 @@
         getBalanceClients: getBalanceClients,
         getBalanceTotals: getBalanceTotals,
         getTotalSolde: getTotalSolde,
+        getDashboardStats: getDashboardStats,
         applyPaiementToBon: applyPaiementToBon,
         formatDateFR: formatDateFR,
         fmtMoney: fmtMoney

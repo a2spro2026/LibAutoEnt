@@ -245,9 +245,16 @@
 
         .form-grid {
             display: grid;
-            grid-template-columns: repeat(3, minmax(0, 1fr));
-            gap: 0.9rem;
+            grid-template-columns: minmax(120px, 1.1fr) minmax(90px, 0.7fr) minmax(160px, 1.8fr);
+            gap: 0.65rem;
             margin-bottom: 1.15rem;
+            align-items: end;
+        }
+        .field-narrow input,
+        .field-narrow select {
+            padding-left: 0.45rem;
+            padding-right: 0.45rem;
+            font-size: 0.84rem;
         }
 
         .field label {
@@ -528,13 +535,12 @@
                             <label for="dateBon">Date</label>
                             <input type="date" id="dateBon" name="date" required>
                         </div>
-                        <div class="field">
-                            <label for="numBon">Bon n°</label>
-                            <input type="text" id="numBon" name="numero" placeholder="" value="">
-
+                        <div class="field field-narrow">
+                            <label for="numBon">N° Bn</label>
+                            <input type="text" id="numBon" name="numero" placeholder="N°" value="">
                         </div>
                         <div class="field">
-                            <label for="client">Client</label>
+                            <label for="client">Nom Client</label>
                             <input type="text" id="client" name="client" placeholder="Nom du client" required>
                         </div>
                     </div>
@@ -544,7 +550,7 @@
                             <table class="lines-table">
                                 <thead>
                                     <tr>
-                                        <th>Produit</th>
+                                        <th>Article (Stock)</th>
                                         <th>Catégorie</th>
                                         <th style="width:90px">Qte</th>
                                         <th style="width:110px">P/U</th>
@@ -564,8 +570,8 @@
 
                     <div class="modal-actions">
                         <button type="button" class="btn btn-validate" id="btnValider">Valider</button>
-                        <button type="button" class="btn btn-pay is-disabled" id="btnPayer" disabled>Payer</button>
-                        <button type="button" class="btn btn-ghost-dark is-disabled" id="btnFermerModal" disabled>Fermer</button>
+                        <button type="button" class="btn btn-pay" id="btnPayer">Payer</button>
+                        <button type="button" class="btn btn-ghost-dark" id="btnFermerModal">Fermer</button>
                     </div>
                 </form>
             </div>
@@ -627,8 +633,9 @@
         </div>
     </div>
 
-    <script src="{{ asset('js/table-actions.js') }}?v=5"></script>
-    <script src="{{ asset('js/vente-store.js') }}?v=7"></script>
+    <script src="{{ asset('js/table-actions.js') }}?v=7"></script>
+    <script src="{{ asset('js/stock-store.js') }}?v=6"></script>
+    <script src="{{ asset('js/vente-store.js') }}?v=9"></script>
     <script>
 
         const sidebar = document.getElementById('sidebar');
@@ -671,11 +678,7 @@
 
         function setPayButtonsState(validated) {
             bonValidated = validated;
-            btnPayer.disabled = !validated;
-            btnFermerModal.disabled = !validated;
             btnValider.disabled = validated;
-            btnPayer.classList.toggle('is-disabled', !validated);
-            btnFermerModal.classList.toggle('is-disabled', !validated);
             btnValider.classList.toggle('is-disabled', validated);
             btnValider.textContent = validated ? 'Validé' : 'Valider';
         }
@@ -717,22 +720,23 @@
             const date = document.getElementById('dateBon').value;
             const num = document.getElementById('numBon').value.trim();
             const frns = document.getElementById('client').value.trim();
-            const lines = collectLines();
-            const montant = updateTotal();
-
             if (!date || !frns) {
                 alert('Veuillez renseigner Date et Client.');
                 return null;
             }
+            if (!linesAreValidFromStock()) {
+                return null;
+            }
+            const lines = collectLines();
+            const montant = updateTotal();
             if (!lines.length) {
-                alert('Ajoutez au moins un produit.');
+                alert('Ajoutez au moins un produit du catalogue stock.');
                 return null;
             }
             return { date, num, frns, lines, montant };
         }
 
         function openPayModal() {
-            if (!bonValidated) return;
             const data = validateBonForm();
             if (!data) return;
 
@@ -826,11 +830,72 @@
             return { paid: paidSoFar, solde: restant };
         }
 
+        function getCatalogue() {
+            return (window.StockStore && StockStore.getCatalogue) ? StockStore.getCatalogue() : [];
+        }
+
+        function productOptionsHtml(selectedId) {
+            const list = getCatalogue();
+            let html = '<option value="">— Choisir un article —</option>';
+            list.forEach(function (p) {
+                const id = p.id || '';
+                const label = (p.ref ? p.ref + ' — ' : '') + (p.designation || 'Sans nom');
+                const sel = selectedId && selectedId === id ? ' selected' : '';
+                html += '<option value="' + id.replace(/"/g, '') + '"' + sel +
+                    ' data-ref="' + String(p.ref || '').replace(/"/g, '&quot;') + '"' +
+                    ' data-desig="' + String(p.designation || '').replace(/"/g, '&quot;') + '"' +
+                    ' data-cat="' + String(p.categorie || '').replace(/"/g, '&quot;') + '"' +
+                    ' data-pv="' + (Number(p.pv) || 0) + '">' +
+                    label.replace(/</g, '&lt;') + '</option>';
+            });
+            return html;
+        }
+
+        function applyProductToLine(tr) {
+            const sel = tr.querySelector('.prod');
+            const opt = sel && sel.options[sel.selectedIndex];
+            const cat = tr.querySelector('.cat');
+            const pu = tr.querySelector('.pu');
+            if (!opt || !opt.value) {
+                if (cat) cat.value = '';
+                if (pu) pu.value = '0.00';
+                updateLineSub(tr);
+                return null;
+            }
+            if (cat) cat.value = opt.getAttribute('data-cat') || '';
+            if (pu) pu.value = fmt(opt.getAttribute('data-pv') || 0);
+            updateLineSub(tr);
+            return {
+                id: opt.value,
+                ref: opt.getAttribute('data-ref') || '',
+                produit: opt.getAttribute('data-desig') || opt.textContent.trim(),
+                categorie: opt.getAttribute('data-cat') || '',
+                pu: parseFloat(opt.getAttribute('data-pv')) || 0
+            };
+        }
+
+        function updateLineSub(tr) {
+            const qte = tr.querySelector('.qte');
+            const pu = tr.querySelector('.pu');
+            const sub = tr.querySelector('.subtotal');
+            const s = (parseFloat(qte?.value) || 0) * (parseFloat(pu?.value) || 0);
+            if (sub) sub.value = fmt(s);
+            updateTotal();
+        }
+
         function addLine() {
+            const list = getCatalogue();
+            if (!list.length) {
+                alert('Aucun article dans Catégorie Produit (Stock).\nAjoutez d’abord des produits au catalogue.');
+            }
             const tr = document.createElement('tr');
             tr.innerHTML = `
-                <td><input type="text" class="prod" placeholder="Produit"></td>
-                <td><input type="text" class="cat" placeholder="Catégorie"></td>
+                <td>
+                    <select class="prod" required>
+                        ${productOptionsHtml('')}
+                    </select>
+                </td>
+                <td><input type="text" class="cat readonly" readonly tabindex="-1" placeholder="Auto"></td>
                 <td><input type="number" class="qte" min="0" step="any" value="1"></td>
                 <td><input type="number" class="pu" min="0" step="0.01" value="0"></td>
                 <td><input type="text" class="subtotal readonly" readonly tabindex="-1" value="0.00"></td>
@@ -856,18 +921,16 @@
         }
 
         function bindLine(tr) {
+            const prod = tr.querySelector('.prod');
             const qte = tr.querySelector('.qte');
             const pu = tr.querySelector('.pu');
-            const sub = tr.querySelector('.subtotal');
             const plus = tr.querySelector('.btn-plus');
 
-            const recalc = () => {
-                const s = (parseFloat(qte.value) || 0) * (parseFloat(pu.value) || 0);
-                sub.value = fmt(s);
-                updateTotal();
-            };
-            qte.addEventListener('input', recalc);
-            pu.addEventListener('input', recalc);
+            prod.addEventListener('change', function () {
+                applyProductToLine(tr);
+            });
+            qte.addEventListener('input', function () { updateLineSub(tr); });
+            pu.addEventListener('input', function () { updateLineSub(tr); });
             plus.addEventListener('click', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
@@ -893,18 +956,47 @@
 
         function collectLines() {
             const lines = [];
+            const catalog = getCatalogue();
+            const byId = {};
+            catalog.forEach(function (p) { byId[p.id] = p; });
+
             linesBody.querySelectorAll('tr').forEach((tr) => {
-                const produit = tr.querySelector('.prod')?.value.trim();
-                if (!produit) return;
+                const sel = tr.querySelector('.prod');
+                const produitId = sel?.value?.trim();
+                if (!produitId) return;
+                const p = byId[produitId];
+                if (!p) return;
                 const qte = parseFloat(tr.querySelector('.qte')?.value) || 0;
                 const pu = parseFloat(tr.querySelector('.pu')?.value) || 0;
                 lines.push({
-                    produit,
-                    categorie: tr.querySelector('.cat')?.value.trim() || '',
+                    produitId: p.id,
+                    ref: p.ref || '',
+                    codeBarre: p.codeBarre || '',
+                    produit: p.designation || '',
+                    designation: p.designation || '',
+                    categorie: p.categorie || '',
                     qte, pu, sousTotal: qte * pu
                 });
             });
             return lines;
+        }
+
+        function linesAreValidFromStock() {
+            const rows = [...linesBody.querySelectorAll('tr')];
+            if (!rows.length) return false;
+            const catalog = getCatalogue();
+            if (!catalog.length) {
+                alert('Catalogue stock vide. Ajoutez des articles dans Stock → Catégorie Produit.');
+                return false;
+            }
+            for (let i = 0; i < rows.length; i++) {
+                const sel = rows[i].querySelector('.prod');
+                if (!sel || !sel.value) {
+                    alert('Choisissez un article du catalogue stock pour chaque ligne.');
+                    return false;
+                }
+            }
+            return collectLines().length > 0;
         }
 
         function removeEmptyRow() {
@@ -1020,21 +1112,18 @@
         });
 
         btnValider.addEventListener('click', () => {
-            const data = validateBonForm();
-            if (!data) return;
-            setFormLocked(true);
-            setPayButtonsState(true);
+            // Valider → enregistre et affiche tout de suite (crédit)
+            if (!saveBon('Crédit', 0)) return;
+            closePayModal();
+            closeModal();
         });
 
         btnPayer.addEventListener('click', openPayModal);
 
         btnFermerModal.addEventListener('click', () => {
-            if (!bonValidated) return;
-            // Fermer sans payer → enregistrement en crédit
-            if (saveBon('Crédit', 0)) {
-                closePayModal();
-                closeModal();
-            }
+            // Fermer = quitter sans enregistrer
+            closePayModal();
+            closeModal();
         });
 
         document.getElementById('payModalX').addEventListener('click', closePayModal);

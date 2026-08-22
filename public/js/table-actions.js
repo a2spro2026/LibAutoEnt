@@ -125,6 +125,7 @@
         iconsHtml: iconsHtml,
         handle: handle,
         setHandlers: setHandlers,
+        register: setHandlers,
         bind: bind,
         fillCells: fillCells
     };

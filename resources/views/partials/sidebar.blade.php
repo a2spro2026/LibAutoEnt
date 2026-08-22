@@ -15,6 +15,14 @@
             <strong>LibAuto<span class="gold">Ent</span></strong>
             <span>La Solution qui Gère</span>
         </div>
+        <button type="button" class="sidebar-vis-btn" id="sidebarHide" aria-label="Masquer le panneau" title="Masquer le panneau">
+            <svg class="icon-hide-panel" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                <path d="M17.94 17.94A10.07 10.07 0 0 1 12 19c-6 0-10-7-10-7a18.45 18.45 0 0 1 5.06-5.94"/>
+                <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c6 0 10 7 10 7a18.5 18.5 0 0 1-2.16 3.19"/>
+                <path d="M14.12 14.12a3 3 0 1 1-4.24-4.24"/>
+                <path d="M1 1l22 22" stroke-linecap="round"/>
+            </svg>
+        </button>
         <button type="button" class="sidebar-close" id="sidebarClose" aria-label="Fermer le menu">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6 6 18" stroke-linecap="round"/></svg>
         </button>
@@ -27,36 +35,6 @@
             </span>
             <span class="menu-label">Tableau de Bord</span>
         </a>
-
-        <div class="menu-group is-muted" data-menu="fournisseur" aria-disabled="true">
-            <button type="button" class="menu-btn" aria-expanded="false" disabled tabindex="-1">
-                <span class="menu-ico">
-                    <svg viewBox="0 0 24 24"><path d="M3 10.5 12 4l9 6.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1v-9.5Z" stroke-linejoin="round"/></svg>
-                </span>
-                <span class="menu-label">Fournisseur</span>
-                <svg class="chevron" viewBox="0 0 24 24" fill="none"><path d="m6 9 6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-            </button>
-            <div class="submenu">
-                <a href="{{ route('bon-achat') }}" tabindex="-1">Bon Achat</a>
-                <a href="{{ route('reglement-achat') }}" tabindex="-1">Règlement Achat</a>
-                <a href="{{ route('balance-achat') }}" tabindex="-1">Balance Achat</a>
-            </div>
-        </div>
-
-        <div class="menu-group" data-menu="client">
-            <button type="button" class="menu-btn" aria-expanded="false">
-                <span class="menu-ico">
-                    <svg viewBox="0 0 24 24"><path d="M16 19a4 4 0 0 0-8 0"/><circle cx="12" cy="9" r="3.5"/><path d="M19 19a3.5 3.5 0 0 0-2.2-3.2M5 19a3.5 3.5 0 0 1 2.2-3.2M17.5 8.2a3 3 0 1 1-1.2-4"/></svg>
-                </span>
-                <span class="menu-label">Client</span>
-                <svg class="chevron" viewBox="0 0 24 24" fill="none"><path d="m6 9 6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-            </button>
-            <div class="submenu">
-                <a href="{{ route('bon-vente') }}" class="{{ $activePage === 'bon-vente' ? 'is-active' : '' }}">Bon Vente</a>
-                <a href="{{ route('reglement-vente') }}" class="{{ $activePage === 'reglement-vente' ? 'is-active' : '' }}">Règlement Vente</a>
-                <a href="{{ route('balance-vente') }}" class="{{ $activePage === 'balance-vente' ? 'is-active' : '' }}">Balance Vente</a>
-            </div>
-        </div>
 
         <div class="menu-group" data-menu="stock">
             <button type="button" class="menu-btn" aria-expanded="false">
@@ -72,32 +50,17 @@
             </div>
         </div>
 
-        <div class="menu-group" data-menu="charges">
+        <div class="menu-group" data-menu="client">
             <button type="button" class="menu-btn" aria-expanded="false">
                 <span class="menu-ico">
-                    <svg viewBox="0 0 24 24"><path d="M4 7h16v12H4z"/><path d="M8 7V5.5A1.5 1.5 0 0 1 9.5 4h5A1.5 1.5 0 0 1 16 5.5V7"/><path d="M8 12h8"/></svg>
+                    <svg viewBox="0 0 24 24"><path d="M16 19a4 4 0 0 0-8 0"/><circle cx="12" cy="9" r="3.5"/><path d="M19 19a3.5 3.5 0 0 0-2.2-3.2M5 19a3.5 3.5 0 0 1 2.2-3.2M17.5 8.2a3 3 0 1 1-1.2-4"/></svg>
                 </span>
-                <span class="menu-label">Charges</span>
+                <span class="menu-label">État Vente</span>
                 <svg class="chevron" viewBox="0 0 24 24" fill="none"><path d="m6 9 6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
             </button>
             <div class="submenu">
-                <a href="#">État Charge</a>
-                <a href="#">Balance Charges</a>
-            </div>
-        </div>
-
-        <div class="menu-group" data-menu="rapports">
-            <button type="button" class="menu-btn" aria-expanded="false">
-                <span class="menu-ico">
-                    <svg viewBox="0 0 24 24"><path d="M4 19V5"/><path d="M4 19h16"/><path d="M8 16v-5"/><path d="M12 16V8"/><path d="M16 16v-3"/></svg>
-                </span>
-                <span class="menu-label">Rapports</span>
-                <svg class="chevron" viewBox="0 0 24 24" fill="none"><path d="m6 9 6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-            </button>
-            <div class="submenu">
-                <a href="#">Relevé Compte Frns</a>
-                <a href="#">Relevé Compte Client</a>
-                <a href="#">Relevé Compte Stock</a>
+                <a href="{{ route('reglement-vente') }}" class="{{ $activePage === 'reglement-vente' ? 'is-active' : '' }}">Balance des Ventes</a>
+                <a href="{{ route('balance-vente') }}" class="{{ $activePage === 'balance-vente' ? 'is-active' : '' }}">Rapport Revenue</a>
             </div>
         </div>
 
@@ -114,6 +77,50 @@
                 <a href="#">Paramètres Système</a>
             </div>
         </div>
+
+        <div class="menu-group is-muted" data-menu="fournisseur" aria-disabled="true">
+            <button type="button" class="menu-btn" aria-expanded="false" disabled tabindex="-1">
+                <span class="menu-ico">
+                    <svg viewBox="0 0 24 24"><path d="M3 10.5 12 4l9 6.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1v-9.5Z" stroke-linejoin="round"/></svg>
+                </span>
+                <span class="menu-label">Fournisseur</span>
+                <svg class="chevron" viewBox="0 0 24 24" fill="none"><path d="m6 9 6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            </button>
+            <div class="submenu">
+                <a href="{{ route('bon-achat') }}" tabindex="-1">Bon Achat</a>
+                <a href="{{ route('reglement-achat') }}" tabindex="-1">Règlement Achat</a>
+                <a href="{{ route('balance-achat') }}" tabindex="-1">Balance Achat</a>
+            </div>
+        </div>
+
+        <div class="menu-group is-muted" data-menu="charges" aria-disabled="true">
+            <button type="button" class="menu-btn" aria-expanded="false" disabled tabindex="-1">
+                <span class="menu-ico">
+                    <svg viewBox="0 0 24 24"><path d="M4 7h16v12H4z"/><path d="M8 7V5.5A1.5 1.5 0 0 1 9.5 4h5A1.5 1.5 0 0 1 16 5.5V7"/><path d="M8 12h8"/></svg>
+                </span>
+                <span class="menu-label">Charges</span>
+                <svg class="chevron" viewBox="0 0 24 24" fill="none"><path d="m6 9 6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            </button>
+            <div class="submenu">
+                <a href="#" tabindex="-1">État Charge</a>
+                <a href="#" tabindex="-1">Balance Charges</a>
+            </div>
+        </div>
+
+        <div class="menu-group is-muted" data-menu="rapports" aria-disabled="true">
+            <button type="button" class="menu-btn" aria-expanded="false" disabled tabindex="-1">
+                <span class="menu-ico">
+                    <svg viewBox="0 0 24 24"><path d="M4 19V5"/><path d="M4 19h16"/><path d="M8 16v-5"/><path d="M12 16V8"/><path d="M16 16v-3"/></svg>
+                </span>
+                <span class="menu-label">Rapports</span>
+                <svg class="chevron" viewBox="0 0 24 24" fill="none"><path d="m6 9 6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            </button>
+            <div class="submenu">
+                <a href="#" tabindex="-1">Relevé Compte Frns</a>
+                <a href="#" tabindex="-1">Relevé Compte Client</a>
+                <a href="#" tabindex="-1">Relevé Compte Stock</a>
+            </div>
+        </div>
     </nav>
 
     <div class="sidebar-foot">
@@ -127,4 +134,4 @@
         </a>
     </div>
 </aside>
-<script src="{{ asset('js/sidebar-menu.js') }}?v=2"></script>
+<script src="{{ asset('js/sidebar-menu.js') }}?v=3"></script>

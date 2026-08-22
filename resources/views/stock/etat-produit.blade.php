@@ -17,16 +17,42 @@
         .submenu a.is-active::before { background: var(--green-bright); }
 
         .page-wrap { flex: 1; padding: 0 1.5rem 1.5rem; min-width: 0; }
-        .toolbar { display: flex; flex-wrap: wrap; gap: 0.65rem; margin-bottom: 1rem; justify-content: flex-end; }
+        .toolbar {
+            display: flex; flex-wrap: wrap; gap: 0.65rem; margin-bottom: 1rem;
+            align-items: flex-end; justify-content: space-between;
+        }
+        .search-bar {
+            display: flex; flex-wrap: wrap; gap: 0.65rem; align-items: flex-end; flex: 1; min-width: 0;
+        }
+        .search-field label {
+            display: block; margin-bottom: 0.3rem; font-size: 0.72rem; font-weight: 700;
+            letter-spacing: 0.03em; text-transform: uppercase; color: var(--muted);
+        }
+        .search-field input {
+            width: min(100%, 220px); padding: 0.65rem 0.85rem; border-radius: 10px;
+            border: 1px solid rgba(13,27,42,0.12); background: #fff;
+            font-family: inherit; font-size: 0.92rem; color: var(--ink); outline: none;
+        }
+        .search-field input:focus {
+            border-color: rgba(252,163,17,0.65);
+            box-shadow: 0 0 0 3px rgba(252,163,17,0.15);
+        }
+        .toolbar-actions { display: flex; flex-wrap: wrap; gap: 0.65rem; }
+
         .btn {
             display: inline-flex; align-items: center; gap: 0.45rem;
             padding: 0.7rem 1.15rem; border-radius: 11px; border: none;
             font-family: 'Outfit', sans-serif; font-weight: 600; font-size: 0.9rem;
             cursor: pointer; text-decoration: none;
-            transition: transform 0.15s;
+            transition: transform 0.15s, filter 0.15s;
         }
         .btn:hover { transform: translateY(-1px); }
         .btn svg { width: 16px; height: 16px; }
+        .btn-print {
+            color: var(--ink);
+            background: linear-gradient(135deg, #ffb83a, var(--green-bright) 50%, #e8920a);
+            box-shadow: 0 0 18px rgba(252,163,17,0.35), 0 6px 14px rgba(0,0,0,0.12);
+        }
         .btn-close { color: #fff; background: linear-gradient(135deg, #5a6570, #3d4650); box-shadow: 0 6px 14px rgba(0,0,0,0.12); }
 
         .table-card {
@@ -34,64 +60,106 @@
             border: 1px solid rgba(252,163,17,0.14); overflow: hidden;
         }
         .table-scroll { overflow-x: auto; }
-        table.data-table { width: 100%; border-collapse: collapse; min-width: 980px; }
+        table.data-table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+            min-width: 980px;
+        }
+        .data-table th {
+            padding: 0.55rem 0.25rem; font-family: 'Outfit', sans-serif; font-size: 0.68rem;
+            font-weight: 700; letter-spacing: 0.02em; text-transform: uppercase;
+            color: var(--muted); background: #f4f7fb; border-bottom: 1px solid rgba(13,27,42,0.08);
+            text-align: center; white-space: nowrap;
+        }
         .data-table td {
-            padding: 0.75rem 0.7rem; font-size: 0.88rem;
-            border-bottom: 1px solid rgba(21,32,20,0.06); color: var(--ink);
+            padding: 0.5rem 0.25rem; font-size: 0.8rem;
+            border-bottom: 1px solid rgba(13,27,42,0.06); color: var(--ink);
             vertical-align: middle; text-align: center;
         }
         .data-table tbody tr:hover { background: rgba(252,163,17,0.06); }
         .data-table .empty { text-align: center; color: var(--muted); padding: 2.5rem 1rem; }
-        .nom-cell { font-weight: 600; text-align: left !important; }
+
+        .col-ref { width: 72px; }
+        .col-desig { width: 120px; }
+        .col-stock,
+        .col-actuel { width: 58px; }
+        .col-mois { width: 40px; }
+
+        .desig-cell {
+            font-weight: 600;
+            text-align: left !important;
+            padding-left: 0.45rem !important;
+            padding-right: 0.35rem !important;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
 
         .ref-badge {
-            display: inline-block; padding: 0.25rem 0.65rem; border-radius: 999px;
-            font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 0.75rem;
-            background: rgba(252,163,17,0.15); color: var(--green-deep);
+            display: inline-block;
+            max-width: 100%;
+            padding: 0.15rem 0.35rem;
+            border-radius: 6px;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+            font-size: 0.68rem;
+            line-height: 1.2;
+            background: rgba(252,163,17,0.15);
+            color: var(--green-deep);
             border: 1px solid rgba(252,163,17,0.3);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
-        .qty-input {
-            width: 88px; padding: 0.4rem 0.5rem; border-radius: 8px;
-            border: 1px solid rgba(21,32,20,0.12); background: #f7faf3;
-            font-family: inherit; font-size: 0.88rem; text-align: center; outline: none;
+        .qty-chip {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 42px;
+            height: 28px;
+            padding: 0 0.4rem;
+            border-radius: 8px;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+            font-size: 0.8rem;
+            font-variant-numeric: tabular-nums;
+            color: var(--ink);
+            background: #eef2f7;
+            border: 1px solid rgba(13,27,42,0.1);
         }
-        .qty-input:focus {
-            border-color: rgba(252,163,17,0.65);
-            box-shadow: 0 0 0 3px rgba(252,163,17,0.15); background: #fff;
+        .qty-chip.is-low {
+            color: #c47e00;
+            background: rgba(252,163,17,0.16);
+            border-color: rgba(252,163,17,0.35);
+        }
+        .qty-chip.is-out {
+            color: #b71c1c;
+            background: rgba(229,57,53,0.12);
+            border-color: rgba(229,57,53,0.3);
         }
 
-        .etat-badge, .statut-select {
-            appearance: none; -webkit-appearance: none;
-            min-width: 100px; padding: 0.38rem 1.6rem 0.38rem 0.7rem;
-            border-radius: 999px; border: none;
-            font-family: inherit; font-size: 0.72rem; font-weight: 700;
-            letter-spacing: 0.03em; text-transform: uppercase; text-align: center;
+        .col-mois {
+            font-variant-numeric: tabular-nums;
+            font-size: 0.76rem;
+            color: var(--ink-soft);
         }
-        .etat-badge {
-            display: inline-block; padding-right: 0.7rem; cursor: default;
+
+        @media (max-width: 900px) {
+            .page-wrap { padding: 0 1rem 1.25rem; }
+            .toolbar { flex-direction: column; align-items: stretch; }
+            .search-field input { width: 100%; }
+            .toolbar-actions { justify-content: flex-end; }
         }
-        .etat-dispo { color: #1b5e20; background: rgba(76,175,80,0.18); box-shadow: inset 0 0 0 1px rgba(76,175,80,0.35); }
-        .etat-rupture { color: #b71c1c; background: rgba(229,57,53,0.15); box-shadow: inset 0 0 0 1px rgba(229,57,53,0.35); }
-        .etat-faible { color: #f57f17; background: rgba(255,193,7,0.22); box-shadow: inset 0 0 0 1px rgba(255,193,7,0.45); }
 
-        .statut-select {
-            cursor: pointer; outline: none;
-            background-image:
-                linear-gradient(45deg, transparent 50%, currentColor 50%),
-                linear-gradient(135deg, currentColor 50%, transparent 50%);
-            background-position: calc(100% - 12px) calc(50% - 2px), calc(100% - 7px) calc(50% - 2px);
-            background-size: 5px 5px, 5px 5px;
-            background-repeat: no-repeat;
+        @media print {
+            .sidebar, .topbar, .toolbar, .overlay, .menu-toggle, .sidebar-show-btn { display: none !important; }
+            .app { display: block; }
+            .main { width: 100%; }
+            .page-wrap { padding: 0; }
+            .table-card { box-shadow: none; border: 1px solid #ccc; }
         }
-        .statut-actif { color: #1b5e20; background-color: rgba(76,175,80,0.16); box-shadow: inset 0 0 0 1px rgba(76,175,80,0.3); }
-        .statut-inactif { color: #546e7a; background-color: rgba(120,144,156,0.18); box-shadow: inset 0 0 0 1px rgba(120,144,156,0.35); }
-
-        .stock-final { font-weight: 700; }
-        .stock-final.is-low { color: #f57f17; }
-        .stock-final.is-out { color: #c62828; }
-
-        @media (max-width: 900px) { .page-wrap { padding: 0 1rem 1.25rem; } }
     </style>
 </head>
 <body class="notranslate" translate="no">
@@ -114,30 +182,54 @@
 
             <div class="page-wrap">
                 <div class="toolbar">
-                    <a href="{{ route('dashboard') }}" class="btn btn-close">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6 6 18" stroke-linecap="round"/></svg>
-                        Fermer
-                    </a>
+                    <div class="search-bar">
+                        <div class="search-field">
+                            <label for="searchRef">Réf</label>
+                            <input type="text" id="searchRef" placeholder="Rechercher Réf…" autocomplete="off">
+                        </div>
+                        <div class="search-field">
+                            <label for="searchDesignation">Désignation</label>
+                            <input type="text" id="searchDesignation" placeholder="Rechercher Désignation…" autocomplete="off">
+                        </div>
+                    </div>
+                    <div class="toolbar-actions">
+                        <button type="button" class="btn btn-print" id="btnImprimer">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V3h12v6"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v7H6z"/></svg>
+                            Imprimer
+                        </button>
+                        <a href="{{ route('dashboard') }}" class="btn btn-close">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6 6 18" stroke-linecap="round"/></svg>
+                            Fermer
+                        </a>
+                    </div>
                 </div>
 
                 <div class="table-card">
                     <div class="table-scroll">
                         <table class="data-table" id="etatTable">
                             <thead>
-                                <tr>
-                                    <th>Réf</th>
-                                    <th>Nom Produit</th>
-                                    <th>Qte Initial</th>
-                                    <th>Achat</th>
-                                    <th>Vente par Mois</th>
-                                    <th>Stock Final</th>
-                                    <th>État</th>
-                                    <th>Statut</th>
+                                <tr id="etatHeadRow">
+                                    <th class="col-ref">Réf</th>
+                                    <th class="col-desig">Désignation</th>
+                                    <th class="col-stock">S. Init.</th>
+                                    <th class="col-mois">Jan</th>
+                                    <th class="col-mois">Fév</th>
+                                    <th class="col-mois">Mar</th>
+                                    <th class="col-mois">Avr</th>
+                                    <th class="col-mois">Mai</th>
+                                    <th class="col-mois">Juin</th>
+                                    <th class="col-mois">Juil</th>
+                                    <th class="col-mois">Aoû</th>
+                                    <th class="col-mois">Sep</th>
+                                    <th class="col-mois">Oct</th>
+                                    <th class="col-mois">Nov</th>
+                                    <th class="col-mois">Déc</th>
+                                    <th class="col-actuel">S. Act.</th>
                                 </tr>
                             </thead>
                             <tbody id="etatBody">
                                 <tr class="empty-row">
-                                    <td colspan="8" class="empty">Aucun produit — saisissez un produit sur un bon d’achat</td>
+                                    <td colspan="16" class="empty">Aucun produit — ajoutez des produits dans Catégorie Produit</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -147,9 +239,8 @@
         </div>
     </div>
 
-    <script src="{{ asset('js/stock-store.js') }}?v=2"></script>
+    <script src="{{ asset('js/stock-store.js') }}?v=6"></script>
     <script>
-
         const sidebar = document.getElementById('sidebar');
         const overlay = document.getElementById('overlay');
         const menuToggle = document.getElementById('menuToggle');
@@ -160,58 +251,78 @@
         sidebarClose?.addEventListener('click', closeSidebar);
         overlay?.addEventListener('click', closeSidebar);
 
-        function etatBadge(p) {
-            return '<span class="etat-badge etat-' + p.etat + '">' + p.etatLabel + '</span>';
+        const searchRef = document.getElementById('searchRef');
+        const searchDesig = document.getElementById('searchDesignation');
+        const COLSPAN = 16;
+
+        function getRows() {
+            if (!window.StockStore) return [];
+            return StockStore.getEtatResume ? StockStore.getEtatResume() : [];
         }
 
-        function statutSelect(p) {
-            return '<select class="statut-select statut-' + p.statut + '" data-key="' + p.key + '" aria-label="Statut">' +
-                '<option value="actif"' + (p.statut === 'actif' ? ' selected' : '') + '>Actif</option>' +
-                '<option value="inactif"' + (p.statut === 'inactif' ? ' selected' : '') + '>Inactif</option>' +
-                '</select>';
+        function filteredRows() {
+            var qRef = (searchRef.value || '').trim().toLowerCase();
+            var qDes = (searchDesig.value || '').trim().toLowerCase();
+            return getRows().filter(function (p) {
+                var okRef = !qRef || String(p.ref || '').toLowerCase().indexOf(qRef) !== -1;
+                var okDes = !qDes || String(p.designation || '').toLowerCase().indexOf(qDes) !== -1;
+                return okRef && okDes;
+            });
         }
 
-        function stockClass(n) {
+        function actuelClass(n) {
+            var seuil = window.StockStore ? StockStore.FAIBLE_SEUIL : 5;
             if (n <= 0) return ' is-out';
-            if (n <= (window.StockStore ? StockStore.FAIBLE_SEUIL : 5)) return ' is-low';
+            if (n <= seuil) return ' is-low';
             return '';
         }
 
+        function qtyChip(n, withState) {
+            var cls = 'qty-chip';
+            if (withState) cls += actuelClass(n);
+            return '<span class="' + cls + '">' + n + '</span>';
+        }
+
         function renderEtat() {
-            const body = document.getElementById('etatBody');
-            if (!body || !window.StockStore) return;
-            const list = StockStore.getEtatProduits();
+            var body = document.getElementById('etatBody');
+            if (!body) return;
+            var list = filteredRows();
             if (!list.length) {
-                body.innerHTML = '<tr class="empty-row"><td colspan="8" class="empty">Aucun produit — saisissez un produit sur un bon d’achat</td></tr>';
+                var emptyMsg = getRows().length
+                    ? 'Aucun résultat pour cette recherche'
+                    : 'Aucun produit — ajoutez des produits dans Catégorie Produit';
+                body.innerHTML = '<tr class="empty-row"><td colspan="' + COLSPAN + '" class="empty">' + emptyMsg + '</td></tr>';
                 return;
             }
             body.innerHTML = list.map(function (p) {
+                var mois = p.ventesParMois || [0,0,0,0,0,0,0,0,0,0,0,0];
+                var moisCells = '';
+                for (var i = 0; i < 12; i++) {
+                    var v = Number(mois[i]) || 0;
+                    moisCells += '<td class="col-mois">' + (v || '—') + '</td>';
+                }
+                var init = Number(p.stockInitial) || 0;
+                var actuel = Number(p.qteActuel);
+                if (isNaN(actuel)) actuel = 0;
+                var ref = p.ref || '—';
+                var desig = p.designation || '';
                 return '' +
-                    '<tr data-key="' + p.key + '">' +
-                    '<td><span class="ref-badge">' + p.ref + '</span></td>' +
-                    '<td class="nom-cell">' + p.nom + '</td>' +
-                    '<td><input type="number" class="qty-input" min="0" step="1" value="' + p.qteInitial + '" data-key="' + p.key + '" aria-label="Qte Initial"></td>' +
-                    '<td>' + p.achat + '</td>' +
-                    '<td>' + p.venteMois + '</td>' +
-                    '<td class="stock-final' + stockClass(p.stockFinal) + '">' + p.stockFinal + '</td>' +
-                    '<td>' + etatBadge(p) + '</td>' +
-                    '<td>' + statutSelect(p) + '</td>' +
+                    '<tr>' +
+                    '<td class="col-ref"><span class="ref-badge" title="' + ref.replace(/"/g, '&quot;') + '">' + ref + '</span></td>' +
+                    '<td class="desig-cell col-desig" title="' + desig.replace(/"/g, '&quot;') + '">' + desig + '</td>' +
+                    '<td class="col-stock">' + qtyChip(init, false) + '</td>' +
+                    moisCells +
+                    '<td class="col-actuel">' + qtyChip(actuel, true) + '</td>' +
                     '</tr>';
             }).join('');
-
-            body.querySelectorAll('.qty-input').forEach(function (inp) {
-                inp.addEventListener('change', function () {
-                    StockStore.setQteInitial(inp.getAttribute('data-key'), inp.value);
-                    renderEtat();
-                });
-            });
-            body.querySelectorAll('.statut-select').forEach(function (sel) {
-                sel.addEventListener('change', function () {
-                    StockStore.setStatut(sel.getAttribute('data-key'), sel.value);
-                    renderEtat();
-                });
-            });
         }
+
+        searchRef.addEventListener('input', renderEtat);
+        searchDesig.addEventListener('input', renderEtat);
+
+        document.getElementById('btnImprimer').addEventListener('click', function () {
+            window.print();
+        });
 
         renderEtat();
         window.addEventListener('focus', renderEtat);

@@ -4,68 +4,80 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="google" content="notranslate">
-    <title>Règlement Vente — LibAutoEnt</title>
+    <title>Balance des Ventes — LibAutoEnt</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('css/shell.css') }}">
     <style>
-        .menu-link--quiet {
-            background: transparent;
-            box-shadow: none;
-            color: rgba(255, 255, 255, 0.82);
-        }
-        .menu-link--quiet:hover {
-            background: rgba(252, 163, 17, 0.12);
-            color: #fff;
-            transform: none;
-        }
-        .menu-link--quiet .menu-ico {
-            background: rgba(255, 255, 255, 0.06);
-            border-color: rgba(255, 255, 255, 0.08);
-            box-shadow: none;
-        }
-        .submenu a.is-active {
-            color: #fff;
-            background: rgba(252, 163, 17, 0.16);
-        }
+        .menu-link--quiet { background: transparent; box-shadow: none; color: rgba(255,255,255,0.82); }
+        .menu-link--quiet:hover { background: rgba(252,163,17,0.12); color: #fff; transform: none; }
+        .menu-link--quiet .menu-ico { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.08); box-shadow: none; }
+        .submenu a.is-active { color: #fff; background: rgba(252,163,17,0.16); }
         .submenu a.is-active::before { background: var(--green-bright); }
 
-        .page-wrap {
-            flex: 1;
-            padding: 0 1.5rem 1.5rem;
-            min-width: 0;
+        .page-wrap { flex: 1; padding: 0 1.5rem 1.5rem; min-width: 0; }
+
+        .balance-stats {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 0.85rem;
+            margin-bottom: 1rem;
         }
+        .stat-card {
+            position: relative; overflow: hidden; border-radius: 16px;
+            padding: 1rem 1.1rem 1.05rem; color: #fff; min-height: 108px;
+        }
+        .stat-card::before {
+            content: ''; position: absolute; inset: 0;
+            background:
+                radial-gradient(circle at 100% 0%, rgba(255,255,255,0.18), transparent 42%),
+                radial-gradient(circle at 0% 100%, rgba(0,0,0,0.1), transparent 45%);
+            pointer-events: none;
+        }
+        .stat-card[data-tone="achats"] {
+            background: linear-gradient(145deg, #1a3a5c 0%, #0d1b2a 55%, #07111c 100%);
+            box-shadow: 0 8px 20px rgba(7,17,28,0.16), 0 0 0 1px rgba(100,181,246,0.2);
+        }
+        .stat-card[data-tone="ventes"] {
+            background: linear-gradient(145deg, #fca311 0%, #e8920a 48%, #c47e00 100%);
+            color: #0d1b2a;
+            box-shadow: 0 8px 20px rgba(252,163,17,0.22), 0 0 0 1px rgba(252,163,17,0.3);
+        }
+        .stat-card[data-tone="marge"] {
+            background: linear-gradient(145deg, #1b4332 0%, #0f2f24 50%, #07111c 100%);
+            box-shadow: 0 8px 20px rgba(7,17,28,0.16), 0 0 0 1px rgba(77,182,172,0.24);
+        }
+        .stat-label {
+            position: relative; z-index: 1; font-family: 'Outfit', sans-serif;
+            font-size: 0.72rem; font-weight: 600; letter-spacing: 0.03em;
+            text-transform: uppercase; opacity: 0.9; margin-bottom: 0.35rem;
+        }
+        .stat-value {
+            position: relative; z-index: 1; font-family: 'Outfit', sans-serif;
+            font-size: clamp(1.15rem, 2vw, 1.4rem); font-weight: 800;
+            font-variant-numeric: tabular-nums; line-height: 1.2;
+        }
+        .stat-value small { font-size: 0.55em; font-weight: 700; margin-left: 0.15rem; opacity: 0.8; }
+        .stat-hint { position: relative; z-index: 1; margin-top: 0.35rem; font-size: 0.75rem; opacity: 0.75; }
 
         .toolbar {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.65rem;
-            margin-bottom: 1rem;
-            justify-content: flex-end;
+            display: flex; flex-wrap: wrap; gap: 0.65rem;
+            margin-bottom: 1rem; justify-content: flex-end;
         }
-
         .btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.45rem;
-            padding: 0.7rem 1.15rem;
-            border-radius: 11px;
-            border: none;
-            font-family: 'Outfit', sans-serif;
-            font-weight: 600;
-            font-size: 0.9rem;
-            cursor: pointer;
-            text-decoration: none;
+            display: inline-flex; align-items: center; gap: 0.45rem;
+            padding: 0.7rem 1.15rem; border-radius: 11px; border: none;
+            font-family: 'Outfit', sans-serif; font-weight: 600; font-size: 0.9rem;
+            cursor: pointer; text-decoration: none;
             transition: transform 0.15s, filter 0.15s, box-shadow 0.15s;
         }
         .btn:hover { transform: translateY(-1px); }
         .btn svg { width: 16px; height: 16px; }
-
-        .btn-add {
-            color: var(--ink);
-            background: linear-gradient(135deg, #ffb83a, var(--green-bright) 50%, #e8920a);
-            box-shadow: 0 0 18px rgba(252, 163, 17, 0.35), 0 6px 14px rgba(0,0,0,0.12);
+        .btn-print {
+            color: #fff;
+            background: linear-gradient(135deg, #3d7ea6, #2f6a8f);
+            box-shadow: 0 6px 14px rgba(0,0,0,0.12);
         }
         .btn-close {
             color: #fff;
@@ -74,252 +86,37 @@
         }
 
         .table-card {
-            background: var(--white);
-            border-radius: 18px;
-            box-shadow: var(--shadow-card);
-            border: 1px solid rgba(252, 163, 17, 0.14);
-            overflow: hidden;
+            background: var(--white); border-radius: 18px; box-shadow: var(--shadow-card);
+            border: 1px solid rgba(252,163,17,0.14); overflow: hidden;
         }
-
         .table-scroll { overflow-x: auto; }
-
-        table.data-table {
-            width: 100%;
-            border-collapse: collapse;
-            min-width: 1200px;
+        table.data-table { width: 100%; border-collapse: collapse; min-width: 860px; }
+        .data-table th {
+            padding: 0.85rem 0.7rem; font-family: 'Outfit', sans-serif; font-size: 0.78rem;
+            font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase;
+            color: var(--muted); background: #f4f7fb; border-bottom: 1px solid rgba(13,27,42,0.08);
+            text-align: center; white-space: nowrap;
         }
-
         .data-table td {
-            padding: 0.8rem 0.75rem;
-            font-size: 0.88rem;
-            border-bottom: 1px solid rgba(13, 27, 42, 0.06);
-            color: var(--ink);
-            vertical-align: middle;
-            text-align: center;
+            padding: 0.8rem 0.75rem; font-size: 0.88rem;
+            border-bottom: 1px solid rgba(13,27,42,0.06); color: var(--ink);
+            vertical-align: middle; text-align: center;
         }
-
-        .data-table tbody tr:hover { background: rgba(252, 163, 17, 0.06); }
-
-        .data-table .empty {
-            text-align: center;
-            color: var(--muted);
-            padding: 2.5rem 1rem;
-        }
-
-        .photo-thumb {
-            width: 36px;
-            height: 36px;
-            border-radius: 8px;
-            object-fit: cover;
-            border: 1px solid rgba(13, 27, 42, 0.1);
-            background: #eef2f7;
-            display: inline-grid;
-            place-items: center;
-            color: var(--muted);
-            font-size: 0.7rem;
-            margin: 0 auto;
-        }
-
-        .actions {
-            display: flex;
-            gap: 0.35rem;
-            justify-content: center;
-            flex-wrap: wrap;
-            position: relative;
-            z-index: 2;
-        }
-
-        .icon-btn {
-            width: 32px;
-            height: 32px;
-            border-radius: 9px;
-            border: 1px solid rgba(13, 27, 42, 0.1);
-            background: #f4f7f0;
-            color: var(--ink-soft);
-            display: inline-grid;
-            place-items: center;
-            cursor: pointer;
-            pointer-events: auto !important;
-            position: relative;
-            z-index: 10;
-            transition: background 0.15s, color 0.15s, box-shadow 0.15s;
-        }
-        .icon-btn svg,
-        .icon-btn svg * {
-            width: 14px;
-            height: 14px;
-            stroke: currentColor;
-            fill: none;
-            stroke-width: 1.8;
-            pointer-events: none !important;
-        }
-        .icon-btn:hover { box-shadow: 0 4px 12px rgba(21,32,20,0.1); }
-        .icon-btn.view:hover { background: rgba(61, 126, 166, 0.12); color: #3d7ea6; }
-        .icon-btn.edit:hover { background: rgba(252, 163, 17, 0.15); color: #a8861a; }
-        .icon-btn.delete:hover { background: rgba(184, 92, 56, 0.12); color: #b85c38; }
-        .icon-btn.import:hover { background: rgba(47, 143, 107, 0.14); color: #2f8f6b; }
-        .icon-btn.pdf:hover { background: rgba(183, 28, 28, 0.12); color: #b71c1c; }
-
-        .status-select {
-            appearance: none;
-            -webkit-appearance: none;
-            min-width: 120px;
-            padding: 0.4rem 1.8rem 0.4rem 0.7rem;
-            border-radius: 999px;
-            border: none;
-            font-family: inherit;
-            font-size: 0.72rem;
-            font-weight: 700;
-            letter-spacing: 0.03em;
-            text-transform: uppercase;
-            text-align: center;
-            cursor: pointer;
-            outline: none;
-            background-image:
-                linear-gradient(45deg, transparent 50%, currentColor 50%),
-                linear-gradient(135deg, currentColor 50%, transparent 50%);
-            background-position:
-                calc(100% - 14px) calc(50% - 2px),
-                calc(100% - 9px) calc(50% - 2px);
-            background-size: 5px 5px, 5px 5px;
-            background-repeat: no-repeat;
-            transition: box-shadow 0.15s, filter 0.15s;
-        }
-        .status-select:focus {
-            box-shadow: 0 0 0 3px rgba(252, 163, 17, 0.25);
-        }
-        .status-select.status-paye { color: #1b5e20; background-color: rgba(76, 175, 80, 0.18); box-shadow: inset 0 0 0 1px rgba(76, 175, 80, 0.35); }
-        .status-select.status-imp { color: #b71c1c; background-color: rgba(229, 57, 53, 0.15); box-shadow: inset 0 0 0 1px rgba(229, 57, 53, 0.35); }
-        .status-select.status-attente { color: #546e7a; background-color: rgba(120, 144, 156, 0.18); box-shadow: inset 0 0 0 1px rgba(120, 144, 156, 0.35); }
-        .status-select.status-reporte { color: #f57f17; background-color: rgba(255, 193, 7, 0.2); box-shadow: inset 0 0 0 1px rgba(255, 193, 7, 0.45); }
-        .status-select.status-devalide { color: #6a1b9a; background-color: rgba(156, 39, 176, 0.15); box-shadow: inset 0 0 0 1px rgba(156, 39, 176, 0.35); }
-
-        /* Modal règlement */
-        .modal-backdrop {
-            position: fixed;
-            inset: 0;
-            background: rgba(10, 16, 8, 0.55);
-            backdrop-filter: blur(4px);
-            z-index: 80;
-            display: none;
-            pointer-events: none;
-            align-items: flex-start;
-            justify-content: center;
-            padding: 1.25rem;
-            overflow-y: auto;
-        }
-        .modal-backdrop.show { display: flex; pointer-events: auto; }
-
-        .modal {
-            width: min(100%, 820px);
-            margin: 1.5rem auto;
-            background: var(--white);
-            border-radius: 20px;
-            box-shadow: 0 24px 60px rgba(7, 17, 28, 0.35), 0 0 0 1px rgba(252, 163, 17, 0.2);
-            overflow: hidden;
-        }
-        .modal-head {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 1rem;
-            padding: 1.1rem 1.35rem;
-            background: linear-gradient(125deg, #14213d, #0d1b2a 60%, #243016);
-            color: #fff;
-        }
-        .modal-head h2 {
-            font-family: 'Outfit', sans-serif;
-            font-size: 1.2rem;
-            font-weight: 700;
-        }
-        .modal-head h2 span { color: var(--gold); }
-        .modal-body { padding: 1.25rem 1.35rem 1.4rem; }
-
-        .form-grid {
-            display: grid;
-            grid-template-columns: repeat(3, minmax(0, 1fr));
-            gap: 0.9rem;
-            margin-bottom: 1rem;
-        }
-        .field label {
-            display: block;
-            margin-bottom: 0.35rem;
-            font-size: 0.72rem;
-            font-weight: 700;
-            letter-spacing: 0.03em;
-            text-transform: uppercase;
-            color: var(--muted);
-        }
-        .field input,
-        .field select {
-            width: 100%;
-            padding: 0.7rem 0.85rem;
-            border-radius: 10px;
-            border: 1px solid rgba(13, 27, 42, 0.12);
-            background: #f7faf3;
-            font-family: inherit;
-            font-size: 0.92rem;
-            color: var(--ink);
-            outline: none;
-            text-align: center;
-        }
-        .field input:focus,
-        .field select:focus {
-            border-color: rgba(252, 163, 17, 0.65);
-            box-shadow: 0 0 0 3px rgba(252, 163, 17, 0.15);
-            background: #fff;
-        }
-        .field input.readonly {
-            background: #eef2f7;
-            font-weight: 600;
-            cursor: default;
-        }
-        .field.col-solde input {
-            color: #c62828;
-            font-weight: 700;
-        }
-        .import-row {
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            gap: 0.75rem;
-            margin: 0.5rem 0 1.1rem;
-            padding: 0.85rem 1rem;
-            border-radius: 12px;
-            background: #f0f3f7;
-            border: 1px dashed rgba(252, 163, 17, 0.45);
-        }
-        .import-row input[type="file"] { display: none; }
-        .photo-preview {
-            width: 64px;
-            height: 48px;
-            border-radius: 8px;
-            object-fit: cover;
-            border: 1px solid rgba(21,32,20,0.1);
-            background: #e4e9f0;
-            display: none;
-        }
-        .photo-preview.show { display: block; }
-        .modal-actions {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.65rem;
-            justify-content: flex-end;
-        }
-        .btn-validate {
-            color: var(--ink);
-            background: linear-gradient(135deg, #ffb83a, var(--green-bright));
-            box-shadow: 0 0 16px rgba(252, 163, 17, 0.35);
-        }
-        .btn-import {
-            color: #fff;
-            background: linear-gradient(135deg, #3d7ea6, #2f6a8f);
-            box-shadow: 0 6px 14px rgba(0,0,0,0.12);
-        }
+        .data-table tbody tr:hover { background: rgba(252,163,17,0.06); }
+        .data-table .empty { text-align: center; color: var(--muted); padding: 2.5rem 1rem; }
+        .money { font-variant-numeric: tabular-nums; font-weight: 600; }
+        .col-solde { color: #c47e00; font-weight: 700; }
 
         @media (max-width: 900px) {
+            .balance-stats { grid-template-columns: 1fr; }
             .page-wrap { padding: 0 1rem 1.25rem; }
-            .form-grid { grid-template-columns: 1fr; }
+        }
+        @media print {
+            .sidebar, .topbar, .toolbar, .overlay, .menu-toggle, .topbar-badge, .balance-stats { display: none !important; }
+            .app { display: block !important; }
+            .main { margin: 0 !important; width: 100% !important; }
+            .page-wrap { padding: 0 !important; }
+            .table-card { box-shadow: none; border: none; }
         }
     </style>
 </head>
@@ -336,17 +133,35 @@
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M4 12h16M4 17h16" stroke-linecap="round"/></svg>
                     </button>
                     <div class="topbar-left">
-                        <h1>Règlement Vente</h1>
+                        <h1>Balance des Ventes</h1>
                     </div>
                 </div>
                 <div class="topbar-badge"><i></i> Session active</div>
             </header>
 
             <div class="page-wrap">
+                <div class="balance-stats" aria-label="Indicateurs balance">
+                    <article class="stat-card" data-tone="achats">
+                        <div class="stat-label">Total Montant Achats</div>
+                        <div class="stat-value" id="statTotalAchats">0.00 <small>DH</small></div>
+                        <div class="stat-hint">Coût des ventes (P/A)</div>
+                    </article>
+                    <article class="stat-card" data-tone="ventes">
+                        <div class="stat-label">Total Montant Ventes</div>
+                        <div class="stat-value" id="statTotalVentes">0.00 <small>DH</small></div>
+                        <div class="stat-hint">Somme des bons de vente</div>
+                    </article>
+                    <article class="stat-card" data-tone="marge">
+                        <div class="stat-label">Total Marge</div>
+                        <div class="stat-value" id="statTotalMarge">0.00 <small>DH</small></div>
+                        <div class="stat-hint">Ventes − Achats</div>
+                    </article>
+                </div>
+
                 <div class="toolbar">
-                    <button type="button" class="btn btn-add" id="btnAjouter">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14" stroke-linecap="round"/></svg>
-                        Ajouter
+                    <button type="button" class="btn btn-print" id="btnImprimer">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V3h12v6"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v7H6z"/></svg>
+                        Imprimer
                     </button>
                     <a href="{{ route('dashboard') }}" class="btn btn-close">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6 6 18" stroke-linecap="round"/></svg>
@@ -356,25 +171,20 @@
 
                 <div class="table-card">
                     <div class="table-scroll">
-                        <table class="data-table" id="reglementsTable">
+                        <table class="data-table" id="balanceTable">
                             <thead>
                                 <tr>
                                     <th>Date</th>
-                                    <th>N° Rég</th>
-                                    <th>Client</th>
-                                    <th>Montant Rég</th>
-                                    <th>Type</th>
-                                    <th>Bnq</th>
-                                    <th>Tiré</th>
-                                    <th>Date Encaiss</th>
-                                    <th>Photo</th>
-                                    <th>Statut</th>
-                                    <th>Action</th>
+                                    <th>N° Bn</th>
+                                    <th>Montant d'Achat</th>
+                                    <th>Montant de Vente</th>
+                                    <th>Montant Payé</th>
+                                    <th>Solde</th>
                                 </tr>
                             </thead>
-                            <tbody id="reglementsBody">
+                            <tbody id="balanceBody">
                                 <tr class="empty-row">
-                                    <td colspan="11" class="empty">Aucun règlement — les paiements saisis sur Bon Vente apparaîtront ici</td>
+                                    <td colspan="6" class="empty">Aucun bon — les bons de vente apparaîtront ici</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -384,87 +194,10 @@
         </div>
     </div>
 
-    {{-- Fenêtre Ajouter Règlement --}}
-    <div class="modal-backdrop" id="modalReg" role="dialog" aria-modal="true">
-        <div class="modal">
-            <div class="modal-head">
-                <h2>Nouveau <span>Règlement</span></h2>
-                <button type="button" class="btn btn-close" id="regModalX" style="padding:0.45rem 0.7rem;">Fermer</button>
-            </div>
-            <div class="modal-body">
-                <form id="formReg" autocomplete="off" onsubmit="return false;">
-                    <div class="form-grid">
-                        <div class="field">
-                            <label for="regClient">Client</label>
-                            <select id="regClient" required>
-                                <option value="">Sélectionner un client</option>
-                            </select>
-                        </div>
-                        <div class="field">
-                            <label for="regBon">Bon N°</label>
-                            <select id="regBon" required disabled>
-                                <option value="">Sélectionner un bon</option>
-                            </select>
-                        </div>
-                        <div class="field">
-                            <label for="regMontantBon">Montant Bon</label>
-                            <input type="text" id="regMontantBon" class="readonly" readonly tabindex="-1" value="0.00 DH">
-                        </div>
-
-                        <div class="field">
-                            <label for="regMontantPaye">Montant Payé</label>
-                            <input type="number" id="regMontantPaye" min="0" step="0.01" value="0" required>
-                        </div>
-                        <div class="field">
-                            <label for="regType">Type</label>
-                            <select id="regType">
-                                <option value="Esp">Esp</option>
-                                <option value="Chq">Chq</option>
-                                <option value="Eff">Eff</option>
-                                <option value="Vir">Vir</option>
-                                <option value="En Compte">En Compte</option>
-                                <option value="Crédit">Crédit</option>
-                            </select>
-                        </div>
-                        <div class="field">
-                            <label for="regBnq">Bnq</label>
-                            <input type="text" id="regBnq" placeholder="Banque">
-                        </div>
-
-                        <div class="field">
-                            <label for="regTire">Tiré</label>
-                            <input type="text" id="regTire" placeholder="Tiré">
-                        </div>
-                        <div class="field">
-                            <label for="regDateEncaiss">Date Encaiss</label>
-                            <input type="date" id="regDateEncaiss">
-                        </div>
-                        <div class="field col-solde">
-                            <label for="regSolde">Solde</label>
-                            <input type="text" id="regSolde" class="readonly" readonly tabindex="-1" value="0.00 DH">
-                        </div>
-                    </div>
-
-                    <div class="import-row">
-                        <button type="button" class="btn btn-import" id="btnImporter">Importer</button>
-                        <input type="file" id="regPhotoFile" accept="image/*">
-                        <span id="regPhotoName" style="font-size:0.85rem;color:var(--muted)">Aucune photo</span>
-                        <img id="regPhotoPreview" class="photo-preview" alt="Aperçu">
-                    </div>
-
-                    <div class="modal-actions">
-                        <button type="button" class="btn btn-validate" id="btnRegValider">Valider</button>
-                        <button type="button" class="btn btn-close" id="btnRegFermer">Fermer</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <script src="{{ asset('js/table-actions.js') }}?v=5"></script>
-    <script src="{{ asset('js/vente-store.js') }}?v=7"></script>
+    <script src="{{ asset('js/stock-store.js') }}?v=7"></script>
+    <script src="{{ asset('js/achat-store.js') }}?v=6"></script>
+    <script src="{{ asset('js/vente-store.js') }}?v=9"></script>
     <script>
-
         const sidebar = document.getElementById('sidebar');
         const overlay = document.getElementById('overlay');
         const menuToggle = document.getElementById('menuToggle');
@@ -484,286 +217,133 @@
         sidebarClose?.addEventListener('click', closeSidebar);
         overlay?.addEventListener('click', closeSidebar);
 
-        const STATUS_OPTIONS = [
-            { value: 'paye', label: 'Payé', className: 'status-paye' },
-            { value: 'imp', label: 'Imp', className: 'status-imp' },
-            { value: 'attente', label: 'En Attente', className: 'status-attente' },
-            { value: 'reporte', label: 'Reporté', className: 'status-reporte' },
-            { value: 'devalide', label: 'Dévalidé', className: 'status-devalide' },
-        ];
-
-        function buildStatusSelect(selected) {
-            const options = STATUS_OPTIONS.map((s) =>
-                '<option value="' + s.value + '"' + (s.value === selected ? ' selected' : '') + '>' + s.label + '</option>'
-            ).join('');
-            const current = STATUS_OPTIONS.find((s) => s.value === selected) || STATUS_OPTIONS[2];
-            return '<select class="status-select ' + current.className + '" aria-label="Statut">' + options + '</select>';
+        function money(n) {
+            return (Number(n) || 0).toFixed(2) + ' DH';
+        }
+        function fmtMoneyHtml(n) {
+            return (Number(n) || 0).toFixed(2) + ' <small>DH</small>';
         }
 
-        function applyStatusClass(select) {
-            STATUS_OPTIONS.forEach((s) => select.classList.remove(s.className));
-            const found = STATUS_OPTIONS.find((s) => s.value === select.value);
-            if (found) select.classList.add(found.className);
+        function catalogMap() {
+            var map = {};
+            if (!window.StockStore || !StockStore.getCatalogue) return map;
+            StockStore.getCatalogue().forEach(function (p) {
+                if (p.id) map['id:' + p.id] = p;
+                if (p.ref) map['ref:' + String(p.ref).toLowerCase()] = p;
+                if (p.designation) map['desig:' + String(p.designation).toLowerCase()] = p;
+            });
+            return map;
         }
 
-        function bindStatusSelect(cell, id, status) {
-            cell.setAttribute('data-status', status || 'paye');
-            cell.innerHTML = buildStatusSelect(status || 'paye');
-            const select = cell.querySelector('.status-select');
-            if (!select) return;
-            select.addEventListener('change', function () {
-                applyStatusClass(select);
-                if (window.VenteStore && id) {
-                    VenteStore.updateReglementStatut(id, select.value);
-                }
+        function findProduct(map, ligne) {
+            if (ligne.produitId && map['id:' + ligne.produitId]) return map['id:' + ligne.produitId];
+            if (ligne.ref && map['ref:' + String(ligne.ref).toLowerCase()]) return map['ref:' + String(ligne.ref).toLowerCase()];
+            var desig = ligne.designation || ligne.produit || '';
+            if (desig && map['desig:' + String(desig).toLowerCase()]) return map['desig:' + String(desig).toLowerCase()];
+            return null;
+        }
+
+        function montantAchatBon(bon, map) {
+            var total = 0;
+            (bon.lignes || []).forEach(function (l) {
+                var p = findProduct(map, l);
+                var pa = p ? (Number(p.pa) || 0) : 0;
+                var qte = Number(l.qte) || 0;
+                total += pa * qte;
+            });
+            return total;
+        }
+
+        function getBalanceRows() {
+            var map = catalogMap();
+            var bons = (window.VenteStore && VenteStore.getBons) ? VenteStore.getBons() : [];
+            return bons.map(function (b) {
+                var achat = montantAchatBon(b, map);
+                var vente = Number(b.montant) || 0;
+                var paye = Number(b.montantPaye) || 0;
+                var solde = b.solde != null ? Number(b.solde) : Math.max(0, vente - paye);
+                return {
+                    date: b.date || '—',
+                    numero: b.numero || '—',
+                    montantAchat: achat,
+                    montantVente: vente,
+                    montantPaye: paye,
+                    solde: solde
+                };
             });
         }
 
-        function renderReglements() {
-            const body = document.getElementById('reglementsBody');
-            if (!body || !window.VenteStore) return;
+        function refreshBalanceStats(rows) {
+            rows = rows || getBalanceRows();
+            var totalAchats = 0;
+            var totalVentes = 0;
+            rows.forEach(function (r) {
+                totalAchats += Number(r.montantAchat) || 0;
+                totalVentes += Number(r.montantVente) || 0;
+            });
+            document.getElementById('statTotalAchats').innerHTML = fmtMoneyHtml(totalAchats);
+            document.getElementById('statTotalVentes').innerHTML = fmtMoneyHtml(totalVentes);
+            document.getElementById('statTotalMarge').innerHTML = fmtMoneyHtml(totalVentes - totalAchats);
+        }
 
-            const list = VenteStore.getReglements();
-            if (!list.length) {
-                body.innerHTML = '<tr class="empty-row"><td colspan="11" class="empty">Aucun règlement — les paiements saisis sur Bon Vente apparaîtront ici</td></tr>';
+        function renderBalance() {
+            var body = document.getElementById('balanceBody');
+            if (!body) return;
+            var rows = getBalanceRows();
+            refreshBalanceStats(rows);
+            if (!rows.length) {
+                body.innerHTML = '<tr class="empty-row"><td colspan="6" class="empty">Aucun bon — les bons de vente apparaîtront ici</td></tr>';
                 return;
             }
-
-            body.innerHTML = list.map(function (r) {
+            body.innerHTML = rows.map(function (r) {
                 return '' +
-                    '<tr data-id="' + r.id + '">' +
-                    '<td>' + (r.date || '') + '</td>' +
-                    '<td>' + (r.numero || '') + '</td>' +
-                    '<td>' + (r.client || '') + '</td>' +
-                    '<td>' + VenteStore.fmtMoney(r.montant) + '</td>' +
-                    '<td>' + (r.type || '') + '</td>' +
-                    '<td>' + (r.bnq || '—') + '</td>' +
-                    '<td>' + (r.tire || '—') + '</td>' +
-                    '<td>' + (r.dateEncaiss || '—') + '</td>' +
-                    '<td><span class="photo-thumb">' +
-                        (r.photo
-                            ? '<img src="' + r.photo + '" alt="Photo" style="width:100%;height:100%;object-fit:cover;border-radius:8px;display:block">'
-                            : '—') +
-                    '</span></td>' +
-                    '<td class="status-cell" data-status="' + (r.statut || 'paye') + '"></td>' +
-                    '<td class="actions-cell"></td>' +
+                    '<tr>' +
+                    '<td>' + r.date + '</td>' +
+                    '<td>' + r.numero + '</td>' +
+                    '<td class="money">' + money(r.montantAchat) + '</td>' +
+                    '<td class="money">' + money(r.montantVente) + '</td>' +
+                    '<td class="money">' + money(r.montantPaye) + '</td>' +
+                    '<td class="money col-solde">' + money(r.solde) + '</td>' +
+                    '</tr>';
+            }).join('');
+        }
+
+        document.getElementById('btnImprimer').addEventListener('click', function () {
+            var rows = getBalanceRows();
+            var htmlRows = rows.map(function (r) {
+                return '<tr>' +
+                    '<td>' + r.date + '</td>' +
+                    '<td>' + r.numero + '</td>' +
+                    '<td>' + money(r.montantAchat) + '</td>' +
+                    '<td>' + money(r.montantVente) + '</td>' +
+                    '<td>' + money(r.montantPaye) + '</td>' +
+                    '<td>' + money(r.solde) + '</td>' +
                     '</tr>';
             }).join('');
 
-            if (window.TableActions) {
-                TableActions.fillCells('#reglementsBody .actions-cell', ['view', 'edit', 'delete', 'import', 'pdf']);
-            }
-
-            body.querySelectorAll('tr[data-id]').forEach(function (tr) {
-                const id = tr.getAttribute('data-id');
-                const cell = tr.querySelector('.status-cell');
-                const status = cell?.getAttribute('data-status') || 'paye';
-                bindStatusSelect(cell, id, status);
-            });
-        }
-
-        // Bind actions
-        if (window.TableActions) {
-            TableActions.setHandlers({
-                view: function (tr) {
-                    alert('Voir le règlement : ' + (tr.cells[1] ? tr.cells[1].textContent.trim() : ''));
-                },
-                edit: function (tr) {
-                    alert('Modifier le règlement : ' + (tr.cells[1] ? tr.cells[1].textContent.trim() : ''));
-                },
-                delete: function (tr) {
-                    var num = tr.cells[1] ? tr.cells[1].textContent.trim() : '';
-                    var id = tr.getAttribute('data-id');
-                    if (!confirm('Supprimer le règlement ' + num + ' ?')) return;
-                    if (id && window.VenteStore) VenteStore.deleteReglement(id);
-                    if (tr.parentNode) tr.parentNode.removeChild(tr);
-                    var body = document.getElementById('reglementsBody');
-                    if (body && !body.querySelector('tr[data-id]')) {
-                        body.innerHTML = '<tr class="empty-row"><td colspan="11" class="empty">Aucun règlement — les paiements saisis sur Bon Vente apparaîtront ici</td></tr>';
-                    }
-                },
-                import: function (tr) {
-                    alert('Importer un fichier pour : ' + (tr.cells[1] ? tr.cells[1].textContent.trim() : ''));
-                },
-                pdf: function (tr) {
-                    alert('Générer le PDF : ' + (tr.cells[1] ? tr.cells[1].textContent.trim() : ''));
-                }
-            });
-            TableActions.bind(document.getElementById('reglementsBody'));
-        }
-
-        renderReglements();
-
-        /* ——— Modal Ajouter Règlement ——— */
-        const modalReg = document.getElementById('modalReg');
-        const selClient = document.getElementById('regClient');
-        const selBon = document.getElementById('regBon');
-        const inpMontantBon = document.getElementById('regMontantBon');
-        const inpMontantPaye = document.getElementById('regMontantPaye');
-        const inpSolde = document.getElementById('regSolde');
-        const inpDateEncaiss = document.getElementById('regDateEncaiss');
-        const photoFile = document.getElementById('regPhotoFile');
-        const photoPreview = document.getElementById('regPhotoPreview');
-        const photoName = document.getElementById('regPhotoName');
-        let selectedBon = null;
-        let importedPhotoData = '';
-
-        function openRegModal() {
-            if (!window.VenteStore) return;
-            const frns = VenteStore.getClientsNonSoldes();
-            selClient.innerHTML = '<option value="">Sélectionner un client</option>';
-            frns.forEach(function (name) {
-                selClient.innerHTML += '<option value="' + name.replace(/"/g, '&quot;') + '">' + name + '</option>';
-            });
-            selBon.innerHTML = '<option value="">Sélectionner un bon</option>';
-            selBon.disabled = true;
-            selectedBon = null;
-            importedPhotoData = '';
-            inpMontantBon.value = '0.00 DH';
-            inpMontantPaye.value = '0';
-            inpSolde.value = '0.00 DH';
-            document.getElementById('regBnq').value = '';
-            document.getElementById('regTire').value = '';
-            document.getElementById('regType').value = 'Esp';
-            inpDateEncaiss.value = new Date().toISOString().slice(0, 10);
-            photoFile.value = '';
-            photoName.textContent = 'Aucune photo';
-            photoPreview.classList.remove('show');
-            photoPreview.removeAttribute('src');
-
-            if (!frns.length) {
-                alert('Aucun client avec bon non soldé. Créez d’abord un bon de vente non soldé.');
+            var w = window.open('', '_blank', 'width=960,height=720');
+            if (!w) {
+                window.print();
                 return;
             }
-
-            modalReg.classList.add('show');
-            document.body.style.overflow = 'hidden';
-        }
-
-        function closeRegModal() {
-            modalReg.classList.remove('show');
-            document.body.style.overflow = '';
-        }
-
-        function updateRegSolde() {
-            if (!selectedBon) {
-                inpSolde.value = '0.00 DH';
-                return;
-            }
-            var paye = parseFloat(inpMontantPaye.value) || 0;
-            var soldeBon = Number(selectedBon.solde) || 0;
-            var restant = Math.max(0, soldeBon - paye);
-            inpSolde.value = VenteStore.fmtMoney(restant);
-        }
-
-        selClient.addEventListener('change', function () {
-            var name = selClient.value;
-            selectedBon = null;
-            inpMontantBon.value = '0.00 DH';
-            inpMontantPaye.value = '0';
-            selBon.innerHTML = '<option value="">Sélectionner un bon</option>';
-            if (!name) {
-                selBon.disabled = true;
-                updateRegSolde();
-                return;
-            }
-            var bons = VenteStore.getBonsNonSoldesByClient(name);
-            bons.forEach(function (b) {
-                selBon.innerHTML +=
-                    '<option value="' + b.id + '">' +
-                    b.numero + ' — solde ' + VenteStore.fmtMoney(b.solde) +
-                    '</option>';
-            });
-            selBon.disabled = !bons.length;
-            updateRegSolde();
+            w.document.write(
+                '<!DOCTYPE html><html lang="fr"><head><meta charset="utf-8"><title>Balance des Ventes</title>' +
+                '<style>body{font-family:Arial,sans-serif;padding:24px;color:#0d1b2a}h1{font-size:18px;margin:0 0 16px}' +
+                'table{width:100%;border-collapse:collapse}th,td{border:1px solid #ccc;padding:8px;text-align:center;font-size:13px}' +
+                'th{background:#14213d;color:#fff}</style></head><body>' +
+                '<h1>Balance des Ventes</h1>' +
+                '<table><thead><tr><th>Date</th><th>N° Bn</th><th>Montant d\'Achat</th><th>Montant de Vente</th><th>Montant Payé</th><th>Solde</th></tr></thead>' +
+                '<tbody>' + (htmlRows || '<tr><td colspan="6">Aucune donnée</td></tr>') + '</tbody></table>' +
+                '</body></html>'
+            );
+            w.document.close();
+            w.focus();
+            w.print();
         });
 
-        selBon.addEventListener('change', function () {
-            var id = selBon.value;
-            var bons = VenteStore.getBonsNonSoldesByClient(selClient.value);
-            selectedBon = null;
-            for (var i = 0; i < bons.length; i++) {
-                if (bons[i].id === id) { selectedBon = bons[i]; break; }
-            }
-            if (selectedBon) {
-                inpMontantBon.value = VenteStore.fmtMoney(selectedBon.montant);
-                inpMontantPaye.value = selectedBon.solde;
-            } else {
-                inpMontantBon.value = '0.00 DH';
-                inpMontantPaye.value = '0';
-            }
-            updateRegSolde();
-        });
-
-        inpMontantPaye.addEventListener('input', updateRegSolde);
-
-        document.getElementById('btnImporter').addEventListener('click', function () {
-            photoFile.click();
-        });
-
-        photoFile.addEventListener('change', function () {
-            var file = photoFile.files && photoFile.files[0];
-            if (!file) return;
-            if (!file.type || file.type.indexOf('image/') !== 0) {
-                alert('Veuillez choisir une image.');
-                return;
-            }
-            photoName.textContent = file.name;
-            var reader = new FileReader();
-            reader.onload = function (e) {
-                importedPhotoData = e.target.result || '';
-                photoPreview.src = importedPhotoData;
-                photoPreview.classList.add('show');
-            };
-            reader.readAsDataURL(file);
-        });
-
-        document.getElementById('btnAjouter').addEventListener('click', openRegModal);
-        document.getElementById('regModalX').addEventListener('click', closeRegModal);
-        document.getElementById('btnRegFermer').addEventListener('click', closeRegModal);
-        modalReg.addEventListener('click', function (e) {
-            if (e.target === modalReg) closeRegModal();
-        });
-
-        document.getElementById('btnRegValider').addEventListener('click', function () {
-            if (!selectedBon) {
-                alert('Sélectionnez un client et un bon non soldé.');
-                return;
-            }
-            var paye = parseFloat(inpMontantPaye.value) || 0;
-            if (paye <= 0) {
-                alert('Saisissez un montant payé.');
-                return;
-            }
-            if (paye > Number(selectedBon.solde) + 0.001) {
-                alert('Le montant payé ne peut pas dépasser le solde du bon.');
-                return;
-            }
-
-            var type = document.getElementById('regType').value;
-            var bnq = document.getElementById('regBnq').value.trim() || '—';
-            var tire = document.getElementById('regTire').value.trim() || '—';
-            var dateDec = inpDateEncaiss.value
-                ? VenteStore.formatDateFR(inpDateEncaiss.value)
-                : VenteStore.formatDateFR();
-
-            VenteStore.addReglement({
-                client: selectedBon.client,
-                montant: paye,
-                type: type,
-                bnq: bnq,
-                tire: tire,
-                dateEncaiss: dateDec,
-                photo: importedPhotoData,
-                statut: 'paye',
-                numBon: selectedBon.numero,
-                bonId: selectedBon.id
-            });
-
-            VenteStore.applyPaiementToBon(selectedBon.id, paye);
-            renderReglements();
-            closeRegModal();
-        });
+        renderBalance();
+        window.addEventListener('storage', renderBalance);
+        window.addEventListener('focus', renderBalance);
     </script>
 </body>
 </html>

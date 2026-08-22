@@ -80,6 +80,8 @@
                 8px 0 32px rgba(7, 17, 28, 0.28),
                 inset -1px 0 0 rgba(252, 163, 17, 0.12);
             z-index: 50;
+            transition: width 0.28s ease, opacity 0.2s ease, transform 0.28s ease;
+            overflow: hidden;
         }
 
         .sidebar::after {
@@ -410,6 +412,345 @@
             flex-direction: column;
             overflow: hidden;
         }
+
+        .page-wrap {
+            flex: 1;
+            min-height: 0;
+            padding: 0.85rem 1.25rem 1.25rem;
+            overflow: auto;
+        }
+
+        .dash-stats {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 0.7rem;
+            margin-bottom: 0.85rem;
+        }
+
+        .stat-card {
+            position: relative;
+            overflow: hidden;
+            border: none;
+            border-radius: 14px;
+            padding: 0.75rem 0.9rem 0.8rem;
+            text-align: left;
+            color: #fff;
+            isolation: isolate;
+            box-shadow: 0 8px 20px rgba(7, 17, 28, 0.14);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .stat-card:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 10px 24px rgba(7, 17, 28, 0.18);
+        }
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(circle at 100% 0%, rgba(255,255,255,0.18), transparent 42%),
+                radial-gradient(circle at 0% 100%, rgba(0,0,0,0.1), transparent 45%);
+            pointer-events: none;
+            z-index: 0;
+        }
+        .stat-card::after {
+            content: '';
+            position: absolute;
+            right: -14px;
+            bottom: -22px;
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.08);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .stat-card[data-tone="livres"] {
+            background: linear-gradient(145deg, #1a3a5c 0%, #0d1b2a 55%, #07111c 100%);
+            box-shadow: 0 8px 20px rgba(7, 17, 28, 0.16), 0 0 0 1px rgba(100, 181, 246, 0.2);
+        }
+        .stat-card[data-tone="ventes"] {
+            background: linear-gradient(145deg, #fca311 0%, #e8920a 48%, #c47e00 100%);
+            color: #0d1b2a;
+            box-shadow: 0 8px 20px rgba(252, 163, 17, 0.22), 0 0 0 1px rgba(252, 163, 17, 0.3);
+        }
+        .stat-card[data-tone="solde"] {
+            background: linear-gradient(145deg, #1b4332 0%, #0f2f24 50%, #07111c 100%);
+            box-shadow: 0 8px 20px rgba(7, 17, 28, 0.16), 0 0 0 1px rgba(77, 182, 172, 0.24);
+        }
+
+        .stat-top {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.5rem;
+            margin-bottom: 0.45rem;
+        }
+        .stat-ico {
+            width: 32px;
+            height: 32px;
+            border-radius: 10px;
+            display: grid;
+            place-items: center;
+            background: rgba(255,255,255,0.14);
+            border: 1px solid rgba(255,255,255,0.18);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.2);
+        }
+        .stat-card[data-tone="ventes"] .stat-ico {
+            background: rgba(13, 27, 42, 0.12);
+            border-color: rgba(13, 27, 42, 0.12);
+        }
+        .stat-ico svg {
+            width: 16px;
+            height: 16px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 1.8;
+        }
+        .stat-label {
+            position: relative;
+            z-index: 1;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.7rem;
+            font-weight: 600;
+            letter-spacing: 0.03em;
+            text-transform: uppercase;
+            opacity: 0.88;
+            margin-bottom: 0.2rem;
+        }
+        .stat-value {
+            position: relative;
+            z-index: 1;
+            font-family: 'Outfit', sans-serif;
+            font-size: clamp(1.15rem, 1.8vw, 1.35rem);
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            line-height: 1.15;
+            font-variant-numeric: tabular-nums;
+        }
+        .stat-value small {
+            font-size: 0.55em;
+            font-weight: 700;
+            margin-left: 0.15rem;
+            opacity: 0.8;
+        }
+        .stat-hint {
+            display: none;
+        }
+
+        @media (max-width: 900px) {
+            .dash-stats { grid-template-columns: 1fr; }
+        }
+
+        .table-card {
+            background: var(--white);
+            border-radius: 18px;
+            box-shadow: var(--shadow-card);
+            border: 1px solid rgba(252, 163, 17, 0.14);
+            overflow: hidden;
+        }
+        .table-scroll { overflow-x: auto; }
+        table.data-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 980px;
+        }
+        .data-table th {
+            padding: 0.75rem 0.55rem;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.03em;
+            text-transform: uppercase;
+            color: var(--muted);
+            background: #f4f7fb;
+            border-bottom: 1px solid rgba(13, 27, 42, 0.08);
+            text-align: center;
+            white-space: nowrap;
+        }
+        .data-table td {
+            padding: 0.7rem 0.55rem;
+            font-size: 0.86rem;
+            border-bottom: 1px solid rgba(13, 27, 42, 0.06);
+            color: var(--ink);
+            vertical-align: middle;
+            text-align: center;
+        }
+        .data-table tbody tr:hover { background: rgba(252, 163, 17, 0.06); }
+        .data-table .empty { text-align: center; color: var(--muted); padding: 2.5rem 1rem; }
+        .nom-cell { font-weight: 600; text-align: left !important; padding-left: 0.85rem !important; }
+        .money { font-variant-numeric: tabular-nums; font-weight: 600; }
+        .col-solde { color: #c47e00; font-weight: 700; }
+
+        .toolbar {
+            display: flex; flex-wrap: wrap; gap: 0.65rem; margin-bottom: 0.85rem;
+            align-items: flex-end; justify-content: space-between;
+        }
+        .filters {
+            display: flex; flex-wrap: wrap; gap: 0.65rem; align-items: flex-end; flex: 1;
+        }
+        .filter-field label {
+            display: block; margin-bottom: 0.28rem; font-size: 0.7rem; font-weight: 700;
+            letter-spacing: 0.03em; text-transform: uppercase; color: var(--muted);
+        }
+        .filter-field input, .filter-field select {
+            padding: 0.6rem 0.75rem; border-radius: 10px;
+            border: 1px solid rgba(13,27,42,0.12); background: #fff;
+            font-family: inherit; font-size: 0.9rem; color: var(--ink); outline: none;
+            min-width: 140px;
+        }
+        .filter-field input:focus, .filter-field select:focus {
+            border-color: rgba(252,163,17,0.65); box-shadow: 0 0 0 3px rgba(252,163,17,0.15);
+        }
+        .filter-range { display: flex; align-items: center; gap: 0.4rem; }
+        .filter-range span { color: var(--muted); font-size: 0.8rem; font-weight: 600; }
+        .toolbar-actions { display: flex; flex-wrap: wrap; gap: 0.55rem; }
+
+        .btn {
+            display: inline-flex; align-items: center; gap: 0.4rem;
+            padding: 0.65rem 1.05rem; border-radius: 11px; border: none;
+            font-family: 'Outfit', sans-serif; font-weight: 600; font-size: 0.88rem;
+            cursor: pointer; text-decoration: none;
+            transition: transform 0.15s, filter 0.15s;
+        }
+        .btn:hover { transform: translateY(-1px); }
+        .btn svg { width: 15px; height: 15px; }
+        .btn-add {
+            color: var(--ink);
+            background: linear-gradient(135deg, #ffb83a, var(--green-bright) 50%, #e8920a);
+            box-shadow: 0 0 16px rgba(252,163,17,0.3), 0 6px 12px rgba(0,0,0,0.1);
+        }
+        .btn-close { color: #fff; background: linear-gradient(135deg, #5a6570, #3d4650); }
+        .btn-validate {
+            color: var(--ink);
+            background: linear-gradient(135deg, #ffb83a, var(--green-bright));
+            box-shadow: 0 0 14px rgba(252,163,17,0.3);
+        }
+        .btn-print-soft {
+            color: #fff;
+            background: linear-gradient(135deg, #3d7ea6, #2f6284);
+        }
+
+        .mode-badge {
+            display: inline-block; min-width: 54px; padding: 0.28rem 0.55rem; border-radius: 999px;
+            font-size: 0.72rem; font-weight: 700; letter-spacing: 0.02em;
+            background: rgba(13,27,42,0.08); color: var(--ink);
+        }
+
+        .actions { display: flex; gap: 0.3rem; justify-content: center; flex-wrap: wrap; }
+        .icon-btn {
+            width: 30px; height: 30px; border-radius: 8px;
+            border: 1px solid rgba(13,27,42,0.1); background: #f4f7fb; color: var(--ink-soft);
+            display: inline-grid; place-items: center; cursor: pointer;
+        }
+        .icon-btn svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 1.8; pointer-events: none; }
+        .icon-btn.icon-view:hover { background: rgba(61,126,166,0.12); color: #3d7ea6; }
+        .icon-btn.icon-edit:hover { background: rgba(252,163,17,0.15); color: #c47e00; }
+        .icon-btn.icon-delete:hover { background: rgba(184,92,56,0.12); color: #b85c38; }
+
+        .modal-backdrop {
+            position: fixed; inset: 0; background: rgba(7,17,28,0.55); backdrop-filter: blur(4px);
+            z-index: 80; display: none; pointer-events: none;
+            align-items: flex-start; justify-content: center; padding: 1rem; overflow-y: auto;
+        }
+        .modal-backdrop.show { display: flex; pointer-events: auto; }
+        .modal {
+            width: min(100%, 920px); margin: 1.25rem auto; background: var(--white);
+            border-radius: 18px;
+            box-shadow: 0 24px 60px rgba(7,17,28,0.35), 0 0 0 1px rgba(252,163,17,0.2);
+            overflow: hidden;
+        }
+        .modal-head {
+            display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+            padding: 1rem 1.2rem;
+            background: linear-gradient(125deg, #14213d, #0d1b2a 60%, #07111c); color: #fff;
+        }
+        .modal-head h2 { font-family: 'Outfit', sans-serif; font-size: 1.15rem; font-weight: 700; }
+        .modal-head h2 span { color: var(--gold); }
+        .modal-body { padding: 1.1rem 1.2rem 1.25rem; }
+        .form-grid {
+            display: grid;
+            grid-template-columns: minmax(120px, 1.1fr) minmax(90px, 0.7fr) minmax(160px, 1.6fr) minmax(90px, 0.75fr);
+            gap: 0.55rem;
+            margin-bottom: 0.9rem;
+            align-items: end;
+        }
+        .field-narrow input,
+        .field-narrow select {
+            padding-left: 0.45rem;
+            padding-right: 0.45rem;
+            font-size: 0.84rem;
+        }
+        .field label {
+            display: block; margin-bottom: 0.3rem; font-size: 0.7rem; font-weight: 700;
+            letter-spacing: 0.03em; text-transform: uppercase; color: var(--muted);
+        }
+        .field input, .field select {
+            width: 100%; padding: 0.65rem 0.75rem; border-radius: 10px;
+            border: 1px solid rgba(13,27,42,0.12); background: #f4f7fb;
+            font-family: inherit; font-size: 0.9rem; color: var(--ink); outline: none; text-align: center;
+        }
+        .field input:focus, .field select:focus {
+            border-color: rgba(252,163,17,0.65); box-shadow: 0 0 0 3px rgba(252,163,17,0.15); background: #fff;
+        }
+        .field input.readonly { background: #eef2f7; font-weight: 600; cursor: default; }
+
+        .lines-wrap {
+            border: 1px solid rgba(13,27,42,0.08); border-radius: 14px; overflow: hidden; margin-bottom: 0.85rem;
+        }
+        .lines-table { width: 100%; border-collapse: collapse; min-width: 760px; }
+        .lines-table th {
+            padding: 0.55rem 0.4rem; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.03em;
+            background: #f4f7fb; color: var(--muted); text-align: center;
+        }
+        .lines-table td { padding: 0.4rem; border-top: 1px solid rgba(13,27,42,0.06); }
+        .lines-table input, .lines-table select {
+            width: 100%; padding: 0.45rem 0.4rem; border-radius: 8px;
+            border: 1px solid rgba(13,27,42,0.12); background: #fff;
+            font-family: inherit; font-size: 0.84rem; text-align: center; outline: none;
+        }
+        .lines-table input:focus, .lines-table select:focus { border-color: rgba(252,163,17,0.65); }
+        .lines-table input.readonly { background: #eef2f7; font-weight: 600; }
+        .btn-plus {
+            width: 32px; height: 32px; border-radius: 8px; border: none; cursor: pointer;
+            background: linear-gradient(135deg, #ffb83a, #fca311); color: #0d1b2a;
+            display: grid; place-items: center; margin: 0 auto;
+        }
+        .btn-plus svg { width: 16px; height: 16px; }
+        .btn-rm {
+            width: 28px; height: 28px; border-radius: 8px; border: 1px solid rgba(184,92,56,0.25);
+            background: rgba(184,92,56,0.08); color: #b85c38; cursor: pointer; display: grid; place-items: center;
+        }
+        .total-bar {
+            display: flex; justify-content: flex-end; align-items: center; gap: 0.75rem;
+            margin-bottom: 0.9rem; font-family: 'Outfit', sans-serif;
+        }
+        .total-bar strong { font-size: 1.15rem; color: var(--ink); }
+        .modal-actions { display: flex; flex-wrap: wrap; gap: 0.55rem; justify-content: flex-end; }
+
+        @media (max-width: 900px) {
+            .form-grid { grid-template-columns: 1fr 1fr; }
+            .filters { width: 100%; }
+            .toolbar { flex-direction: column; align-items: stretch; }
+            .toolbar-actions { justify-content: flex-end; }
+        }
+        @media (max-width: 560px) {
+            .form-grid { grid-template-columns: 1fr; }
+        }
+
+        .overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(10, 16, 8, 0.45);
+            backdrop-filter: blur(3px);
+            z-index: 45;
+        }
+
+        .overlay.show { display: block; }
 
         .topbar {
             display: flex;
@@ -854,6 +1195,65 @@
             display: none;
         }
 
+        .sidebar-vis-btn {
+            margin-left: auto;
+            width: 36px;
+            height: 36px;
+            flex-shrink: 0;
+            display: grid;
+            place-items: center;
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.06);
+            color: rgba(255, 255, 255, 0.85);
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s, border-color 0.2s;
+        }
+        .sidebar-vis-btn:hover {
+            background: rgba(252, 163, 17, 0.18);
+            border-color: rgba(252, 163, 17, 0.4);
+            color: #fff;
+        }
+        .sidebar-vis-btn svg {
+            width: 18px;
+            height: 18px;
+            stroke: currentColor;
+            fill: none;
+        }
+
+        .sidebar-show-btn {
+            position: fixed;
+            left: 0.85rem;
+            top: 1rem;
+            z-index: 60;
+            width: 44px;
+            height: 44px;
+            display: none;
+            place-items: center;
+            border-radius: 12px;
+            border: 1px solid rgba(252, 163, 17, 0.35);
+            background: linear-gradient(145deg, #14213d, #0d1b2a);
+            color: #fca311;
+            box-shadow: 0 10px 28px rgba(7, 17, 28, 0.35), 0 0 18px rgba(252, 163, 17, 0.2);
+            cursor: pointer;
+        }
+        .sidebar-show-btn.is-visible { display: grid; }
+        .sidebar-show-btn:hover { filter: brightness(1.08); }
+        .sidebar-show-btn svg { width: 20px; height: 20px; }
+
+        .app.sidebar-hidden .sidebar {
+            width: 0 !important;
+            min-width: 0 !important;
+            padding: 0 !important;
+            overflow: hidden !important;
+            border: none !important;
+            box-shadow: none !important;
+            opacity: 0;
+            pointer-events: none;
+            transform: translateX(-100%);
+            transition: transform 0.28s ease, opacity 0.2s ease, width 0.28s ease;
+        }
+
         @media (max-width: 1200px) {
             .kpi-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
         }
@@ -878,9 +1278,27 @@
                 transform: translateX(0);
             }
 
+            .app.sidebar-hidden .sidebar {
+                width: min(86vw, 300px) !important;
+                opacity: 1;
+                pointer-events: auto;
+                transform: translateX(-110%);
+            }
+            .app.sidebar-hidden .sidebar.open {
+                transform: translateX(0);
+            }
+
             .menu-toggle {
                 display: grid;
                 flex-shrink: 0;
+            }
+
+            .sidebar-vis-btn {
+                display: none;
+            }
+
+            .sidebar-show-btn {
+                display: none !important;
             }
 
             .sidebar-close {
@@ -939,6 +1357,14 @@
                     <strong>LibAuto<span class="gold">Ent</span></strong>
                     <span>La Solution qui Gère</span>
                 </div>
+                <button type="button" class="sidebar-vis-btn" id="sidebarHide" aria-label="Masquer le panneau" title="Masquer le panneau">
+                    <svg class="icon-hide-panel" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                        <path d="M17.94 17.94A10.07 10.07 0 0 1 12 19c-6 0-10-7-10-7a18.45 18.45 0 0 1 5.06-5.94"/>
+                        <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c6 0 10 7 10 7a18.5 18.5 0 0 1-2.16 3.19"/>
+                        <path d="M14.12 14.12a3 3 0 1 1-4.24-4.24"/>
+                        <path d="M1 1l22 22" stroke-linecap="round"/>
+                    </svg>
+                </button>
                 <button type="button" class="sidebar-close" id="sidebarClose" aria-label="Fermer le menu">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6 6 18" stroke-linecap="round"/></svg>
                 </button>
@@ -951,6 +1377,48 @@
                     </span>
                     <span class="menu-label">Tableau de Bord</span>
                 </a>
+
+                <div class="menu-group" data-menu="stock">
+                    <button type="button" class="menu-btn" aria-expanded="false">
+                        <span class="menu-ico">
+                            <svg viewBox="0 0 24 24"><path d="M3 8.5 12 4l9 4.5-9 4.5L3 8.5Z"/><path d="M3 12.5 12 17l9-4.5"/><path d="M3 16.5 12 21l9-4.5"/></svg>
+                        </span>
+                        <span class="menu-label">Stock</span>
+                        <svg class="chevron" viewBox="0 0 24 24" fill="none"><path d="m6 9 6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                    </button>
+                    <div class="submenu">
+                        <a href="{{ route('categorie-produit') }}">Catégorie Produit</a>
+                        <a href="{{ route('etat-produit') }}">État Produit</a>
+                    </div>
+                </div>
+
+                <div class="menu-group" data-menu="client">
+                    <button type="button" class="menu-btn" aria-expanded="false">
+                        <span class="menu-ico">
+                            <svg viewBox="0 0 24 24"><path d="M16 19a4 4 0 0 0-8 0"/><circle cx="12" cy="9" r="3.5"/><path d="M19 19a3.5 3.5 0 0 0-2.2-3.2M5 19a3.5 3.5 0 0 1 2.2-3.2M17.5 8.2a3 3 0 1 1-1.2-4"/></svg>
+                        </span>
+                        <span class="menu-label">État Vente</span>
+                        <svg class="chevron" viewBox="0 0 24 24" fill="none"><path d="m6 9 6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                    </button>
+                    <div class="submenu">
+                        <a href="{{ route('reglement-vente') }}">Balance des Ventes</a>
+                        <a href="{{ route('balance-vente') }}">Rapport Revenue</a>
+                    </div>
+                </div>
+
+                <div class="menu-group" data-menu="configuration">
+                    <button type="button" class="menu-btn" aria-expanded="false">
+                        <span class="menu-ico">
+                            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 3.5v2.2M12 18.3v2.2M4.9 6.5l1.6 1.5M17.5 16l1.6 1.5M3.5 12h2.2M18.3 12h2.2M4.9 17.5l1.6-1.5M17.5 8l1.6-1.5"/></svg>
+                        </span>
+                        <span class="menu-label">Configuration</span>
+                        <svg class="chevron" viewBox="0 0 24 24" fill="none"><path d="m6 9 6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                    </button>
+                    <div class="submenu">
+                        <a href="{{ route('utilisateurs') }}">Utilisateurs</a>
+                        <a href="#">Paramètres Système</a>
+                    </div>
+                </div>
 
                 <div class="menu-group is-muted" data-menu="fournisseur" aria-disabled="true">
                     <button type="button" class="menu-btn" aria-expanded="false" disabled tabindex="-1">
@@ -967,37 +1435,8 @@
                     </div>
                 </div>
 
-                <div class="menu-group" data-menu="client">
-                    <button type="button" class="menu-btn" aria-expanded="false">
-                        <span class="menu-ico">
-                            <svg viewBox="0 0 24 24"><path d="M16 19a4 4 0 0 0-8 0"/><circle cx="12" cy="9" r="3.5"/><path d="M19 19a3.5 3.5 0 0 0-2.2-3.2M5 19a3.5 3.5 0 0 1 2.2-3.2M17.5 8.2a3 3 0 1 1-1.2-4"/></svg>
-                        </span>
-                        <span class="menu-label">Client</span>
-                        <svg class="chevron" viewBox="0 0 24 24" fill="none"><path d="m6 9 6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-                    </button>
-                    <div class="submenu">
-                        <a href="{{ route('bon-vente') }}">Bon Vente</a>
-                        <a href="{{ route('reglement-vente') }}">Règlement Vente</a>
-                        <a href="{{ route('balance-vente') }}">Balance Vente</a>
-                    </div>
-                </div>
-
-                <div class="menu-group" data-menu="stock">
-                    <button type="button" class="menu-btn" aria-expanded="false">
-                        <span class="menu-ico">
-                            <svg viewBox="0 0 24 24"><path d="M3 8.5 12 4l9 4.5-9 4.5L3 8.5Z"/><path d="M3 12.5 12 17l9-4.5"/><path d="M3 16.5 12 21l9-4.5"/></svg>
-                        </span>
-                        <span class="menu-label">Stock</span>
-                        <svg class="chevron" viewBox="0 0 24 24" fill="none"><path d="m6 9 6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-                    </button>
-                    <div class="submenu">
-                        <a href="{{ route('categorie-produit') }}">Catégorie Produit</a>
-                        <a href="{{ route('etat-produit') }}">État Produit</a>
-                    </div>
-                </div>
-
-                <div class="menu-group" data-menu="charges">
-                    <button type="button" class="menu-btn" aria-expanded="false">
+                <div class="menu-group is-muted" data-menu="charges" aria-disabled="true">
+                    <button type="button" class="menu-btn" aria-expanded="false" disabled tabindex="-1">
                         <span class="menu-ico">
                             <svg viewBox="0 0 24 24"><path d="M4 7h16v12H4z"/><path d="M8 7V5.5A1.5 1.5 0 0 1 9.5 4h5A1.5 1.5 0 0 1 16 5.5V7"/><path d="M8 12h8"/></svg>
                         </span>
@@ -1005,37 +1444,23 @@
                         <svg class="chevron" viewBox="0 0 24 24" fill="none"><path d="m6 9 6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
                     </button>
                     <div class="submenu">
-                        <a href="#">État Charge</a>
-                        <a href="#">Balance Charges</a>
+                        <a href="#" tabindex="-1">État Charge</a>
+                        <a href="#" tabindex="-1">Balance Charges</a>
                     </div>
                 </div>
 
-                <div class="menu-group" data-menu="rapports">
-                    <button type="button" class="menu-btn" aria-expanded="false">
+                <div class="menu-group is-muted" data-menu="rapports" aria-disabled="true">
+                    <button type="button" class="menu-btn" aria-expanded="false" disabled tabindex="-1">
                         <span class="menu-ico">
-                            <svg viewBox="0 0 24 24"><path d="M4 19V5"/><path d="M4 19h16"/><path d="M8 16v-5"/><path d="M12 16V8"/><path d="M16 16v-3"/></svg>
+                            <svg viewBox="0 0 24 24"><path d="M4 19V5"/><path d="M8 16v-5"/><path d="M12 16V8"/><path d="M16 16v-3"/><path d="M4 19h16"/></svg>
                         </span>
                         <span class="menu-label">Rapports</span>
                         <svg class="chevron" viewBox="0 0 24 24" fill="none"><path d="m6 9 6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
                     </button>
                     <div class="submenu">
-                        <a href="#">Relevé Compte Frns</a>
-                        <a href="#">Relevé Compte Client</a>
-                        <a href="#">Relevé Compte Stock</a>
-                    </div>
-                </div>
-
-                <div class="menu-group" data-menu="configuration">
-                    <button type="button" class="menu-btn" aria-expanded="false">
-                        <span class="menu-ico">
-                            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 3.5v2.2M12 18.3v2.2M4.9 6.5l1.6 1.5M17.5 16l1.6 1.5M3.5 12h2.2M18.3 12h2.2M4.9 17.5l1.6-1.5M17.5 8l1.6-1.5"/></svg>
-                        </span>
-                        <span class="menu-label">Configuration</span>
-                        <svg class="chevron" viewBox="0 0 24 24" fill="none"><path d="m6 9 6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-                    </button>
-                    <div class="submenu">
-                        <a href="{{ route('utilisateurs') }}">Utilisateurs</a>
-                        <a href="#">Paramètres Système</a>
+                        <a href="#" tabindex="-1">Relevé Compte Frns</a>
+                        <a href="#" tabindex="-1">Relevé Compte Client</a>
+                        <a href="#" tabindex="-1">Relevé Compte Stock</a>
                     </div>
                 </div>
             </nav>
@@ -1066,114 +1491,565 @@
                 <div class="topbar-badge"><i></i> Session active</div>
             </header>
 
-            <nav class="kpi-grid notranslate" aria-label="Indicateurs rapides" translate="no">
-                <button type="button" class="kpi-card is-muted" data-tone="suppliers" disabled aria-disabled="true" title="Indisponible">
-                    <div class="kpi-head">
-                        <span class="kpi-ico">
-                            <svg viewBox="0 0 24 24"><path d="M3 10.5 12 4l9 6.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1v-9.5Z" stroke-linejoin="round"/></svg>
-                        </span>
+            <div class="page-wrap">
+                <div class="dash-stats" aria-label="Indicateurs ventes">
+                    <article class="stat-card" data-tone="livres">
+                        <div class="stat-top">
+                            <span class="stat-ico" aria-hidden="true">
+                                <svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+                            </span>
+                        </div>
+                        <div class="stat-label">Nbrs Bon Livrés</div>
+                        <div class="stat-value" id="statBonsLivres">0</div>
+                        <div class="stat-hint">Bons de vente enregistrés</div>
+                    </article>
+
+                    <article class="stat-card" data-tone="ventes">
+                        <div class="stat-top">
+                            <span class="stat-ico" aria-hidden="true">
+                                <svg viewBox="0 0 24 24"><path d="M12 3v18"/><path d="M7 7.5c0-1.7 2.2-3 5-3s5 1.3 5 3-2.2 3-5 3-5 1.3-5 3 2.2 3 5 3 5-1.3 5-3"/></svg>
+                            </span>
+                        </div>
+                        <div class="stat-label">Total Ventes</div>
+                        <div class="stat-value" id="statTotalVentes">0.00 <small>DH</small></div>
+                        <div class="stat-hint">Chiffre d’affaires cumulé</div>
+                    </article>
+
+                    <article class="stat-card" data-tone="solde">
+                        <div class="stat-top">
+                            <span class="stat-ico" aria-hidden="true">
+                                <svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18"/><path d="M8 14h4"/></svg>
+                            </span>
+                        </div>
+                        <div class="stat-label">Total Solde</div>
+                        <div class="stat-value" id="statTotalSolde">0.00 <small>DH</small></div>
+                        <div class="stat-hint">Reste à encaisser</div>
+                    </article>
+                </div>
+
+                <div class="toolbar">
+                    <div class="filters">
+                        <div class="filter-field">
+                            <label for="filterMois">Mois</label>
+                            <select id="filterMois">
+                                <option value="">Tous</option>
+                                <option value="1">Janvier</option>
+                                <option value="2">Février</option>
+                                <option value="3">Mars</option>
+                                <option value="4">Avril</option>
+                                <option value="5">Mai</option>
+                                <option value="6">Juin</option>
+                                <option value="7">Juillet</option>
+                                <option value="8">Août</option>
+                                <option value="9">Septembre</option>
+                                <option value="10">Octobre</option>
+                                <option value="11">Novembre</option>
+                                <option value="12">Décembre</option>
+                            </select>
+                        </div>
+                        <div class="filter-field">
+                            <label>De — À</label>
+                            <div class="filter-range">
+                                <input type="date" id="filterDe" aria-label="Date début">
+                                <span>à</span>
+                                <input type="date" id="filterA" aria-label="Date fin">
+                            </div>
+                        </div>
                     </div>
-                    <div class="kpi-label" translate="no">Solde Fournisseur</div>
-                    <div class="kpi-value" id="kpiSoldeFournisseur">0.00 <small>DH</small></div>
-                </button>
-
-                <button type="button" class="kpi-card" data-tone="clients">
-                    <div class="kpi-head">
-                        <span class="kpi-ico">
-                            <svg viewBox="0 0 24 24"><path d="M16 19a4 4 0 0 0-8 0"/><circle cx="12" cy="9" r="3.5"/><path d="M19 19a3.5 3.5 0 0 0-2.2-3.2M5 19a3.5 3.5 0 0 1 2.2-3.2"/></svg>
-                        </span>
+                    <div class="toolbar-actions">
+                        <button type="button" class="btn btn-add" id="btnAjouter">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14" stroke-linecap="round"/></svg>
+                            Ajouter
+                        </button>
+                        <button type="button" class="btn btn-close" id="btnFermerFiltres">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6 6 18" stroke-linecap="round"/></svg>
+                            Fermer
+                        </button>
                     </div>
-                    <div class="kpi-label" translate="no">Solde Clients</div>
-                    <div class="kpi-value" id="kpiSoldeClients">0.00 <small>DH</small></div>
-                </button>
+                </div>
 
-                <button type="button" class="kpi-card" data-tone="stock">
-                    <div class="kpi-head">
-                        <span class="kpi-ico">
-                            <svg viewBox="0 0 24 24"><path d="M3 8.5 12 4l9 4.5-9 4.5L3 8.5Z"/><path d="M3 12.5 12 17l9-4.5"/><path d="M3 16.5 12 21l9-4.5"/></svg>
-                        </span>
+                <div class="table-card">
+                    <div class="table-scroll">
+                        <table class="data-table" id="bonsTable">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>N° Bn</th>
+                                    <th>Nom Client</th>
+                                    <th>Montant Bn</th>
+                                    <th>Montant Payé</th>
+                                    <th>Solde</th>
+                                    <th>Mode</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="bonsBody">
+                                <tr class="empty-row">
+                                    <td colspan="8" class="empty">Aucun bon — cliquez sur Ajouter</td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
-                    <div class="kpi-label" translate="no">Valeur Stock</div>
-                    <div class="kpi-value">0.00 <small>DH</small></div>
-                </button>
-
-                <button type="button" class="kpi-card" data-tone="caisse">
-                    <div class="kpi-head">
-                        <span class="kpi-ico">
-                            <svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18"/><path d="M8 14h3"/></svg>
-                        </span>
-                    </div>
-                    <div class="kpi-label" translate="no">Caisse</div>
-                    <div class="kpi-value">0.00 <small>DH</small></div>
-                </button>
-
-                <button type="button" class="kpi-card" data-tone="charges">
-                    <div class="kpi-head">
-                        <span class="kpi-ico">
-                            <svg viewBox="0 0 24 24"><path d="M12 3v18"/><path d="M7 7.5c0-1.7 2.2-3 5-3s5 1.3 5 3-2.2 3-5 3-5 1.3-5 3 2.2 3 5 3 5-1.3 5-3"/></svg>
-                        </span>
-                    </div>
-                    <div class="kpi-label" translate="no">Charges</div>
-                    <div class="kpi-value">0.00 <small>DH</small></div>
-                </button>
-            </nav>
-
-            <figure class="dash-hero">
-                <img src="{{ asset('images/dashboard-hero.png') }}" alt="Rayon fruits et légumes — LibAutoEnt" width="1600" height="900">
-            </figure>
-
-            <section class="content">
-            </section>
+                </div>
+            </div>
         </div>
     </div>
 
-    <script src="{{ asset('js/sidebar-menu.js') }}?v=2"></script>
-    <script src="{{ asset('js/achat-store.js') }}?v=7"></script>
-    <script src="{{ asset('js/vente-store.js') }}?v=7"></script>
-    <script>
+    <div class="modal-backdrop" id="modalBon" role="dialog" aria-modal="true">
+        <div class="modal">
+            <div class="modal-head">
+                <h2 id="modalBonTitle">Nouveau <span>Bon</span></h2>
+                <button type="button" class="btn btn-close" id="bonModalX" style="padding:0.4rem 0.65rem;">Fermer</button>
+            </div>
+            <div class="modal-body">
+                <form id="formBon" autocomplete="off" onsubmit="return false;">
+                    <input type="hidden" id="bonEditId" value="">
+                    <div class="form-grid">
+                        <div class="field">
+                            <label for="bonDate">Date</label>
+                            <input type="date" id="bonDate" class="readonly" readonly>
+                        </div>
+                        <div class="field field-narrow">
+                            <label for="bonNumero">N° Bn</label>
+                            <input type="text" id="bonNumero" placeholder="N°">
+                        </div>
+                        <div class="field">
+                            <label for="bonClient">Nom Client</label>
+                            <input type="text" id="bonClient" required>
+                        </div>
+                        <div class="field field-narrow">
+                            <label for="bonMode">Mode</label>
+                            <select id="bonMode">
+                                <option value="Esp">Esp</option>
+                                <option value="Chq">Chq</option>
+                                <option value="Vir">Vir</option>
+                                <option value="Vers">Vers</option>
+                                <option value="Crédit">Crédit</option>
+                            </select>
+                        </div>
+                    </div>
 
+                    <div class="lines-wrap">
+                        <div class="table-scroll">
+                            <table class="lines-table">
+                                <thead>
+                                    <tr>
+                                        <th style="width:90px">Réf</th>
+                                        <th style="width:110px">Code Barre</th>
+                                        <th>Article (Stock)</th>
+                                        <th style="width:80px">Quantité</th>
+                                        <th style="width:95px">Prix/U</th>
+                                        <th style="width:105px">Sous-Total</th>
+                                        <th style="width:48px">+</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="linesBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="total-bar">
+                        <span>Total</span>
+                        <strong id="bonGrandTotal">0.00 DH</strong>
+                    </div>
+
+                    <div class="modal-actions">
+                        <button type="button" class="btn btn-validate" id="btnBonValider">Valider</button>
+                        <button type="button" class="btn btn-print-soft" id="btnBonImprimer">Imprimer</button>
+                        <button type="button" class="btn btn-close" id="btnBonFermer">Fermer</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ asset('js/sidebar-menu.js') }}?v=3"></script>
+    <script src="{{ asset('js/table-actions.js') }}?v=7"></script>
+    <script src="{{ asset('js/stock-store.js') }}?v=6"></script>
+    <script src="{{ asset('js/vente-store.js') }}?v=9"></script>
+    <script>
         const sidebar = document.getElementById('sidebar');
         const overlay = document.getElementById('overlay');
         const menuToggle = document.getElementById('menuToggle');
         const sidebarClose = document.getElementById('sidebarClose');
+        const modalBon = document.getElementById('modalBon');
+        const modalTitle = document.getElementById('modalBonTitle');
+        const linesBody = document.getElementById('linesBody');
+
+        let editMode = false;
+        let viewMode = false;
 
         function openSidebar() {
             sidebar.classList.add('open');
             overlay.classList.add('show');
             document.body.style.overflow = 'hidden';
         }
-
         function closeSidebar() {
             sidebar.classList.remove('open');
             overlay.classList.remove('show');
-            document.body.style.overflow = '';
+            if (!modalBon.classList.contains('show')) document.body.style.overflow = '';
         }
-
-        menuToggle?.addEventListener('click', () => {
-            if (sidebar.classList.contains('open')) closeSidebar();
-            else openSidebar();
-        });
-
+        menuToggle?.addEventListener('click', () => sidebar.classList.contains('open') ? closeSidebar() : openSidebar());
         sidebarClose?.addEventListener('click', closeSidebar);
         overlay?.addEventListener('click', closeSidebar);
 
-        function fillKpiMoney(el, amount) {
-            if (!el) return;
-            var n = Number(amount) || 0;
-            var txt = n.toFixed(2);
-            el.innerHTML = txt + ' <small>DH</small>';
+        function todayISO() {
+            return new Date().toISOString().slice(0, 10);
+        }
+        function toIsoFromFr(fr) {
+            if (!fr) return '';
+            if (fr.indexOf('-') !== -1) return fr;
+            var p = fr.split('/');
+            if (p.length === 3) return p[2] + '-' + p[1] + '-' + p[0];
+            return '';
+        }
+        function parseDateTs(s) {
+            if (!s) return 0;
+            if (s.indexOf('-') !== -1) {
+                var a = s.split('-');
+                return new Date(Number(a[0]), Number(a[1]) - 1, Number(a[2])).getTime() || 0;
+            }
+            var p = s.split('/');
+            if (p.length !== 3) return 0;
+            return new Date(Number(p[2]), Number(p[1]) - 1, Number(p[0])).getTime() || 0;
+        }
+        function monthOf(s) {
+            var ts = parseDateTs(s);
+            if (!ts) return 0;
+            return new Date(ts).getMonth() + 1;
+        }
+        function fmt(n) { return (Number(n) || 0).toFixed(2); }
+        function money(n) { return fmt(n) + ' DH'; }
+
+        function fmtMoneyHtml(n) {
+            return fmt(n) + ' <small>DH</small>';
         }
 
-        function refreshDashboardKpis() {
-            var soldeFrns = window.AchatStore ? AchatStore.getTotalSolde() : 0;
-            var soldeClients = window.VenteStore ? VenteStore.getTotalSolde() : 0;
-            fillKpiMoney(document.getElementById('kpiSoldeFournisseur'), soldeFrns);
-            fillKpiMoney(document.getElementById('kpiSoldeClients'), soldeClients);
+        function refreshDashStats() {
+            var stats = window.VenteStore && VenteStore.getDashboardStats
+                ? VenteStore.getDashboardStats()
+                : { nbrBonsLivres: 0, totalVentes: 0, totalSolde: 0 };
+            document.getElementById('statBonsLivres').textContent = String(stats.nbrBonsLivres || 0);
+            document.getElementById('statTotalVentes').innerHTML = fmtMoneyHtml(stats.totalVentes);
+            document.getElementById('statTotalSolde').innerHTML = fmtMoneyHtml(stats.totalSolde);
         }
 
-        refreshDashboardKpis();
-        window.addEventListener('storage', refreshDashboardKpis);
-        window.addEventListener('focus', refreshDashboardKpis);
+        function filteredBons() {
+            if (!window.VenteStore) return [];
+            var mois = document.getElementById('filterMois').value;
+            var de = document.getElementById('filterDe').value;
+            var a = document.getElementById('filterA').value;
+            var deTs = de ? parseDateTs(de) : 0;
+            var aTs = a ? parseDateTs(a) : 0;
+            return VenteStore.getBons().filter(function (b) {
+                var ts = parseDateTs(b.date);
+                if (mois && String(monthOf(b.date)) !== String(mois)) return false;
+                if (deTs && ts < deTs) return false;
+                if (aTs && ts > aTs) return false;
+                return true;
+            });
+        }
+
+        function renderBons() {
+            var body = document.getElementById('bonsBody');
+            if (!body) return;
+            var list = filteredBons();
+            if (!list.length) {
+                body.innerHTML = '<tr class="empty-row"><td colspan="8" class="empty">Aucun bon — cliquez sur Ajouter</td></tr>';
+                return;
+            }
+            body.innerHTML = list.map(function (b) {
+                return '' +
+                    '<tr data-id="' + b.id + '">' +
+                    '<td>' + (b.date || '—') + '</td>' +
+                    '<td>' + (b.numero || '—') + '</td>' +
+                    '<td class="nom-cell">' + (b.client || '—') + '</td>' +
+                    '<td class="money">' + money(b.montant) + '</td>' +
+                    '<td class="money">' + money(b.montantPaye) + '</td>' +
+                    '<td class="money col-solde">' + money(b.solde) + '</td>' +
+                    '<td><span class="mode-badge">' + (b.typePaie || 'Crédit') + '</span></td>' +
+                    '<td class="actions-cell"></td>' +
+                    '</tr>';
+            }).join('');
+            if (window.TableActions) {
+                TableActions.fillCells('#bonsBody .actions-cell', ['view', 'edit', 'delete']);
+            }
+        }
+
+        function catalog() {
+            return (window.StockStore && StockStore.getCatalogue) ? StockStore.getCatalogue() : [];
+        }
+
+        function findProductById(id) {
+            if (!id) return null;
+            var list = catalog();
+            for (var i = 0; i < list.length; i++) {
+                if (list[i].id === id) return list[i];
+            }
+            return null;
+        }
+
+        function productOptionsHtml(selectedId) {
+            var list = catalog();
+            var html = '<option value="">— Choisir un article —</option>';
+            list.forEach(function (p) {
+                var id = p.id || '';
+                var label = (p.ref ? p.ref + ' — ' : '') + (p.designation || 'Sans nom');
+                var sel = selectedId && selectedId === id ? ' selected' : '';
+                html += '<option value="' + String(id).replace(/"/g, '') + '"' + sel + '>' +
+                    String(label).replace(/</g, '&lt;') + '</option>';
+            });
+            return html;
+        }
+
+        function recalcLine(tr) {
+            var qte = parseFloat(tr.querySelector('.ln-qte').value) || 0;
+            var pu = parseFloat(tr.querySelector('.ln-pu').value) || 0;
+            tr.querySelector('.ln-st').value = fmt(qte * pu);
+            recalcTotal();
+        }
+
+        function recalcTotal() {
+            var total = 0;
+            linesBody.querySelectorAll('tr').forEach(function (tr) {
+                total += parseFloat(tr.querySelector('.ln-st').value) || 0;
+            });
+            document.getElementById('bonGrandTotal').textContent = money(total);
+            return total;
+        }
+
+        function fillFromProduct(tr, p) {
+            if (!p) {
+                tr.querySelector('.ln-ref').value = '';
+                tr.querySelector('.ln-cb').value = '';
+                tr.querySelector('.ln-pu').value = fmt(0);
+                recalcLine(tr);
+                return;
+            }
+            tr.querySelector('.ln-ref').value = p.ref || '';
+            tr.querySelector('.ln-cb').value = p.codeBarre || '';
+            if (p.pv != null) tr.querySelector('.ln-pu').value = fmt(p.pv);
+            recalcLine(tr);
+        }
+
+        function addLine(data) {
+            data = data || {};
+            var list = catalog();
+            if (!list.length && !data.produitId) {
+                alert('Aucun article dans Catégorie Produit (Stock).\nAjoutez d’abord des produits au catalogue.');
+            }
+            var selectedId = data.produitId || '';
+            if (!selectedId && data.ref) {
+                var hit = list.filter(function (p) {
+                    return String(p.ref || '') === String(data.ref || '') ||
+                        String(p.designation || '') === String(data.designation || data.produit || '');
+                })[0];
+                if (hit) selectedId = hit.id;
+            }
+            var tr = document.createElement('tr');
+            tr.innerHTML =
+                '<td><input type="text" class="ln-ref readonly" readonly tabindex="-1" value=""></td>' +
+                '<td><input type="text" class="ln-cb readonly" readonly tabindex="-1" value=""></td>' +
+                '<td><select class="ln-prod">' + productOptionsHtml(selectedId) + '</select></td>' +
+                '<td><input type="number" class="ln-qte" min="0" step="1" value="' + (data.qte != null ? data.qte : 1) + '"></td>' +
+                '<td><input type="number" class="ln-pu" min="0" step="0.01" value="' + fmt(data.pu || data.prix || 0) + '"></td>' +
+                '<td><input type="text" class="ln-st readonly" readonly value="0.00"></td>' +
+                '<td><button type="button" class="btn-plus ln-add" title="Ajouter une ligne"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14" stroke-linecap="round"/></svg></button></td>';
+            linesBody.appendChild(tr);
+            bindLine(tr);
+            var p = findProductById(selectedId);
+            if (p) fillFromProduct(tr, p);
+            else if (data.pu != null || data.prix != null) recalcLine(tr);
+            else recalcLine(tr);
+        }
+
+        function bindLine(tr) {
+            var prod = tr.querySelector('.ln-prod');
+            var qte = tr.querySelector('.ln-qte');
+            var pu = tr.querySelector('.ln-pu');
+            var addBtn = tr.querySelector('.ln-add');
+
+            prod.addEventListener('change', function () {
+                fillFromProduct(tr, findProductById(prod.value));
+            });
+            qte.addEventListener('input', function () { recalcLine(tr); });
+            pu.addEventListener('input', function () { recalcLine(tr); });
+            addBtn.addEventListener('click', function () { addLine(); });
+        }
+
+        function collectLignes() {
+            var rows = [];
+            linesBody.querySelectorAll('tr').forEach(function (tr) {
+                var produitId = tr.querySelector('.ln-prod').value;
+                var p = findProductById(produitId);
+                if (!p) return;
+                var qte = parseFloat(tr.querySelector('.ln-qte').value) || 0;
+                var pu = parseFloat(tr.querySelector('.ln-pu').value) || 0;
+                rows.push({
+                    produitId: p.id,
+                    ref: p.ref || '',
+                    codeBarre: p.codeBarre || '',
+                    designation: p.designation || '',
+                    produit: p.designation || '',
+                    categorie: p.categorie || '',
+                    qte: qte,
+                    pu: pu,
+                    sousTotal: qte * pu
+                });
+            });
+            return rows;
+        }
+
+        function setFormReadonly(ro) {
+            document.getElementById('bonClient').readOnly = ro;
+            document.getElementById('bonMode').disabled = ro;
+            document.getElementById('bonNumero').readOnly = ro;
+            linesBody.querySelectorAll('input, select').forEach(function (inp) {
+                if (inp.classList.contains('ln-st') || inp.classList.contains('ln-ref') || inp.classList.contains('ln-cb')) return;
+                if (inp.tagName === 'SELECT') inp.disabled = ro;
+                else inp.readOnly = ro;
+            });
+            linesBody.querySelectorAll('.ln-add').forEach(function (b) {
+                b.style.visibility = ro ? 'hidden' : 'visible';
+            });
+            document.getElementById('btnBonValider').style.display = ro ? 'none' : '';
+        }
+
+        function openModal(bon, mode) {
+            editMode = mode === 'edit';
+            viewMode = mode === 'view';
+            document.getElementById('formBon').reset();
+            document.getElementById('bonEditId').value = bon && bon.id ? bon.id : '';
+            linesBody.innerHTML = '';
+
+            if (viewMode) modalTitle.innerHTML = 'Voir <span>Bon</span>';
+            else if (editMode) modalTitle.innerHTML = 'Modifier <span>Bon</span>';
+            else modalTitle.innerHTML = 'Nouveau <span>Bon</span>';
+
+            document.getElementById('bonDate').value = bon ? (toIsoFromFr(bon.date) || todayISO()) : todayISO();
+            document.getElementById('bonClient').value = bon ? (bon.client || '') : '';
+            document.getElementById('bonMode').value = bon ? (bon.typePaie || 'Crédit') : 'Crédit';
+            document.getElementById('bonNumero').value = bon ? (bon.numero || '') : '';
+
+            var lignes = (bon && bon.lignes && bon.lignes.length) ? bon.lignes : [{}];
+            lignes.forEach(function (l) { addLine(l); });
+            setFormReadonly(viewMode);
+            modalBon.classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            modalBon.classList.remove('show');
+            document.body.style.overflow = '';
+            editMode = false;
+            viewMode = false;
+            setFormReadonly(false);
+        }
+
+        document.getElementById('btnAjouter').addEventListener('click', function () { openModal(null, 'add'); });
+        document.getElementById('bonModalX').addEventListener('click', closeModal);
+        document.getElementById('btnBonFermer').addEventListener('click', closeModal);
+        modalBon.addEventListener('click', function (e) { if (e.target === modalBon) closeModal(); });
+
+        document.getElementById('btnFermerFiltres').addEventListener('click', function () {
+            document.getElementById('filterMois').value = '';
+            document.getElementById('filterDe').value = '';
+            document.getElementById('filterA').value = '';
+            renderBons();
+        });
+
+        document.getElementById('filterMois').addEventListener('change', renderBons);
+        document.getElementById('filterDe').addEventListener('change', renderBons);
+        document.getElementById('filterA').addEventListener('change', renderBons);
+
+        document.getElementById('btnBonValider').addEventListener('click', function () {
+            if (viewMode || !window.VenteStore) return;
+            var client = document.getElementById('bonClient').value.trim();
+            if (!client) {
+                alert('Veuillez renseigner le Nom Client.');
+                return;
+            }
+            var lignes = collectLignes();
+            if (!lignes.length) {
+                if (!catalog().length) {
+                    alert('Catalogue stock vide. Ajoutez des articles dans Stock → Catégorie Produit.');
+                } else {
+                    alert('Choisissez un article du catalogue stock pour chaque ligne.');
+                }
+                return;
+            }
+            var total = lignes.reduce(function (s, l) { return s + (l.sousTotal || 0); }, 0);
+            var mode = document.getElementById('bonMode').value || 'Crédit';
+            var paye = (mode === 'Crédit') ? 0 : total;
+            var solde = Math.max(0, total - paye);
+            var payload = {
+                date: VenteStore.formatDateFR(document.getElementById('bonDate').value),
+                numero: document.getElementById('bonNumero').value.trim(),
+                client: client,
+                montant: total,
+                typePaie: mode,
+                montantPaye: paye,
+                solde: solde,
+                lignes: lignes
+            };
+            var id = document.getElementById('bonEditId').value;
+            if (id) VenteStore.updateBon(id, payload);
+            else VenteStore.addBon(payload);
+            closeModal();
+            refreshDashboard();
+        });
+
+        document.getElementById('btnBonImprimer').addEventListener('click', function () {
+            var client = document.getElementById('bonClient').value.trim() || '—';
+            var date = document.getElementById('bonDate').value || '';
+            var num = document.getElementById('bonNumero').value.trim() || '—';
+            var mode = document.getElementById('bonMode').value || '';
+            var lignes = collectLignes();
+            var rows = lignes.map(function (l) {
+                return '<tr><td>' + (l.ref || '') + '</td><td>' + (l.codeBarre || '') + '</td><td>' + (l.designation || '') + '</td><td>' + l.qte + '</td><td>' + fmt(l.pu) + '</td><td>' + fmt(l.sousTotal) + '</td></tr>';
+            }).join('');
+            var total = document.getElementById('bonGrandTotal').textContent;
+            var w = window.open('', '_blank');
+            if (!w) return;
+            w.document.write('<!DOCTYPE html><html lang="fr"><head><meta charset="utf-8"><title>Bon ' + num + '</title>' +
+                '<style>body{font-family:Arial,sans-serif;padding:24px}table{width:100%;border-collapse:collapse;margin-top:16px}th,td{border:1px solid #ccc;padding:8px;text-align:center}h1{margin:0 0 8px}</style></head><body>' +
+                '<h1>Bon de vente</h1><p>Date : ' + date + ' | N° : ' + num + ' | Client : ' + client + ' | Mode : ' + mode + '</p>' +
+                '<table><thead><tr><th>Réf</th><th>Code Barre</th><th>Désignation</th><th>Qté</th><th>Prix/U</th><th>Sous-Total</th></tr></thead><tbody>' + rows + '</tbody></table>' +
+                '<p style="text-align:right;font-weight:bold;margin-top:16px">Total : ' + total + '</p></body></html>');
+            w.document.close();
+            w.focus();
+            w.print();
+        });
+
+        if (window.TableActions) {
+            TableActions.setHandlers({
+                view: function (tr) {
+                    var b = VenteStore.getBon(tr.getAttribute('data-id'));
+                    if (b) openModal(b, 'view');
+                },
+                edit: function (tr) {
+                    var b = VenteStore.getBon(tr.getAttribute('data-id'));
+                    if (b) openModal(b, 'edit');
+                },
+                delete: function (tr) {
+                    var id = tr.getAttribute('data-id');
+                    var b = VenteStore.getBon(id);
+                    if (!confirm('Supprimer le bon ' + ((b && b.numero) || '') + ' ?')) return;
+                    VenteStore.deleteBon(id);
+                    refreshDashboard();
+                }
+            });
+            TableActions.bind('#bonsBody');
+        }
+
+        function refreshDashboard() {
+            refreshDashStats();
+            renderBons();
+        }
+
+        refreshDashboard();
+        window.addEventListener('storage', refreshDashboard);
+        window.addEventListener('focus', refreshDashboard);
     </script>
 </body>
 </html>
