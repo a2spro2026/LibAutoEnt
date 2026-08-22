@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="google" content="notranslate">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Catégorie Produit — LibAutoEnt</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -281,9 +282,9 @@
         </div>
     </div>
 
-    <script src="{{ asset('js/data-sync.js') }}?v=1"></script>
+    <script src="{{ asset('js/data-sync.js') }}?v=2"></script>
     <script src="{{ asset('js/table-actions.js') }}?v=7"></script>
-    <script src="{{ asset('js/stock-store.js') }}?v=9"></script>
+    <script src="{{ asset('js/stock-store.js') }}?v=10"></script>
     <script>
         const sidebar = document.getElementById('sidebar');
         const overlay = document.getElementById('overlay');
@@ -397,9 +398,15 @@
                 modalTitle.innerHTML = 'Nouveau <span>Produit</span>';
             }
 
+            var nextRef = 'PR-0001';
+            try {
+                if (window.StockStore && StockStore.nextCatalogRef) {
+                    nextRef = StockStore.nextCatalogRef();
+                }
+            } catch (e) { /* catalogue local corrompu */ }
             document.getElementById('produitRef').value = produit && produit.ref
                 ? produit.ref
-                : (window.StockStore ? StockStore.nextCatalogRef() : 'PR-0001');
+                : nextRef;
             document.getElementById('produitCodeBarre').value = produit ? String(produit.codeBarre || '').toUpperCase() : '';
             document.getElementById('produitDesignation').value = produit ? (produit.designation || '') : '';
             document.getElementById('produitCategorie').value = produit ? (produit.categorie || '') : '';

@@ -272,19 +272,29 @@
         return meta[key];
     }
 
+    function asArray(data) {
+        return Array.isArray(data) ? data : [];
+    }
+
     function readCatalog() {
         try {
             var raw = localStorage.getItem(KEY_CATALOG);
-            return raw ? JSON.parse(raw) : [];
+            var data = raw ? JSON.parse(raw) : [];
+            if (!Array.isArray(data)) {
+                localStorage.setItem(KEY_CATALOG, '[]');
+                return [];
+            }
+            return data;
         } catch (e) {
             return [];
         }
     }
 
     function writeCatalog(list) {
-        localStorage.setItem(KEY_CATALOG, JSON.stringify(list));
+        var safe = asArray(list);
+        localStorage.setItem(KEY_CATALOG, JSON.stringify(safe));
         if (window.DataSync) {
-            DataSync.pushKey(KEY_CATALOG, list);
+            DataSync.pushKey(KEY_CATALOG, safe);
         }
     }
 
@@ -292,7 +302,12 @@
         if (!window.DataSync) {
             return Promise.resolve();
         }
-        return DataSync.pullKey(KEY_CATALOG);
+        return DataSync.pullKey(KEY_CATALOG).then(function (data) {
+            if (data != null && !Array.isArray(data)) {
+                writeCatalog([]);
+            }
+            return readCatalog();
+        });
     }
 
     function uid() {

@@ -17,13 +17,34 @@
         'libautoent_reglements_vente'
     ];
 
+    var ARRAY_KEYS = {
+        libautoent_catalogue_produits: true,
+        libautoent_utilisateurs: true,
+        libautoent_bons_achat: true,
+        libautoent_bons_vente: true,
+        libautoent_reglements_achat: true,
+        libautoent_reglements_vente: true
+    };
+
     function getCsrf() {
+        var meta = document.querySelector('meta[name="csrf-token"]');
+        if (meta && meta.content) return meta.content;
         var match = document.cookie.match(/(?:^|;\s*)XSRF-TOKEN=([^;]*)/);
         if (match) {
             return decodeURIComponent(match[1]);
         }
-        var meta = document.querySelector('meta[name="csrf-token"]');
-        return meta ? meta.content : '';
+        return '';
+    }
+
+    function normalizePulled(key, data) {
+        if (data === null || data === undefined) return null;
+        if (ARRAY_KEYS[key]) {
+            return Array.isArray(data) ? data : [];
+        }
+        if (typeof data !== 'object' || Array.isArray(data)) {
+            return {};
+        }
+        return data;
     }
 
     function pullKey(key) {
@@ -41,6 +62,8 @@
                         var raw = localStorage.getItem(key);
                         if (raw && raw !== '[]' && raw !== '{}') {
                             var local = JSON.parse(raw);
+                            local = normalizePulled(key, local);
+                            if (local == null) return null;
                             return pushKey(key, local).then(function () {
                                 return local;
                             });
@@ -48,8 +71,9 @@
                     } catch (e) { /* ignore */ }
                     return null;
                 }
-                localStorage.setItem(key, JSON.stringify(data));
-                return data;
+                var normalized = normalizePulled(key, data);
+                localStorage.setItem(key, JSON.stringify(normalized));
+                return normalized;
             })
             .catch(function () {
                 return null;

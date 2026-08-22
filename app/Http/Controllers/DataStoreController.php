@@ -26,6 +26,24 @@ class DataStoreController extends Controller
         return storage_path('app/libautoent/'.$key.'.json');
     }
 
+    private const ARRAY_KEYS = [
+        'libautoent_catalogue_produits',
+        'libautoent_utilisateurs',
+        'libautoent_bons_achat',
+        'libautoent_bons_vente',
+        'libautoent_reglements_achat',
+        'libautoent_reglements_vente',
+    ];
+
+    private function normalizePayload(string $key, mixed $data): mixed
+    {
+        if (in_array($key, self::ARRAY_KEYS, true)) {
+            return is_array($data) && array_is_list($data) ? $data : [];
+        }
+
+        return is_array($data) && ! array_is_list($data) ? $data : [];
+    }
+
     public function show(string $key)
     {
         $safe = $this->safeKey($key);
@@ -44,7 +62,7 @@ class DataStoreController extends Controller
             return response()->json(null);
         }
 
-        return response()->json($data);
+        return response()->json($this->normalizePayload($safe, $data));
     }
 
     public function update(Request $request, string $key)
@@ -59,7 +77,7 @@ class DataStoreController extends Controller
             mkdir($dir, 0755, true);
         }
 
-        $payload = $request->json()->all();
+        $payload = $this->normalizePayload($safe, $request->json()->all());
         file_put_contents(
             $this->filePath($safe),
             json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT)
