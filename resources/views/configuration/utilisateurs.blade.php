@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="google" content="notranslate">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Utilisateurs — LibAutoEnt</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -287,8 +288,9 @@
         </div>
     </div>
 
-    <script src="{{ asset('js/table-actions.js') }}?v=6"></script>
-    <script src="{{ asset('js/users-store.js') }}?v=3"></script>
+    <script src="{{ asset('js/data-sync.js') }}?v=3"></script>
+    <script src="{{ asset('js/table-actions.js') }}?v=7"></script>
+    <script src="{{ asset('js/users-store.js') }}?v=4"></script>
     <script>
         const sidebar = document.getElementById('sidebar');
         const overlay = document.getElementById('overlay');
@@ -472,6 +474,11 @@
         }
 
         renderUsers();
+        if (window.DataSync) {
+            DataSync.pullKey('libautoent_utilisateurs').then(function () {
+                renderUsers();
+            });
+        }
 
         (function () {
             var input = document.getElementById('userPassword');

@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="google" content="notranslate">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Règlement Achat — LibAutoEnt</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -461,8 +462,9 @@
         </div>
     </div>
 
-    <script src="{{ asset('js/table-actions.js') }}?v=5"></script>
-    <script src="{{ asset('js/achat-store.js') }}?v=7"></script>
+    <script src="{{ asset('js/data-sync.js') }}?v=3"></script>
+    <script src="{{ asset('js/table-actions.js') }}?v=7"></script>
+    <script src="{{ asset('js/achat-store.js') }}?v=8"></script>
     <script>
 
         const sidebar = document.getElementById('sidebar');
@@ -566,10 +568,44 @@
         if (window.TableActions) {
             TableActions.setHandlers({
                 view: function (tr) {
-                    alert('Voir le règlement : ' + (tr.cells[1] ? tr.cells[1].textContent.trim() : ''));
+                    var id = tr.getAttribute('data-id');
+                    var r = id && window.AchatStore ? AchatStore.getReglements().find(function (x) { return x.id === id; }) : null;
+                    if (!r) {
+                        alert('Règlement introuvable.');
+                        return;
+                    }
+                    alert(
+                        'N° : ' + (r.numero || '') + '\n' +
+                        'Date : ' + (r.date || '') + '\n' +
+                        'Fournisseur : ' + (r.fournisseur || '') + '\n' +
+                        'Montant : ' + (r.montant || 0) + '\n' +
+                        'Type : ' + (r.type || '') + '\n' +
+                        'Statut : ' + (r.statut || '') + '\n' +
+                        'Bon : ' + (r.numBon || '')
+                    );
                 },
                 edit: function (tr) {
-                    alert('Modifier le règlement : ' + (tr.cells[1] ? tr.cells[1].textContent.trim() : ''));
+                    var id = tr.getAttribute('data-id');
+                    var list = window.AchatStore ? AchatStore.getReglements() : [];
+                    var r = list.find(function (x) { return x.id === id; });
+                    if (!r) {
+                        alert('Règlement introuvable.');
+                        return;
+                    }
+                    openRegModal();
+                    var frnsEl = document.getElementById('regFournisseur');
+                    var montantEl = document.getElementById('regMontantPaye');
+                    var typeEl = document.getElementById('regType');
+                    var bnqEl = document.getElementById('regBnq');
+                    var tireEl = document.getElementById('regTire');
+                    if (frnsEl) {
+                        frnsEl.value = r.fournisseur || '';
+                        frnsEl.dispatchEvent(new Event('change'));
+                    }
+                    if (montantEl) montantEl.value = r.montant || 0;
+                    if (typeEl) typeEl.value = r.type || 'Esp';
+                    if (bnqEl) bnqEl.value = r.bnq && r.bnq !== '—' ? r.bnq : '';
+                    if (tireEl) tireEl.value = r.tire && r.tire !== '—' ? r.tire : '';
                 },
                 delete: function (tr) {
                     var num = tr.cells[1] ? tr.cells[1].textContent.trim() : '';
@@ -583,16 +619,55 @@
                     }
                 },
                 import: function (tr) {
-                    alert('Importer un fichier pour : ' + (tr.cells[1] ? tr.cells[1].textContent.trim() : ''));
+                    var cell = tr.querySelector('.photo-cell') || tr;
+                    var file = document.createElement('input');
+                    file.type = 'file';
+                    file.accept = 'image/*,.pdf';
+                    file.onchange = function () {
+                        var f = file.files && file.files[0];
+                        if (!f) return;
+                        var reader = new FileReader();
+                        reader.onload = function () {
+                            var id = tr.getAttribute('data-id');
+                            var list = AchatStore.getReglements().map(function (r) {
+                                if (r.id === id) r.photo = String(reader.result || '');
+                                return r;
+                            });
+                            AchatStore.saveReglements(list);
+                            renderReglements();
+                        };
+                        reader.readAsDataURL(f);
+                    };
+                    file.click();
                 },
                 pdf: function (tr) {
-                    alert('Générer le PDF : ' + (tr.cells[1] ? tr.cells[1].textContent.trim() : ''));
+                    var id = tr.getAttribute('data-id');
+                    var r = id && window.AchatStore ? AchatStore.getReglements().find(function (x) { return x.id === id; }) : null;
+                    if (!r) return;
+                    var w = window.open('', '_blank');
+                    if (!w) return;
+                    w.document.write(
+                        '<!DOCTYPE html><html lang="fr"><head><meta charset="utf-8"><title>Règlement ' + (r.numero || '') + '</title>' +
+                        '<style>body{font-family:Arial,sans-serif;padding:24px}h1{margin:0 0 12px}</style></head><body>' +
+                        '<h1>Règlement Achat</h1>' +
+                        '<p>N° : ' + (r.numero || '') + '<br>Date : ' + (r.date || '') +
+                        '<br>Fournisseur : ' + (r.fournisseur || '') +
+                        '<br>Montant : ' + (r.montant || 0) +
+                        '<br>Type : ' + (r.type || '') +
+                        '<br>Statut : ' + (r.statut || '') + '</p></body></html>'
+                    );
+                    w.document.close();
+                    w.focus();
+                    w.print();
                 }
             });
             TableActions.bind(document.getElementById('reglementsBody'));
         }
 
         renderReglements();
+        if (window.AchatStore && AchatStore.initFromServer) {
+            AchatStore.initFromServer().then(renderReglements);
+        }
 
         /* ——— Modal Ajouter Règlement ——— */
         const modalReg = document.getElementById('modalReg');

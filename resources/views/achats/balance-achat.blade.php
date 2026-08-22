@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="google" content="notranslate">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Balance Achat — LibAutoEnt</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -375,8 +376,9 @@
         </div>
     </div>
 
-    <script src="{{ asset('js/table-actions.js') }}?v=5"></script>
-    <script src="{{ asset('js/achat-store.js') }}?v=7"></script>
+    <script src="{{ asset('js/data-sync.js') }}?v=3"></script>
+    <script src="{{ asset('js/table-actions.js') }}?v=7"></script>
+    <script src="{{ asset('js/achat-store.js') }}?v=8"></script>
     <script>
 
         const sidebar = document.getElementById('sidebar');
@@ -532,6 +534,9 @@
         });
 
         renderBalance();
+        if (window.AchatStore && AchatStore.initFromServer) {
+            AchatStore.initFromServer().then(renderBalance);
+        }
     </script>
 </body>
 </html>

@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="google" content="notranslate">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Bon Vente — LibAutoEnt</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -633,10 +634,10 @@
         </div>
     </div>
 
-    <script src="{{ asset('js/data-sync.js') }}?v=1"></script>
+    <script src="{{ asset('js/data-sync.js') }}?v=3"></script>
     <script src="{{ asset('js/table-actions.js') }}?v=7"></script>
-    <script src="{{ asset('js/stock-store.js') }}?v=9"></script>
-    <script src="{{ asset('js/vente-store.js') }}?v=9"></script>
+    <script src="{{ asset('js/stock-store.js') }}?v=10"></script>
+    <script src="{{ asset('js/vente-store.js') }}?v=10"></script>
     <script>
 
         const sidebar = document.getElementById('sidebar');
@@ -1062,7 +1063,7 @@
                 typePaie: typePaie,
                 montantPaye: montantPaye,
                 solde: solde,
-                lignes: data.lignes || []
+                lignes: data.lines || []
             };
 
             let saved = bon;
@@ -1082,14 +1083,66 @@
             }
             TableActions.setHandlers({
                 view: function (tr) {
-                    var num = tr.cells[1] ? tr.cells[1].textContent.trim() : '';
-                    var frns = tr.cells[2] ? tr.cells[2].textContent.trim() : '';
-                    var montant = tr.cells[3] ? tr.cells[3].textContent.trim() : '';
-                    alert('Bon : ' + num + '\nClient : ' + frns + '\nMontant : ' + montant);
+                    var id = tr.getAttribute('data-id');
+                    var b = id && window.VenteStore ? VenteStore.getBon(id) : null;
+                    if (!b) {
+                        alert('Bon introuvable.');
+                        return;
+                    }
+                    var lignes = (b.lignes || []).map(function (l) {
+                        return '- ' + (l.designation || l.produit || '') + ' x' + (l.qte || 0);
+                    }).join('\n') || '(aucune ligne)';
+                    alert(
+                        'Bon : ' + (b.numero || '') + '\n' +
+                        'Date : ' + (b.date || '') + '\n' +
+                        'Client : ' + (b.client || '') + '\n' +
+                        'Montant : ' + (b.montant || 0) + '\n' +
+                        'Payé : ' + (b.montantPaye || 0) + '\n' +
+                        'Solde : ' + (b.solde || 0) + '\n\n' +
+                        'Lignes :\n' + lignes
+                    );
                 },
                 edit: function (tr) {
-                    var num = tr.cells[1] ? tr.cells[1].textContent.trim() : '';
-                    alert('Modification du bon ' + num + ' — à venir');
+                    var id = tr.getAttribute('data-id');
+                    var b = id && window.VenteStore ? VenteStore.getBon(id) : null;
+                    if (!b) {
+                        alert('Bon introuvable.');
+                        return;
+                    }
+                    openModal();
+                    document.getElementById('dateBon').value = (function () {
+                        var d = b.date || '';
+                        if (d.indexOf('/') !== -1) {
+                            var p = d.split('/');
+                            return p[2] + '-' + p[1] + '-' + p[0];
+                        }
+                        return d;
+                    })();
+                    document.getElementById('numBon').value = b.numero || '';
+                    document.getElementById('client').value = b.client || '';
+                    linesBody.innerHTML = '';
+                    var rows = b.lignes || [];
+                    if (!rows.length) {
+                        addLine();
+                    } else {
+                        rows.forEach(function (l) {
+                            addLine();
+                            var trLine = linesBody.lastElementChild;
+                            if (!trLine) return;
+                            var sel = trLine.querySelector('.prod');
+                            if (sel && l.produitId) {
+                                sel.value = l.produitId;
+                                applyProductToLine(trLine);
+                            }
+                            var qte = trLine.querySelector('.qte');
+                            var pu = trLine.querySelector('.pu');
+                            if (qte) qte.value = l.qte || 1;
+                            if (pu) pu.value = fmt(l.pu || l.prix || 0);
+                            updateLineSub(trLine);
+                        });
+                    }
+                    updateTotal();
+                    setPayButtonsState(true);
                 },
                 delete: function (tr) {
                     var num = tr.cells[1] ? tr.cells[1].textContent.trim() : '';
@@ -1108,9 +1161,11 @@
         }
 
         window.onCatalogueSynced = refreshBonPage;
-        var bootBon = window.StockStore && StockStore.initCatalogFromServer
-            ? StockStore.initCatalogFromServer()
-            : Promise.resolve();
+        window.onVentesSynced = refreshBonPage;
+        var bootBon = Promise.all([
+            (window.StockStore && StockStore.initCatalogFromServer) ? StockStore.initCatalogFromServer() : Promise.resolve(),
+            (window.VenteStore && VenteStore.initFromServer) ? VenteStore.initFromServer() : Promise.resolve()
+        ]);
         bootBon.then(function () {
             renderBons();
             initBonTableActions();

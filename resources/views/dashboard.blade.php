@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="google" content="notranslate">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Tableau de bord — LibAutoEnt</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1664,11 +1665,11 @@
         </div>
     </div>
 
-    <script src="{{ asset('js/data-sync.js') }}?v=1"></script>
+    <script src="{{ asset('js/data-sync.js') }}?v=3"></script>
     <script src="{{ asset('js/sidebar-menu.js') }}?v=3"></script>
     <script src="{{ asset('js/table-actions.js') }}?v=7"></script>
-    <script src="{{ asset('js/stock-store.js') }}?v=9"></script>
-    <script src="{{ asset('js/vente-store.js') }}?v=9"></script>
+    <script src="{{ asset('js/stock-store.js') }}?v=10"></script>
+    <script src="{{ asset('js/vente-store.js') }}?v=10"></script>
     <script>
         const sidebar = document.getElementById('sidebar');
         const overlay = document.getElementById('overlay');
@@ -2050,17 +2051,18 @@
         }
 
         window.onCatalogueSynced = refreshDashboard;
-        var bootDash = window.StockStore && StockStore.initCatalogFromServer
-            ? StockStore.initCatalogFromServer()
-            : Promise.resolve();
+        window.onVentesSynced = refreshDashboard;
+        var bootDash = Promise.all([
+            (window.StockStore && StockStore.initCatalogFromServer) ? StockStore.initCatalogFromServer() : Promise.resolve(),
+            (window.VenteStore && VenteStore.initFromServer) ? VenteStore.initFromServer() : Promise.resolve()
+        ]);
         bootDash.then(refreshDashboard);
         window.addEventListener('storage', refreshDashboard);
         window.addEventListener('focus', function () {
-            if (window.StockStore && StockStore.initCatalogFromServer) {
-                StockStore.initCatalogFromServer().then(refreshDashboard);
-            } else {
-                refreshDashboard();
-            }
+            var jobs = [];
+            if (window.StockStore && StockStore.initCatalogFromServer) jobs.push(StockStore.initCatalogFromServer());
+            if (window.VenteStore && VenteStore.initFromServer) jobs.push(VenteStore.initFromServer());
+            Promise.all(jobs).then(refreshDashboard);
         });
     </script>
 </body>

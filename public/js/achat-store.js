@@ -10,14 +10,27 @@
     function read(key) {
         try {
             var raw = localStorage.getItem(key);
-            return raw ? JSON.parse(raw) : [];
+            var data = raw ? JSON.parse(raw) : [];
+            return Array.isArray(data) ? data : [];
         } catch (e) {
             return [];
         }
     }
 
     function write(key, data) {
-        localStorage.setItem(key, JSON.stringify(data));
+        var safe = Array.isArray(data) ? data : [];
+        localStorage.setItem(key, JSON.stringify(safe));
+        if (window.DataSync) {
+            DataSync.pushKey(key, safe);
+        }
+    }
+
+    function initFromServer() {
+        if (!window.DataSync) return Promise.resolve();
+        return Promise.all([
+            DataSync.pullKey(KEY_BONS),
+            DataSync.pullKey(KEY_REGLEMENTS)
+        ]);
     }
 
     function nextRegNumber() {
@@ -281,6 +294,7 @@
         getTotalSolde: getTotalSolde,
         applyPaiementToBon: applyPaiementToBon,
         formatDateFR: formatDateFR,
-        fmtMoney: fmtMoney
+        fmtMoney: fmtMoney,
+        initFromServer: initFromServer
     };
 })(window);

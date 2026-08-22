@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="google" content="notranslate">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>État Produit — LibAutoEnt</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -239,7 +240,8 @@
         </div>
     </div>
 
-    <script src="{{ asset('js/stock-store.js') }}?v=6"></script>
+    <script src="{{ asset('js/data-sync.js') }}?v=3"></script>
+    <script src="{{ asset('js/stock-store.js') }}?v=10"></script>
     <script>
         const sidebar = document.getElementById('sidebar');
         const overlay = document.getElementById('overlay');
@@ -324,8 +326,18 @@
             window.print();
         });
 
-        renderEtat();
-        window.addEventListener('focus', renderEtat);
+        var bootEtat = (window.StockStore && StockStore.initCatalogFromServer)
+            ? StockStore.initCatalogFromServer()
+            : Promise.resolve();
+        bootEtat.then(renderEtat);
+        window.addEventListener('focus', function () {
+            if (window.StockStore && StockStore.initCatalogFromServer) {
+                StockStore.initCatalogFromServer().then(renderEtat);
+            } else {
+                renderEtat();
+            }
+        });
+        window.onCatalogueSynced = renderEtat;
     </script>
 </body>
 </html>

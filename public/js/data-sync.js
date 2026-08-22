@@ -26,14 +26,21 @@
         libautoent_reglements_vente: true
     };
 
-    function getCsrf() {
+    function getSyncHeaders() {
+        var headers = {
+            'Content-Type': 'application/json',
+            Accept: 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+        };
         var meta = document.querySelector('meta[name="csrf-token"]');
-        if (meta && meta.content) return meta.content;
+        if (meta && meta.content) {
+            headers['X-CSRF-TOKEN'] = meta.content;
+        }
         var match = document.cookie.match(/(?:^|;\s*)XSRF-TOKEN=([^;]*)/);
         if (match) {
-            return decodeURIComponent(match[1]);
+            headers['X-XSRF-TOKEN'] = decodeURIComponent(match[1]);
         }
-        return '';
+        return headers;
     }
 
     function normalizePulled(key, data) {
@@ -83,12 +90,7 @@
     function pushKey(key, data) {
         return fetch(API + '/' + encodeURIComponent(key), {
             method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-                Accept: 'application/json',
-                'X-CSRF-TOKEN': getCsrf(),
-                'X-Requested-With': 'XMLHttpRequest'
-            },
+            headers: getSyncHeaders(),
             credentials: 'same-origin',
             body: JSON.stringify(data)
         }).catch(function () {});
@@ -114,6 +116,11 @@
         pullKey('libautoent_catalogue_produits').then(function () {
             if (typeof window.onCatalogueSynced === 'function') {
                 window.onCatalogueSynced();
+            }
+        });
+        pullKey('libautoent_bons_vente').then(function () {
+            if (typeof window.onVentesSynced === 'function') {
+                window.onVentesSynced();
             }
         });
     });

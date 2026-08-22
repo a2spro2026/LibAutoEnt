@@ -11,14 +11,19 @@
     function read() {
         try {
             var raw = localStorage.getItem(KEY);
-            return raw ? JSON.parse(raw) : [];
+            var data = raw ? JSON.parse(raw) : [];
+            return Array.isArray(data) ? data : [];
         } catch (e) {
             return [];
         }
     }
 
     function write(list) {
-        localStorage.setItem(KEY, JSON.stringify(list));
+        var safe = Array.isArray(list) ? list : [];
+        localStorage.setItem(KEY, JSON.stringify(safe));
+        if (window.DataSync) {
+            DataSync.pushKey(KEY, safe);
+        }
     }
 
     function formatDateFR(isoOrDate) {

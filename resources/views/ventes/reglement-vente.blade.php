@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="google" content="notranslate">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Balance des Ventes — LibAutoEnt</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -194,9 +195,10 @@
         </div>
     </div>
 
-    <script src="{{ asset('js/stock-store.js') }}?v=7"></script>
-    <script src="{{ asset('js/achat-store.js') }}?v=6"></script>
-    <script src="{{ asset('js/vente-store.js') }}?v=9"></script>
+    <script src="{{ asset('js/data-sync.js') }}?v=3"></script>
+    <script src="{{ asset('js/stock-store.js') }}?v=10"></script>
+    <script src="{{ asset('js/achat-store.js') }}?v=8"></script>
+    <script src="{{ asset('js/vente-store.js') }}?v=10"></script>
     <script>
         const sidebar = document.getElementById('sidebar');
         const overlay = document.getElementById('overlay');
@@ -344,6 +346,13 @@
         renderBalance();
         window.addEventListener('storage', renderBalance);
         window.addEventListener('focus', renderBalance);
+        window.onVentesSynced = renderBalance;
+        if (window.VenteStore && VenteStore.initFromServer) {
+            VenteStore.initFromServer().then(renderBalance);
+        }
+        if (window.AchatStore && AchatStore.initFromServer) {
+            AchatStore.initFromServer().then(renderBalance);
+        }
     </script>
 </body>
 </html>
