@@ -114,12 +114,22 @@
         write(KEY_BONS, list);
     }
 
+    function nextBonNumero() {
+        var list = read(KEY_BONS);
+        var max = 0;
+        list.forEach(function (b) {
+            var m = String(b.numero || '').trim().match(/^BL0*(\d+)$/i);
+            if (m) max = Math.max(max, parseInt(m[1], 10) || 0);
+        });
+        return 'BL' + String(max + 1).padStart(4, '0');
+    }
+
     function addBon(bon) {
         var list = read(KEY_BONS);
         var item = {
             id: bon.id || ('bonv_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7)),
             date: bon.date || formatDateFR(),
-            numero: bon.numero || '',
+            numero: String(bon.numero || '').trim() || nextBonNumero(),
             client: bon.client || '',
             montant: Number(bon.montant) || 0,
             typePaie: bon.typePaie || 'Crédit',
@@ -319,6 +329,7 @@
         updateBon: updateBon,
         getBon: getBon,
         deleteBon: deleteBon,
+        nextBonNumero: nextBonNumero,
         getBonsNonSoldes: getBonsNonSoldes,
         getClientsNonSoldes: getClientsNonSoldes,
         getBonsNonSoldesByClient: getBonsNonSoldesByClient,

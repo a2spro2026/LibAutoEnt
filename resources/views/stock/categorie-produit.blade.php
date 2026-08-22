@@ -282,9 +282,9 @@
         </div>
     </div>
 
-    <script src="{{ asset('js/data-sync.js') }}?v=3"></script>
+    <script src="{{ asset('js/data-sync.js') }}?v=4"></script>
     <script src="{{ asset('js/table-actions.js') }}?v=7"></script>
-    <script src="{{ asset('js/stock-store.js') }}?v=10"></script>
+    <script src="{{ asset('js/stock-store.js') }}?v=11"></script>
     <script>
         const sidebar = document.getElementById('sidebar');
         const overlay = document.getElementById('overlay');
@@ -333,6 +333,110 @@
             }
         }
 
+        function compressImageFile(file, maxSide, quality) {
+            return new Promise(function (resolve, reject) {
+                var url = URL.createObjectURL(file);
+                var img = new Image();
+                img.onload = function () {
+                    try {
+                        var w = img.naturalWidth || img.width;
+                        var h = img.naturalHeight || img.height;
+                        var scale = Math.min(1, maxSide / Math.max(w, h));
+                        var cw = Math.max(1, Math.round(w * scale));
+                        var ch = Math.max(1, Math.round(h * scale));
+                        var canvas = document.createElement('canvas');
+                        canvas.width = cw;
+                        canvas.height = ch;
+                        var ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, cw, ch);
+                        URL.revokeObjectURL(url);
+                        canvas.toBlob(function (blob) {
+                            if (!blob) {
+                                reject(new Error('Compression impossible'));
+                                return;
+                            }
+                            resolve(blob);
+                        }, 'image/jpeg', quality);
+                    } catch (err) {
+                        URL.revokeObjectURL(url);
+                        reject(err);
+                    }
+                };
+                img.onerror = function () {
+                    URL.revokeObjectURL(url);
+                    reject(new Error('Lecture image impossible'));
+                };
+                img.src = url;
+            });
+        }
+
+        function importPhotoFile(file) {
+            if (!file) return;
+            if (!file.type || file.type.indexOf('image/') !== 0) {
+                alert('Veuillez choisir une image.');
+                photoFile.value = '';
+                return;
+            }
+            if (file.size > 5 * 1024 * 1024) {
+                alert('Image trop lourde (max 5 Mo).');
+                photoFile.value = '';
+                return;
+            }
+
+            btnImporterPhoto.disabled = true;
+            btnImporterPhoto.textContent = 'Import…';
+            photoName.textContent = 'Traitement de la photo…';
+
+            function readAsDataUrl(blobOrFile) {
+                return new Promise(function (resolve, reject) {
+                    var reader = new FileReader();
+                    reader.onload = function () { resolve(String(reader.result || '')); };
+                    reader.onerror = reject;
+                    reader.readAsDataURL(blobOrFile);
+                });
+            }
+
+            function applyPhoto(urlOrData, label) {
+                setPhotoUI(urlOrData, label);
+                setFieldsReadonly(viewMode);
+            }
+
+            compressImageFile(file, 800, 0.72)
+                .catch(function () {
+                    // HEIC / formats non supportés par canvas → fichier brut
+                    return file;
+                })
+                .then(function (blobOrFile) {
+                    var name = (blobOrFile === file) ? (file.name || 'photo.jpg') : 'produit.jpg';
+                    if (window.DataSync && DataSync.uploadPhoto) {
+                        return DataSync.uploadPhoto(blobOrFile, name).then(function (url) {
+                            applyPhoto(url, file.name);
+                            return url;
+                        }).catch(function () {
+                            return readAsDataUrl(blobOrFile).then(function (dataUrl) {
+                                applyPhoto(dataUrl, file.name + ' (local)');
+                                return dataUrl;
+                            });
+                        });
+                    }
+                    return readAsDataUrl(blobOrFile).then(function (dataUrl) {
+                        applyPhoto(dataUrl, file.name);
+                        return dataUrl;
+                    });
+                })
+                .catch(function (err) {
+                    console.error(err);
+                    alert('Impossible d’importer la photo.');
+                    photoFile.value = '';
+                    if (!importedPhotoData) photoName.textContent = 'Aucune photo';
+                })
+                .finally(function () {
+                    btnImporterPhoto.disabled = false;
+                    btnImporterPhoto.innerHTML =
+                        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg> Importer photo';
+                });
+        }
+
         function setFieldsReadonly(ro) {
             fields.forEach(function (id) {
                 var el = document.getElementById(id);
@@ -348,8 +452,10 @@
         }
 
         function photoCell(p) {
-            if (p.photo) {
-                return '<span class="photo-thumb"><img src="' + p.photo + '" alt=""></span>';
+            var src = p && p.photo ? String(p.photo) : '';
+            if (src) {
+                var safe = src.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+                return '<span class="photo-thumb"><img src="' + safe + '" alt="" onerror="this.parentNode.textContent=\'—\'"></span>';
             }
             return '<span class="photo-thumb">—</span>';
         }
@@ -453,23 +559,7 @@
 
         photoFile.addEventListener('change', function () {
             var file = photoFile.files && photoFile.files[0];
-            if (!file) return;
-            if (!file.type || file.type.indexOf('image/') !== 0) {
-                alert('Veuillez choisir une image.');
-                photoFile.value = '';
-                return;
-            }
-            if (file.size > 1.5 * 1024 * 1024) {
-                alert('Image trop lourde (max 1,5 Mo).');
-                photoFile.value = '';
-                return;
-            }
-            var reader = new FileReader();
-            reader.onload = function () {
-                setPhotoUI(String(reader.result || ''), file.name);
-                setFieldsReadonly(viewMode);
-            };
-            reader.readAsDataURL(file);
+            importPhotoFile(file);
         });
 
         document.getElementById('btnProduitValider').addEventListener('click', function () {
@@ -486,18 +576,24 @@
                 document.getElementById('produitDesignation').focus();
                 return;
             }
-            var saved = StockStore.saveProduit({
-                id: document.getElementById('produitEditId').value || '',
-                ref: ref,
-                codeBarre: document.getElementById('produitCodeBarre').value,
-                designation: designation,
-                categorie: document.getElementById('produitCategorie').value,
-                famille: document.getElementById('produitFamille').value,
-                quantite: document.getElementById('produitQuantite').value,
-                pa: document.getElementById('produitPa').value,
-                pv: document.getElementById('produitPv').value,
-                photo: importedPhotoData
-            });
+            var saved = null;
+            try {
+                saved = StockStore.saveProduit({
+                    id: document.getElementById('produitEditId').value || '',
+                    ref: ref,
+                    codeBarre: document.getElementById('produitCodeBarre').value,
+                    designation: designation,
+                    categorie: document.getElementById('produitCategorie').value,
+                    famille: document.getElementById('produitFamille').value,
+                    quantite: document.getElementById('produitQuantite').value,
+                    pa: document.getElementById('produitPa').value,
+                    pv: document.getElementById('produitPv').value,
+                    photo: importedPhotoData
+                });
+            } catch (err) {
+                alert(err.message || 'Enregistrement impossible.');
+                return;
+            }
             if (!saved) {
                 alert('Enregistrement impossible.');
                 return;

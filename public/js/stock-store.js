@@ -292,7 +292,12 @@
 
     function writeCatalog(list) {
         var safe = asArray(list);
-        localStorage.setItem(KEY_CATALOG, JSON.stringify(safe));
+        try {
+            localStorage.setItem(KEY_CATALOG, JSON.stringify(safe));
+        } catch (e) {
+            console.error('Catalogue localStorage', e);
+            throw new Error('Espace de stockage insuffisant (photo trop lourde). Réessayez avec une image plus légère.');
+        }
         if (window.DataSync) {
             DataSync.pushKey(KEY_CATALOG, safe);
         }

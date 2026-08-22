@@ -26,12 +26,14 @@
         libautoent_reglements_vente: true
     };
 
-    function getSyncHeaders() {
+    function getSyncHeaders(isJson) {
         var headers = {
-            'Content-Type': 'application/json',
             Accept: 'application/json',
             'X-Requested-With': 'XMLHttpRequest'
         };
+        if (isJson !== false) {
+            headers['Content-Type'] = 'application/json';
+        }
         var meta = document.querySelector('meta[name="csrf-token"]');
         if (meta && meta.content) {
             headers['X-CSRF-TOKEN'] = meta.content;
@@ -54,6 +56,35 @@
         return data;
     }
 
+    function readLocal(key) {
+        try {
+            var raw = localStorage.getItem(key);
+            return raw ? JSON.parse(raw) : null;
+        } catch (e) {
+            return null;
+        }
+    }
+
+    function mergeCatalogue(remote, local) {
+        if (!Array.isArray(remote)) return Array.isArray(local) ? local : [];
+        if (!Array.isArray(local) || !local.length) return remote;
+        var byId = {};
+        local.forEach(function (p) {
+            if (p && p.id) byId[p.id] = p;
+        });
+        return remote.map(function (p) {
+            if (!p || !p.id) return p;
+            var loc = byId[p.id];
+            if (!loc) return p;
+            var remotePhoto = String(p.photo || '');
+            var localPhoto = String(loc.photo || '');
+            if (!remotePhoto && localPhoto) {
+                return Object.assign({}, p, { photo: localPhoto });
+            }
+            return p;
+        });
+    }
+
     function pullKey(key) {
         return fetch(API + '/' + encodeURIComponent(key), {
             headers: { Accept: 'application/json' },
@@ -64,21 +95,34 @@
                 return r.json();
             })
             .then(function (data) {
+                var local = readLocal(key);
+
                 if (data === null || data === undefined) {
-                    try {
-                        var raw = localStorage.getItem(key);
-                        if (raw && raw !== '[]' && raw !== '{}') {
-                            var local = JSON.parse(raw);
-                            local = normalizePulled(key, local);
-                            if (local == null) return null;
-                            return pushKey(key, local).then(function () {
-                                return local;
-                            });
-                        }
-                    } catch (e) { /* ignore */ }
+                    if (local != null && JSON.stringify(local) !== '[]' && JSON.stringify(local) !== '{}') {
+                        var normalizedLocal = normalizePulled(key, local);
+                        if (normalizedLocal == null) return null;
+                        return pushKey(key, normalizedLocal).then(function () {
+                            return normalizedLocal;
+                        });
+                    }
                     return null;
                 }
+
                 var normalized = normalizePulled(key, data);
+
+                // Ne pas écraser un catalogue local non vide par une liste serveur vide
+                if (key === 'libautoent_catalogue_produits' &&
+                    Array.isArray(normalized) && normalized.length === 0 &&
+                    Array.isArray(local) && local.length > 0) {
+                    return pushKey(key, local).then(function () {
+                        return local;
+                    });
+                }
+
+                if (key === 'libautoent_catalogue_produits' && Array.isArray(normalized)) {
+                    normalized = mergeCatalogue(normalized, local);
+                }
+
                 localStorage.setItem(key, JSON.stringify(normalized));
                 return normalized;
             })
@@ -87,13 +131,55 @@
             });
     }
 
+    function sanitizeForPush(key, data) {
+        // Ne jamais pousser les photos base64 (trop lourdes → sync échoue → photos perdues)
+        if (key === 'libautoent_catalogue_produits' && Array.isArray(data)) {
+            return data.map(function (p) {
+                if (!p || typeof p !== 'object') return p;
+                var photo = String(p.photo || '');
+                if (photo.indexOf('data:') === 0) {
+                    return Object.assign({}, p, { photo: '' });
+                }
+                return p;
+            });
+        }
+        return data;
+    }
+
     function pushKey(key, data) {
+        var body = sanitizeForPush(key, data);
         return fetch(API + '/' + encodeURIComponent(key), {
             method: 'PUT',
-            headers: getSyncHeaders(),
+            headers: getSyncHeaders(true),
             credentials: 'same-origin',
-            body: JSON.stringify(data)
-        }).catch(function () {});
+            body: JSON.stringify(body)
+        }).then(function (r) {
+            if (!r.ok) {
+                return r.text().then(function () {
+                    return { ok: false, status: r.status };
+                });
+            }
+            return { ok: true };
+        }).catch(function () {
+            return { ok: false };
+        });
+    }
+
+    function uploadPhoto(blobOrFile, filename) {
+        var fd = new FormData();
+        fd.append('photo', blobOrFile, filename || 'photo.jpg');
+        return fetch('/api/photo', {
+            method: 'POST',
+            headers: getSyncHeaders(false),
+            credentials: 'same-origin',
+            body: fd
+        }).then(function (r) {
+            if (!r.ok) throw new Error('Upload photo échoué (' + r.status + ')');
+            return r.json();
+        }).then(function (json) {
+            if (!json || !json.url) throw new Error('Réponse photo invalide');
+            return json.url;
+        });
     }
 
     function pullAll(keys) {
@@ -130,6 +216,7 @@
         pullKey: pullKey,
         pushKey: pushKey,
         pullAll: pullAll,
-        pushKeyFromLocal: pushKeyFromLocal
+        pushKeyFromLocal: pushKeyFromLocal,
+        uploadPhoto: uploadPhoto
     };
 })(window);

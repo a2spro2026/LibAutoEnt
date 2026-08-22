@@ -60,3 +60,4 @@ Route::get('/configuration/utilisateurs', function () {
 
 Route::get('/api/store/{key}', [App\Http\Controllers\DataStoreController::class, 'show']);
 Route::put('/api/store/{key}', [App\Http\Controllers\DataStoreController::class, 'update']);
+Route::post('/api/photo', [App\Http\Controllers\DataStoreController::class, 'uploadPhoto']);

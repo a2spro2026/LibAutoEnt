@@ -780,6 +780,75 @@
         }
         .btn-add-line svg { width: 15px; height: 15px; }
         .btn-add-line:disabled { opacity: 0.45; cursor: default; }
+        .btn-pick {
+            color: #fff;
+            background: linear-gradient(135deg, #3d7ea6, #2f6284);
+            box-shadow: 0 4px 10px rgba(47,98,132,0.28);
+        }
+        .pick-backdrop {
+            position: fixed; inset: 0; z-index: 125;
+            background: rgba(10,16,8,0.55); backdrop-filter: blur(4px);
+            display: none; align-items: flex-start; justify-content: center;
+            padding: 1rem; overflow-y: auto;
+        }
+        .pick-backdrop.show { display: flex; }
+        .pick-panel {
+            width: min(100%, 920px); margin: 0.75rem auto; background: #fff;
+            border-radius: 18px; overflow: hidden;
+            box-shadow: 0 24px 60px rgba(16,24,14,0.35), 0 0 0 1px rgba(252,163,17,0.2);
+        }
+        .pick-head {
+            display: flex; align-items: center; justify-content: space-between; gap: 0.75rem;
+            padding: 0.9rem 1.1rem;
+            background: linear-gradient(125deg, #14213d, #0d1b2a 60%, #243016); color: #fff;
+        }
+        .pick-head h2 { font-family: 'Outfit', sans-serif; font-size: 1.1rem; font-weight: 700; margin: 0; }
+        .pick-head h2 span { color: var(--gold); }
+        .pick-body { padding: 1rem 1.1rem 1.15rem; }
+        .pick-search {
+            width: 100%; margin-bottom: 0.85rem; padding: 0.75rem 0.9rem;
+            border-radius: 11px; border: 1px solid rgba(13,27,42,0.14);
+            background: #f7fafc; font-family: inherit; font-size: 0.95rem; outline: none;
+        }
+        .pick-search:focus {
+            border-color: rgba(252,163,17,0.65); background: #fff;
+            box-shadow: 0 0 0 3px rgba(252,163,17,0.15);
+        }
+        .pick-hint { margin: -0.35rem 0 0.85rem; font-size: 0.8rem; color: var(--muted); }
+        .pick-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 0.75rem; max-height: 58vh; overflow: auto; padding: 0.1rem;
+        }
+        .pick-card {
+            border: 1px solid rgba(13,27,42,0.1); border-radius: 14px; background: #fff;
+            padding: 0.65rem; cursor: pointer; text-align: center;
+            transition: transform 0.12s, box-shadow 0.12s, border-color 0.12s;
+        }
+        .pick-card:hover {
+            transform: translateY(-2px);
+            border-color: rgba(252,163,17,0.55);
+            box-shadow: 0 8px 18px rgba(13,27,42,0.1);
+        }
+        .pick-photo {
+            width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 10px;
+            background: #eef2f7; display: block; margin-bottom: 0.5rem;
+        }
+        .pick-photo.placeholder {
+            display: grid; place-items: center; color: var(--muted); font-size: 0.75rem; font-weight: 600;
+        }
+        .pick-ref {
+            display: inline-block; margin-bottom: 0.25rem; padding: 0.15rem 0.45rem;
+            border-radius: 999px; font-size: 0.7rem; font-weight: 700;
+            background: rgba(252,163,17,0.15); color: var(--green-deep);
+        }
+        .pick-name {
+            font-size: 0.84rem; font-weight: 600; color: var(--ink);
+            margin-bottom: 0.2rem; line-height: 1.25;
+            display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+        }
+        .pick-meta { font-size: 0.72rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.03em; }
+        .pick-price { margin-top: 0.35rem; font-weight: 700; font-size: 0.88rem; color: var(--ink); }
+        .pick-empty { grid-column: 1 / -1; text-align: center; color: var(--muted); padding: 2rem 1rem; }
         .btn-rm {
             width: 28px; height: 28px; border-radius: 8px; border: 1px solid rgba(184,92,56,0.25);
             background: rgba(184,92,56,0.08); color: #b85c38; cursor: pointer; display: grid; place-items: center;
@@ -1671,7 +1740,7 @@
                         </div>
                         <div class="field field-narrow">
                             <label for="bonNumero">N° Bn</label>
-                            <input type="text" id="bonNumero" placeholder="N°">
+                            <input type="text" id="bonNumero" class="readonly" readonly tabindex="-1" placeholder="BL0001">
                         </div>
                         <div class="field">
                             <label for="bonClient">Nom Client</label>
@@ -1715,10 +1784,10 @@
                                 </button>
                             </div>
                         </div>
-                        <div style="padding:0 0.65rem 0.55rem;display:flex;justify-content:flex-start;">
-                            <button type="button" class="btn-add-line" id="btnAddArticle">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14" stroke-linecap="round"/></svg>
-                                Ajouter un article
+                        <div style="padding:0 0.65rem 0.55rem;display:flex;justify-content:flex-start;gap:0.5rem;flex-wrap:wrap;">
+                            <button type="button" class="btn-add-line btn-pick" id="btnPickArticle">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7h18v12H3z"/><path d="M8 7V5h8v2"/><circle cx="12" cy="13" r="2.5"/></svg>
+                                Choisir un article
                             </button>
                         </div>
                     </div>
@@ -1739,6 +1808,20 @@
         </div>
     </div>
 
+    <div class="pick-backdrop" id="pickCatalog" role="dialog" aria-modal="true" aria-labelledby="pickCatalogTitle">
+        <div class="pick-panel">
+            <div class="pick-head">
+                <h2 id="pickCatalogTitle">Choisir <span>Article</span></h2>
+                <button type="button" class="btn btn-close" id="pickCatalogX" style="padding:0.45rem 0.85rem;">Fermer</button>
+            </div>
+            <div class="pick-body">
+                <input type="search" id="pickSearch" class="pick-search" placeholder="Rechercher : réf, code barre ou désignation…" autocomplete="off">
+                <p class="pick-hint">Cliquez une carte pour l’ajouter au bon (photo, réf, code barre, désignation).</p>
+                <div class="pick-grid" id="pickGrid"></div>
+            </div>
+        </div>
+    </div>
+
     <div class="preview-backdrop" id="previewBon" role="dialog" aria-modal="true" aria-labelledby="previewBonTitle">
         <div class="preview-panel">
             <div class="preview-head">
@@ -1754,11 +1837,11 @@
         </div>
     </div>
 
-    <script src="{{ asset('js/data-sync.js') }}?v=3"></script>
+    <script src="{{ asset('js/data-sync.js') }}?v=4"></script>
     <script src="{{ asset('js/sidebar-menu.js') }}?v=3"></script>
     <script src="{{ asset('js/table-actions.js') }}?v=7"></script>
-    <script src="{{ asset('js/stock-store.js') }}?v=10"></script>
-    <script src="{{ asset('js/vente-store.js') }}?v=10"></script>
+    <script src="{{ asset('js/stock-store.js') }}?v=11"></script>
+    <script src="{{ asset('js/vente-store.js') }}?v=11"></script>
     <script>
         const sidebar = document.getElementById('sidebar');
         const overlay = document.getElementById('overlay');
@@ -2158,7 +2241,7 @@
         function setFormReadonly(ro) {
             document.getElementById('bonClient').readOnly = ro;
             document.getElementById('bonMode').disabled = ro;
-            document.getElementById('bonNumero').readOnly = ro;
+            document.getElementById('bonNumero').readOnly = true;
             linesBody.querySelectorAll('input, select').forEach(function (inp) {
                 if (inp.classList.contains('ln-st')) return;
                 if (inp.tagName === 'SELECT') {
@@ -2172,13 +2255,98 @@
                     inp.readOnly = ro;
                 }
             });
-            var btnAdd = document.getElementById('btnAddArticle');
-            if (btnAdd) {
-                btnAdd.style.display = ro ? 'none' : '';
-                btnAdd.disabled = !!ro;
+            var btnPick = document.getElementById('btnPickArticle');
+            if (btnPick) {
+                btnPick.style.display = ro ? 'none' : '';
+                btnPick.disabled = !!ro;
             }
             document.getElementById('btnBonValider').style.display = ro ? 'none' : '';
             setTimeout(updateScrollButtons, 0);
+        }
+
+        function filterCatalogue(q) {
+            q = String(q || '').trim().toLowerCase();
+            var list = catalog();
+            if (!q) return list;
+            return list.filter(function (p) {
+                var ref = String(p.ref || '').toLowerCase();
+                var cb = String(p.codeBarre || '').toLowerCase();
+                var des = String(p.designation || '').toLowerCase();
+                var fam = String(p.famille || '').toLowerCase();
+                var cat = String(p.categorie || '').toLowerCase();
+                return ref.indexOf(q) !== -1 || cb.indexOf(q) !== -1 || des.indexOf(q) !== -1 ||
+                    fam.indexOf(q) !== -1 || cat.indexOf(q) !== -1;
+            });
+        }
+
+        function renderPickGrid(q) {
+            var grid = document.getElementById('pickGrid');
+            if (!grid) return;
+            var list = filterCatalogue(q);
+            if (!list.length) {
+                grid.innerHTML = '<div class="pick-empty">Aucun article trouvé — vérifiez le stock / catalogue.</div>';
+                return;
+            }
+            grid.innerHTML = list.map(function (p) {
+                var photo = p.photo
+                    ? '<img class="pick-photo" src="' + String(p.photo).replace(/&/g, '&amp;').replace(/"/g, '&quot;') + '" alt="" onerror="this.outerHTML=\'<div class=&quot;pick-photo placeholder&quot;>Sans photo</div>\'">'
+                    : '<div class="pick-photo placeholder">Sans photo</div>';
+                return '' +
+                    '<button type="button" class="pick-card" data-id="' + String(p.id || '').replace(/"/g, '') + '">' +
+                    photo +
+                    '<div><span class="pick-ref">' + escapeHtml(p.ref || '—') + '</span></div>' +
+                    '<div class="pick-name">' + escapeHtml(p.designation || 'Sans nom') + '</div>' +
+                    '<div class="pick-meta">' + escapeHtml(String(p.codeBarre || '—').toUpperCase()) + '</div>' +
+                    '<div class="pick-price">' + money(p.pv) + '</div>' +
+                    '</button>';
+            }).join('');
+        }
+
+        function openPickCatalog() {
+            if (viewMode) return;
+            if (!catalog().length) {
+                alert('Catalogue stock vide. Ajoutez des articles dans Stock → Catégorie Produit.');
+                return;
+            }
+            var search = document.getElementById('pickSearch');
+            if (search) search.value = '';
+            renderPickGrid('');
+            document.getElementById('pickCatalog').classList.add('show');
+            document.body.style.overflow = 'hidden';
+            setTimeout(function () {
+                if (search) search.focus();
+            }, 40);
+        }
+
+        function closePickCatalog() {
+            document.getElementById('pickCatalog').classList.remove('show');
+            if (!modalBon.classList.contains('show') && !document.getElementById('previewBon').classList.contains('show')) {
+                document.body.style.overflow = '';
+            }
+        }
+
+        function pickProductById(id) {
+            var p = findProductById(id);
+            if (!p) return;
+            // Remplir la dernière ligne vide, sinon ajouter une ligne
+            var rows = linesBody.querySelectorAll('tr');
+            var target = null;
+            for (var i = rows.length - 1; i >= 0; i--) {
+                var sel = rows[i].querySelector('.ln-prod');
+                if (sel && !sel.value) { target = rows[i]; break; }
+            }
+            if (!target) target = addLine({ produitId: p.id, pu: p.pv, qte: 1 });
+            else {
+                var prod = target.querySelector('.ln-prod');
+                if (prod) prod.value = p.id;
+                selectProductOnLine(target, p, { focusQty: true });
+            }
+            closePickCatalog();
+            var box = document.getElementById('linesScroll');
+            if (box) box.scrollTop = box.scrollHeight;
+            updateScrollButtons();
+            var qte = target.querySelector('.ln-qte');
+            if (qte) { qte.focus(); qte.select(); }
         }
 
         function openModal(bon, mode) {
@@ -2195,7 +2363,13 @@
             document.getElementById('bonDate').value = bon ? (toIsoFromFr(bon.date) || todayISO()) : todayISO();
             document.getElementById('bonClient').value = bon ? (bon.client || '') : '';
             document.getElementById('bonMode').value = bon ? (bon.typePaie || 'Crédit') : 'Crédit';
-            document.getElementById('bonNumero').value = bon ? (bon.numero || '') : '';
+            if (bon && bon.numero) {
+                document.getElementById('bonNumero').value = bon.numero;
+            } else {
+                document.getElementById('bonNumero').value = (window.VenteStore && VenteStore.nextBonNumero)
+                    ? VenteStore.nextBonNumero()
+                    : 'BL0001';
+            }
 
             var lignes = (bon && bon.lignes && bon.lignes.length) ? bon.lignes : [{}];
             lignes.forEach(function (l) { addLine(l); });
@@ -2203,8 +2377,9 @@
             modalBon.classList.add('show');
             document.body.style.overflow = 'hidden';
             if (!viewMode) {
-                var firstCb = linesBody.querySelector('.ln-cb');
-                if (firstCb) setTimeout(function () { firstCb.focus(); }, 50);
+                setTimeout(function () {
+                    document.getElementById('bonClient').focus();
+                }, 50);
             }
         }
 
@@ -2217,14 +2392,18 @@
         }
 
         document.getElementById('btnAjouter').addEventListener('click', function () { openModal(null, 'add'); });
-        document.getElementById('btnAddArticle').addEventListener('click', function () {
-            if (viewMode) return;
-            var row = addLine();
-            var focusEl = row && row.querySelector('.ln-cb');
-            if (focusEl) focusEl.focus();
-            var box = document.getElementById('linesScroll');
-            if (box) box.scrollTop = box.scrollHeight;
-            updateScrollButtons();
+        document.getElementById('btnPickArticle').addEventListener('click', openPickCatalog);
+        document.getElementById('pickCatalogX').addEventListener('click', closePickCatalog);
+        document.getElementById('pickCatalog').addEventListener('click', function (e) {
+            if (e.target === document.getElementById('pickCatalog')) closePickCatalog();
+        });
+        document.getElementById('pickSearch').addEventListener('input', function () {
+            renderPickGrid(document.getElementById('pickSearch').value);
+        });
+        document.getElementById('pickGrid').addEventListener('click', function (e) {
+            var card = e.target.closest('.pick-card');
+            if (!card) return;
+            pickProductById(card.getAttribute('data-id'));
         });
         document.getElementById('btnScrollUp').addEventListener('click', function () { scrollLines(-1); });
         document.getElementById('btnScrollDown').addEventListener('click', function () { scrollLines(1); });

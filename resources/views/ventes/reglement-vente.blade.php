@@ -195,7 +195,7 @@
         </div>
     </div>
 
-    <script src="{{ asset('js/data-sync.js') }}?v=3"></script>
+    <script src="{{ asset('js/data-sync.js') }}?v=4"></script>
     <script src="{{ asset('js/stock-store.js') }}?v=10"></script>
     <script src="{{ asset('js/achat-store.js') }}?v=8"></script>
     <script src="{{ asset('js/vente-store.js') }}?v=10"></script>
