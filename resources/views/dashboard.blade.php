@@ -634,6 +634,36 @@
             color: #fff;
             background: linear-gradient(135deg, #3d7ea6, #2f6284);
         }
+        .btn-view-soft {
+            color: #fff;
+            background: linear-gradient(135deg, #5a6570, #3d4650);
+        }
+
+        .preview-backdrop {
+            position: fixed; inset: 0; z-index: 120;
+            background: rgba(10,16,8,0.55); backdrop-filter: blur(4px);
+            display: none; align-items: flex-start; justify-content: center;
+            padding: 1.25rem; overflow-y: auto;
+        }
+        .preview-backdrop.show { display: flex; }
+        .preview-panel {
+            width: min(100%, 820px); margin: 1rem auto; background: #fff;
+            border-radius: 18px; overflow: hidden;
+            box-shadow: 0 24px 60px rgba(16,24,14,0.35), 0 0 0 1px rgba(252,163,17,0.2);
+        }
+        .preview-head {
+            display: flex; align-items: center; justify-content: space-between; gap: 0.75rem;
+            padding: 0.9rem 1.1rem;
+            background: linear-gradient(125deg, #14213d, #0d1b2a 60%, #243016); color: #fff;
+        }
+        .preview-head h2 { font-family: 'Outfit', sans-serif; font-size: 1.1rem; font-weight: 700; margin: 0; }
+        .preview-head h2 span { color: var(--gold); }
+        .preview-actions { display: flex; gap: 0.45rem; flex-wrap: wrap; }
+        .preview-body { background: #f4f7fb; padding: 0.85rem; }
+        #previewFrame {
+            width: 100%; min-height: 62vh; border: 0; border-radius: 12px;
+            background: #fff; box-shadow: 0 4px 16px rgba(13,27,42,0.08);
+        }
 
         .mode-badge {
             display: inline-block; min-width: 54px; padding: 0.28rem 0.55rem; border-radius: 999px;
@@ -704,24 +734,52 @@
         }
         .lines-table { width: 100%; border-collapse: collapse; min-width: 760px; }
         .lines-table th {
-            padding: 0.55rem 0.4rem; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.03em;
+            padding: 0.4rem 0.3rem; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.03em;
             background: #f4f7fb; color: var(--muted); text-align: center;
         }
-        .lines-table td { padding: 0.4rem; border-top: 1px solid rgba(13,27,42,0.06); }
+        .lines-table td { padding: 0.15rem 0.25rem; border-top: 1px solid rgba(13,27,42,0.06); }
         .lines-table input, .lines-table select {
-            width: 100%; padding: 0.45rem 0.4rem; border-radius: 8px;
+            width: 100%; padding: 0.35rem 0.35rem; border-radius: 7px;
             border: 1px solid rgba(13,27,42,0.12); background: #fff;
             font-family: inherit; font-size: 0.84rem; text-align: center; outline: none;
         }
         .lines-table input:focus, .lines-table select:focus { border-color: rgba(252,163,17,0.65); }
         .lines-table input.readonly { background: #eef2f7; font-weight: 600; }
         .lines-table .ln-cb { text-transform: uppercase; letter-spacing: 0.04em; }
-        .btn-plus {
-            width: 32px; height: 32px; border-radius: 8px; border: none; cursor: pointer;
-            background: linear-gradient(135deg, #ffb83a, #fca311); color: #0d1b2a;
-            display: grid; place-items: center; margin: 0 auto;
+        .lines-table .ln-ref,
+        .lines-table .ln-cb { font-weight: 600; }
+        .lines-table .ln-ref:not([readonly]),
+        .lines-table .ln-cb:not([readonly]) { background: #fffaf0; }
+        .lines-scroll-wrap {
+            display: flex; align-items: stretch; gap: 0.35rem;
         }
-        .btn-plus svg { width: 16px; height: 16px; }
+        .lines-scroll-wrap .table-scroll {
+            flex: 1; min-width: 0; max-height: 260px; overflow: auto;
+        }
+        .lines-scroll-btns {
+            display: flex; flex-direction: column; justify-content: center; gap: 0.35rem;
+            flex-shrink: 0; padding: 0.15rem 0;
+        }
+        .btn-scroll {
+            width: 34px; height: 34px; border-radius: 9px;
+            border: 1px solid rgba(13,27,42,0.12); background: #f4f7fb; color: var(--ink);
+            cursor: pointer; display: grid; place-items: center; padding: 0;
+            transition: background 0.15s, border-color 0.15s;
+        }
+        .btn-scroll:hover { background: rgba(252,163,17,0.2); border-color: rgba(252,163,17,0.45); }
+        .btn-scroll:disabled { opacity: 0.35; cursor: default; }
+        .btn-scroll svg { width: 16px; height: 16px; }
+        .btn-add-line {
+            display: inline-flex; align-items: center; gap: 0.4rem;
+            margin: 0.55rem 0 0.15rem; padding: 0.45rem 0.85rem;
+            border: none; border-radius: 9px; cursor: pointer;
+            font-family: 'Outfit', sans-serif; font-weight: 600; font-size: 0.85rem;
+            color: #0d1b2a;
+            background: linear-gradient(135deg, #ffb83a, #fca311);
+            box-shadow: 0 4px 10px rgba(252,163,17,0.28);
+        }
+        .btn-add-line svg { width: 15px; height: 15px; }
+        .btn-add-line:disabled { opacity: 0.45; cursor: default; }
         .btn-rm {
             width: 28px; height: 28px; border-radius: 8px; border: 1px solid rgba(184,92,56,0.25);
             background: rgba(184,92,56,0.08); color: #b85c38; cursor: pointer; display: grid; place-items: center;
@@ -1632,21 +1690,36 @@
                     </div>
 
                     <div class="lines-wrap">
-                        <div class="table-scroll">
-                            <table class="lines-table">
-                                <thead>
-                                    <tr>
-                                        <th style="width:90px">Réf</th>
-                                        <th style="width:110px">Code Barre</th>
-                                        <th>Article (Stock)</th>
-                                        <th style="width:80px">Quantité</th>
-                                        <th style="width:95px">Prix/U</th>
-                                        <th style="width:105px">Sous-Total</th>
-                                        <th style="width:48px">+</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="linesBody"></tbody>
-                            </table>
+                        <div class="lines-scroll-wrap">
+                            <div class="table-scroll" id="linesScroll">
+                                <table class="lines-table">
+                                    <thead>
+                                        <tr>
+                                            <th style="width:90px">Réf</th>
+                                            <th style="width:110px">Code Barre</th>
+                                            <th>Article (Stock)</th>
+                                            <th style="width:80px">Quantité</th>
+                                            <th style="width:95px">Prix/U</th>
+                                            <th style="width:105px">Sous-Total</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="linesBody"></tbody>
+                                </table>
+                            </div>
+                            <div class="lines-scroll-btns">
+                                <button type="button" class="btn-scroll" id="btnScrollUp" title="Défiler vers le haut" aria-label="Défiler vers le haut">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 14l6-6 6 6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                </button>
+                                <button type="button" class="btn-scroll" id="btnScrollDown" title="Défiler vers le bas" aria-label="Défiler vers le bas">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 10l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                </button>
+                            </div>
+                        </div>
+                        <div style="padding:0 0.65rem 0.55rem;display:flex;justify-content:flex-start;">
+                            <button type="button" class="btn-add-line" id="btnAddArticle">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14" stroke-linecap="round"/></svg>
+                                Ajouter un article
+                            </button>
                         </div>
                     </div>
 
@@ -1657,10 +1730,26 @@
 
                     <div class="modal-actions">
                         <button type="button" class="btn btn-validate" id="btnBonValider">Valider</button>
+                        <button type="button" class="btn btn-view-soft" id="btnBonVisualiser">Visualiser</button>
                         <button type="button" class="btn btn-print-soft" id="btnBonImprimer">Imprimer</button>
                         <button type="button" class="btn btn-close" id="btnBonFermer">Fermer</button>
                     </div>
                 </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="preview-backdrop" id="previewBon" role="dialog" aria-modal="true" aria-labelledby="previewBonTitle">
+        <div class="preview-panel">
+            <div class="preview-head">
+                <h2 id="previewBonTitle">Visualiser <span>Bon</span></h2>
+                <div class="preview-actions">
+                    <button type="button" class="btn btn-print-soft" id="btnPreviewImprimer" style="padding:0.45rem 0.85rem;">Imprimer</button>
+                    <button type="button" class="btn btn-close" id="btnPreviewFermer" style="padding:0.45rem 0.85rem;">Fermer</button>
+                </div>
+            </div>
+            <div class="preview-body">
+                <iframe id="previewFrame" title="Aperçu du bon"></iframe>
             </div>
         </div>
     </div>
@@ -1792,17 +1881,131 @@
             return null;
         }
 
+        function normSearch(s) {
+            return String(s || '').trim().toLowerCase();
+        }
+
+        function findProductsByRef(q) {
+            q = normSearch(q);
+            if (!q) return [];
+            return catalog().filter(function (p) {
+                return normSearch(p.ref).indexOf(q) !== -1;
+            }).sort(function (a, b) {
+                var ar = normSearch(a.ref);
+                var br = normSearch(b.ref);
+                if (ar === q && br !== q) return -1;
+                if (br === q && ar !== q) return 1;
+                if (ar.indexOf(q) === 0 && br.indexOf(q) !== 0) return -1;
+                if (br.indexOf(q) === 0 && ar.indexOf(q) !== 0) return 1;
+                return ar.localeCompare(br, 'fr');
+            });
+        }
+
+        function findProductsByCodeBarre(q) {
+            q = String(q || '').trim().toUpperCase();
+            if (!q) return [];
+            return catalog().filter(function (p) {
+                return String(p.codeBarre || '').toUpperCase().indexOf(q) !== -1;
+            }).sort(function (a, b) {
+                var ac = String(a.codeBarre || '').toUpperCase();
+                var bc = String(b.codeBarre || '').toUpperCase();
+                if (ac === q && bc !== q) return -1;
+                if (bc === q && ac !== q) return 1;
+                return ac.localeCompare(bc);
+            });
+        }
+
+        function selectProductOnLine(tr, p, opts) {
+            opts = opts || {};
+            var prod = tr.querySelector('.ln-prod');
+            if (p) {
+                if (prod) prod.value = p.id;
+                fillFromProduct(tr, p);
+                if (opts.focusQty) {
+                    var qte = tr.querySelector('.ln-qte');
+                    if (qte) { qte.focus(); qte.select(); }
+                }
+            } else {
+                if (prod) prod.value = '';
+                fillFromProduct(tr, null);
+            }
+            return p;
+        }
+
+        function applySearchOnLine(tr, field) {
+            var refInput = tr.querySelector('.ln-ref');
+            var cbInput = tr.querySelector('.ln-cb');
+            var matches = [];
+            if (field === 'ref') {
+                matches = findProductsByRef(refInput.value);
+            } else {
+                matches = findProductsByCodeBarre(cbInput.value);
+            }
+            tr._matchList = matches;
+            tr._matchIndex = matches.length ? 0 : -1;
+            if (!matches.length) {
+                if (String((field === 'ref' ? refInput : cbInput).value || '').trim()) {
+                    (field === 'ref' ? refInput : cbInput).style.borderColor = 'rgba(184,92,56,0.65)';
+                }
+                return null;
+            }
+            (field === 'ref' ? refInput : cbInput).style.borderColor = '';
+            return selectProductOnLine(tr, matches[0], { focusQty: field === 'cb' });
+        }
+
+        function cycleMatchOnLine(tr, field, dir) {
+            var matches = tr._matchList;
+            if (!matches || !matches.length) {
+                applySearchOnLine(tr, field);
+                matches = tr._matchList || [];
+            }
+            if (!matches.length) return;
+            var idx = typeof tr._matchIndex === 'number' ? tr._matchIndex : 0;
+            idx = (idx + dir + matches.length) % matches.length;
+            tr._matchIndex = idx;
+            selectProductOnLine(tr, matches[idx], { focusQty: false });
+            var refInput = tr.querySelector('.ln-ref');
+            var cbInput = tr.querySelector('.ln-cb');
+            if (field === 'ref' && refInput) {
+                refInput.focus();
+                refInput.setSelectionRange(refInput.value.length, refInput.value.length);
+            } else if (cbInput) {
+                cbInput.focus();
+                cbInput.setSelectionRange(cbInput.value.length, cbInput.value.length);
+            }
+        }
+
         function productOptionsHtml(selectedId) {
             var list = catalog();
-            var html = '<option value="">— Choisir un article —</option>';
+            var html = '<option value="">— Choisir / rechercher —</option>';
             list.forEach(function (p) {
                 var id = p.id || '';
-                var label = (p.ref ? p.ref + ' — ' : '') + (p.designation || 'Sans nom');
+                var label = (p.ref ? p.ref + ' — ' : '') + (p.designation || 'Sans nom') +
+                    (p.codeBarre ? ' [' + String(p.codeBarre).toUpperCase() + ']' : '');
                 var sel = selectedId && selectedId === id ? ' selected' : '';
-                html += '<option value="' + String(id).replace(/"/g, '') + '"' + sel + '>' +
+                html += '<option value="' + String(id).replace(/"/g, '') + '"' + sel +
+                    ' data-ref="' + String(p.ref || '').replace(/"/g, '&quot;') + '"' +
+                    ' data-cb="' + String(p.codeBarre || '').replace(/"/g, '&quot;') + '">' +
                     String(label).replace(/</g, '&lt;') + '</option>';
             });
             return html;
+        }
+
+        function scrollLines(dir) {
+            var box = document.getElementById('linesScroll');
+            if (!box) return;
+            box.scrollBy({ top: dir * 72, behavior: 'smooth' });
+            updateScrollButtons();
+        }
+
+        function updateScrollButtons() {
+            var box = document.getElementById('linesScroll');
+            var up = document.getElementById('btnScrollUp');
+            var down = document.getElementById('btnScrollDown');
+            if (!box || !up || !down) return;
+            var max = Math.max(0, box.scrollHeight - box.clientHeight);
+            up.disabled = box.scrollTop <= 2;
+            down.disabled = box.scrollTop >= max - 2;
         }
 
         function recalcLine(tr) {
@@ -1843,41 +2046,90 @@
             }
             var selectedId = data.produitId || '';
             if (!selectedId && data.ref) {
-                var hit = list.filter(function (p) {
-                    return String(p.ref || '') === String(data.ref || '') ||
-                        String(p.designation || '') === String(data.designation || data.produit || '');
-                })[0];
+                var hit = findProductsByRef(data.ref)[0];
                 if (hit) selectedId = hit.id;
+            }
+            if (!selectedId && data.codeBarre) {
+                var hitCb = findProductsByCodeBarre(data.codeBarre)[0];
+                if (hitCb) selectedId = hitCb.id;
             }
             var tr = document.createElement('tr');
             tr.innerHTML =
-                '<td><input type="text" class="ln-ref readonly" readonly tabindex="-1" value=""></td>' +
-                '<td><input type="text" class="ln-cb readonly" readonly tabindex="-1" value=""></td>' +
+                '<td><input type="text" class="ln-ref" autocomplete="off" spellcheck="false" placeholder="Réf…" value=""></td>' +
+                '<td><input type="text" class="ln-cb" autocomplete="off" spellcheck="false" placeholder="Code barre…" value=""></td>' +
                 '<td><select class="ln-prod">' + productOptionsHtml(selectedId) + '</select></td>' +
                 '<td><input type="number" class="ln-qte" min="0" step="1" value="' + (data.qte != null ? data.qte : 1) + '"></td>' +
                 '<td><input type="number" class="ln-pu" min="0" step="0.01" value="' + fmt(data.pu || data.prix || 0) + '"></td>' +
-                '<td><input type="text" class="ln-st readonly" readonly value="0.00"></td>' +
-                '<td><button type="button" class="btn-plus ln-add" title="Ajouter une ligne"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14" stroke-linecap="round"/></svg></button></td>';
+                '<td><input type="text" class="ln-st readonly" readonly value="0.00"></td>';
             linesBody.appendChild(tr);
             bindLine(tr);
             var p = findProductById(selectedId);
             if (p) fillFromProduct(tr, p);
             else if (data.pu != null || data.prix != null) recalcLine(tr);
             else recalcLine(tr);
+            setTimeout(updateScrollButtons, 0);
+            return tr;
         }
 
         function bindLine(tr) {
             var prod = tr.querySelector('.ln-prod');
+            var ref = tr.querySelector('.ln-ref');
+            var cb = tr.querySelector('.ln-cb');
             var qte = tr.querySelector('.ln-qte');
             var pu = tr.querySelector('.ln-pu');
-            var addBtn = tr.querySelector('.ln-add');
 
             prod.addEventListener('change', function () {
                 fillFromProduct(tr, findProductById(prod.value));
+                tr._matchList = null;
+                tr._matchIndex = -1;
+                ref.style.borderColor = '';
+                cb.style.borderColor = '';
             });
+
+            function bindSearchField(input, field) {
+                input.addEventListener('input', function () {
+                    if (field === 'cb') input.value = input.value.toUpperCase();
+                    input.style.borderColor = '';
+                    tr._matchList = null;
+                });
+                input.addEventListener('keydown', function (e) {
+                    if (e.key === 'ArrowDown') {
+                        e.preventDefault();
+                        cycleMatchOnLine(tr, field, 1);
+                        return;
+                    }
+                    if (e.key === 'ArrowUp') {
+                        e.preventDefault();
+                        cycleMatchOnLine(tr, field, -1);
+                        return;
+                    }
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        var found = applySearchOnLine(tr, field);
+                        if (found && field === 'cb') {
+                            var row = addLine();
+                            var nextCb = row && row.querySelector('.ln-cb');
+                            if (nextCb) nextCb.focus();
+                            var box = document.getElementById('linesScroll');
+                            if (box) box.scrollTop = box.scrollHeight;
+                            updateScrollButtons();
+                        } else if (found) {
+                            qte.focus();
+                            qte.select();
+                        }
+                    }
+                });
+                input.addEventListener('blur', function () {
+                    if (!String(input.value || '').trim()) return;
+                    if (!prod.value) applySearchOnLine(tr, field);
+                });
+            }
+
+            bindSearchField(ref, 'ref');
+            bindSearchField(cb, 'cb');
+
             qte.addEventListener('input', function () { recalcLine(tr); });
             pu.addEventListener('input', function () { recalcLine(tr); });
-            addBtn.addEventListener('click', function () { addLine(); });
         }
 
         function collectLignes() {
@@ -1908,14 +2160,25 @@
             document.getElementById('bonMode').disabled = ro;
             document.getElementById('bonNumero').readOnly = ro;
             linesBody.querySelectorAll('input, select').forEach(function (inp) {
-                if (inp.classList.contains('ln-st') || inp.classList.contains('ln-ref') || inp.classList.contains('ln-cb')) return;
-                if (inp.tagName === 'SELECT') inp.disabled = ro;
-                else inp.readOnly = ro;
+                if (inp.classList.contains('ln-st')) return;
+                if (inp.tagName === 'SELECT') {
+                    inp.disabled = ro;
+                } else if (inp.classList.contains('ln-ref') || inp.classList.contains('ln-cb')) {
+                    inp.readOnly = ro;
+                    inp.classList.toggle('readonly', ro);
+                    if (ro) inp.setAttribute('tabindex', '-1');
+                    else inp.removeAttribute('tabindex');
+                } else {
+                    inp.readOnly = ro;
+                }
             });
-            linesBody.querySelectorAll('.ln-add').forEach(function (b) {
-                b.style.visibility = ro ? 'hidden' : 'visible';
-            });
+            var btnAdd = document.getElementById('btnAddArticle');
+            if (btnAdd) {
+                btnAdd.style.display = ro ? 'none' : '';
+                btnAdd.disabled = !!ro;
+            }
             document.getElementById('btnBonValider').style.display = ro ? 'none' : '';
+            setTimeout(updateScrollButtons, 0);
         }
 
         function openModal(bon, mode) {
@@ -1939,6 +2202,10 @@
             setFormReadonly(viewMode);
             modalBon.classList.add('show');
             document.body.style.overflow = 'hidden';
+            if (!viewMode) {
+                var firstCb = linesBody.querySelector('.ln-cb');
+                if (firstCb) setTimeout(function () { firstCb.focus(); }, 50);
+            }
         }
 
         function closeModal() {
@@ -1950,6 +2217,18 @@
         }
 
         document.getElementById('btnAjouter').addEventListener('click', function () { openModal(null, 'add'); });
+        document.getElementById('btnAddArticle').addEventListener('click', function () {
+            if (viewMode) return;
+            var row = addLine();
+            var focusEl = row && row.querySelector('.ln-cb');
+            if (focusEl) focusEl.focus();
+            var box = document.getElementById('linesScroll');
+            if (box) box.scrollTop = box.scrollHeight;
+            updateScrollButtons();
+        });
+        document.getElementById('btnScrollUp').addEventListener('click', function () { scrollLines(-1); });
+        document.getElementById('btnScrollDown').addEventListener('click', function () { scrollLines(1); });
+        document.getElementById('linesScroll').addEventListener('scroll', updateScrollButtons);
         document.getElementById('bonModalX').addEventListener('click', closeModal);
         document.getElementById('btnBonFermer').addEventListener('click', closeModal);
         modalBon.addEventListener('click', function (e) { if (e.target === modalBon) closeModal(); });
@@ -2002,26 +2281,126 @@
             refreshDashboard();
         });
 
-        document.getElementById('btnBonImprimer').addEventListener('click', function () {
+        function escapeHtml(s) {
+            return String(s == null ? '' : s)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;');
+        }
+
+        function buildBonDoc() {
             var client = document.getElementById('bonClient').value.trim() || '—';
             var date = document.getElementById('bonDate').value || '';
             var num = document.getElementById('bonNumero').value.trim() || '—';
             var mode = document.getElementById('bonMode').value || '';
             var lignes = collectLignes();
-            var rows = lignes.map(function (l) {
-                return '<tr><td>' + (l.ref || '') + '</td><td>' + String(l.codeBarre || '').toUpperCase() + '</td><td>' + (l.designation || '') + '</td><td>' + l.qte + '</td><td>' + fmt(l.pu) + '</td><td>' + fmt(l.sousTotal) + '</td></tr>';
-            }).join('');
-            var total = document.getElementById('bonGrandTotal').textContent;
-            var w = window.open('', '_blank');
-            if (!w) return;
-            w.document.write('<!DOCTYPE html><html lang="fr"><head><meta charset="utf-8"><title>Bon ' + num + '</title>' +
-                '<style>body{font-family:Arial,sans-serif;padding:24px}table{width:100%;border-collapse:collapse;margin-top:16px}th,td{border:1px solid #ccc;padding:8px;text-align:center}h1{margin:0 0 8px}</style></head><body>' +
-                '<h1>Bon de vente</h1><p>Date : ' + date + ' | N° : ' + num + ' | Client : ' + client + ' | Mode : ' + mode + '</p>' +
-                '<table><thead><tr><th>Réf</th><th>Code Barre</th><th>Désignation</th><th>Qté</th><th>Prix/U</th><th>Sous-Total</th></tr></thead><tbody>' + rows + '</tbody></table>' +
-                '<p style="text-align:right;font-weight:bold;margin-top:16px">Total : ' + total + '</p></body></html>');
-            w.document.close();
-            w.focus();
-            w.print();
+            var rows = lignes.length
+                ? lignes.map(function (l) {
+                    return '<tr><td>' + escapeHtml(l.ref || '') + '</td><td>' +
+                        escapeHtml(String(l.codeBarre || '').toUpperCase()) + '</td><td>' +
+                        escapeHtml(l.designation || '') + '</td><td>' + escapeHtml(l.qte) + '</td><td>' +
+                        escapeHtml(fmt(l.pu)) + '</td><td>' + escapeHtml(fmt(l.sousTotal)) + '</td></tr>';
+                }).join('')
+                : '<tr><td colspan="6">Aucun article</td></tr>';
+            var total = document.getElementById('bonGrandTotal').textContent || '0.00 DH';
+            var body =
+                '<h1>Bon de vente</h1>' +
+                '<p>Date : ' + escapeHtml(date) + ' | N° : ' + escapeHtml(num) +
+                ' | Client : ' + escapeHtml(client) + ' | Mode : ' + escapeHtml(mode) + '</p>' +
+                '<table><thead><tr><th>Réf</th><th>Code Barre</th><th>Désignation</th><th>Qté</th><th>Prix/U</th><th>Sous-Total</th></tr></thead>' +
+                '<tbody>' + rows + '</tbody></table>' +
+                '<p style="text-align:right;font-weight:bold;margin-top:16px">Total : ' + escapeHtml(total) + '</p>';
+            var title = 'Bon ' + num;
+            var html = '<!DOCTYPE html><html lang="fr"><head><meta charset="utf-8"><title>' +
+                escapeHtml(title) + '</title>' +
+                '<style>body{font-family:Arial,sans-serif;padding:24px;color:#0d1b2a;margin:0}' +
+                'table{width:100%;border-collapse:collapse;margin-top:16px}' +
+                'th,td{border:1px solid #ccc;padding:8px;text-align:center;font-size:13px}' +
+                'th{background:#14213d;color:#fff}h1{margin:0 0 8px;font-size:20px}' +
+                '@media print{body{padding:12px}}</style></head><body>' + body + '</body></html>';
+            return { title: title, body: body, html: html };
+        }
+
+        function writeFrame(frame, html) {
+            var win = frame && frame.contentWindow;
+            var doc = win && win.document;
+            if (!doc) return null;
+            doc.open();
+            doc.write(html);
+            doc.close();
+            return win;
+        }
+
+        function printHtml(title, bodyHtml) {
+            var html = '<!DOCTYPE html><html lang="fr"><head><meta charset="utf-8"><title>' +
+                escapeHtml(title) + '</title>' +
+                '<style>body{font-family:Arial,sans-serif;padding:24px;color:#0d1b2a}' +
+                'table{width:100%;border-collapse:collapse;margin-top:16px}' +
+                'th,td{border:1px solid #ccc;padding:8px;text-align:center;font-size:13px}' +
+                'th{background:#14213d;color:#fff}h1{margin:0 0 8px;font-size:20px}' +
+                '@media print{body{padding:0}}</style></head><body>' + bodyHtml + '</body></html>';
+
+            var frame = document.getElementById('printFrame');
+            if (!frame) {
+                frame = document.createElement('iframe');
+                frame.id = 'printFrame';
+                frame.setAttribute('aria-hidden', 'true');
+                frame.style.cssText = 'position:fixed;right:0;bottom:0;width:0;height:0;border:0;opacity:0;pointer-events:none;';
+                document.body.appendChild(frame);
+            }
+
+            var win = writeFrame(frame, html);
+            if (!win) {
+                alert('Impression impossible sur ce navigateur.');
+                return;
+            }
+
+            setTimeout(function () {
+                try {
+                    win.focus();
+                    win.print();
+                } catch (err) {
+                    alert('Impossible d’ouvrir la feuille d’impression.');
+                }
+            }, 200);
+        }
+
+        function openPreview() {
+            var doc = buildBonDoc();
+            var preview = document.getElementById('previewBon');
+            var frame = document.getElementById('previewFrame');
+            writeFrame(frame, doc.html);
+            preview.classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closePreview() {
+            document.getElementById('previewBon').classList.remove('show');
+            if (!modalBon.classList.contains('show')) document.body.style.overflow = '';
+        }
+
+        document.getElementById('btnBonVisualiser').addEventListener('click', openPreview);
+        document.getElementById('btnPreviewFermer').addEventListener('click', closePreview);
+        document.getElementById('previewBon').addEventListener('click', function (e) {
+            if (e.target === document.getElementById('previewBon')) closePreview();
+        });
+        document.getElementById('btnPreviewImprimer').addEventListener('click', function () {
+            var frame = document.getElementById('previewFrame');
+            var win = frame && frame.contentWindow;
+            if (!win) return;
+            try {
+                win.focus();
+                win.print();
+            } catch (err) {
+                var doc = buildBonDoc();
+                printHtml(doc.title, doc.body);
+            }
+        });
+
+        document.getElementById('btnBonImprimer').addEventListener('click', function () {
+            var doc = buildBonDoc();
+            printHtml(doc.title, doc.body);
         });
 
         if (window.TableActions) {
