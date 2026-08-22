@@ -84,18 +84,38 @@
             width: 100%;
             border-collapse: collapse;
             table-layout: fixed;
-            min-width: 1100px;
+            min-width: 980px;
+        }
+        .data-table td {
+            padding: 0.8rem 0.45rem; font-size: 0.88rem;
+            border-bottom: 1px solid rgba(13,27,42,0.06); color: var(--ink);
+            vertical-align: middle; text-align: center;
         }
         .data-table th {
-            padding: 0.85rem 0.7rem; font-family: 'Outfit', sans-serif; font-size: 0.78rem;
+            padding: 0.85rem 0.45rem; font-family: 'Outfit', sans-serif; font-size: 0.78rem;
             font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase;
             color: var(--muted); background: #f4f7fb;
             text-align: center; white-space: nowrap;
         }
-        .data-table td {
-            padding: 0.8rem 0.7rem; font-size: 0.88rem;
-            border-bottom: 1px solid rgba(13,27,42,0.06); color: var(--ink);
-            vertical-align: middle; text-align: center;
+        .data-table td:nth-child(7),
+        .data-table th:nth-child(7),
+        .data-table td:nth-child(8),
+        .data-table th:nth-child(8),
+        .data-table td:nth-child(9),
+        .data-table th:nth-child(9) {
+            padding-left: 0.25rem;
+            padding-right: 0.25rem;
+            font-size: 0.82rem;
+        }
+        .data-table td:nth-child(10),
+        .data-table th:nth-child(10) {
+            padding-left: 0.35rem;
+            padding-right: 0.35rem;
+        }
+        .data-table .actions {
+            justify-content: center;
+            flex-wrap: nowrap;
+            gap: 0.3rem;
         }
         .data-table tbody tr:hover { background: rgba(252,163,17,0.06); }
         .data-table .empty { text-align: center; color: var(--muted); padding: 2.5rem 1rem; }
@@ -233,9 +253,9 @@
                     <div class="table-freeze-head" id="catHeadScroll">
                         <table class="data-table" aria-hidden="true">
                             <colgroup>
-                                <col style="width:7%"><col style="width:9%"><col style="width:11%">
-                                <col style="width:18%"><col style="width:11%"><col style="width:11%">
-                                <col style="width:8%"><col style="width:9%"><col style="width:9%"><col style="width:7%">
+                                <col style="width:6%"><col style="width:8%"><col style="width:13%">
+                                <col style="width:17%"><col style="width:16%"><col style="width:10%">
+                                <col style="width:5%"><col style="width:6%"><col style="width:6%"><col style="width:13%">
                             </colgroup>
                             <thead>
                                 <tr>
@@ -256,9 +276,9 @@
                     <div class="table-scroll" id="catBodyScroll">
                         <table class="data-table" id="catTable">
                             <colgroup>
-                                <col style="width:7%"><col style="width:9%"><col style="width:11%">
-                                <col style="width:18%"><col style="width:11%"><col style="width:11%">
-                                <col style="width:8%"><col style="width:9%"><col style="width:9%"><col style="width:7%">
+                                <col style="width:6%"><col style="width:8%"><col style="width:13%">
+                                <col style="width:17%"><col style="width:16%"><col style="width:10%">
+                                <col style="width:5%"><col style="width:6%"><col style="width:6%"><col style="width:13%">
                             </colgroup>
                             <tbody id="catBody">
                                 <tr class="empty-row">
