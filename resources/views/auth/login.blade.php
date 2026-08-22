@@ -398,21 +398,22 @@
         <div class="brand-mark">
             <img src="{{ asset('images/brand-logo.png') }}" alt="LibAutoEnt — La Solution qui Gère" width="520" height="420">
         </div>
-        <form class="login-panel" method="POST" action="{{ url('/login') }}" autocomplete="off">
+        <form class="login-panel" method="POST" action="{{ url('/login') }}" autocomplete="off" novalidate>
             @csrf
+            <input type="text" name="decoy_user" value="" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0;" tabindex="-1" autocomplete="username" aria-hidden="true">
+            <input type="password" name="decoy_pass" value="" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0;" tabindex="-1" autocomplete="current-password" aria-hidden="true">
             <header class="panel-header">
                 <h1>Connexion <span>LibAutoEnt</span></h1>
                 <p>Accédez à votre espace de gestion</p>
             </header>
 
             <div class="field">
-                <label for="statut">Statut</label>
+                <label for="statut">Statue</label>
                 <select id="statut" name="statut" required autocomplete="off">
-                    <option value="" selected disabled></option>
-                    <option value="admin">Administrateur</option>
+                    <option value="" selected disabled>Sélectionner…</option>
                     <option value="gerant">Gérant</option>
+                    <option value="assis">Assis</option>
                     <option value="vendeur">Vendeur</option>
-                    <option value="caissier">Caissier</option>
                 </select>
             </div>
 
@@ -422,9 +423,13 @@
                     type="text"
                     id="login"
                     name="login"
-                    value="bilal@autolib.com"
                     required
                     autocomplete="off"
+                    autocapitalize="off"
+                    autocorrect="off"
+                    spellcheck="false"
+                    placeholder="Votre identifiant"
+                    readonly
                 >
             </div>
 
@@ -435,9 +440,10 @@
                         type="password"
                         id="password"
                         name="password"
-                        value="0661755048"
                         required
                         autocomplete="new-password"
+                        placeholder="Mot de passe"
+                        readonly
                     >
                     <button type="button" class="toggle-password" id="togglePassword" aria-label="Afficher le mot de passe" title="Afficher / masquer">
                         <svg class="icon-show" viewBox="0 0 24 24"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg>
@@ -453,12 +459,29 @@
     </main>
     <script>
         (function () {
-            var input = document.getElementById('password');
+            var login = document.getElementById('login');
+            var password = document.getElementById('password');
+            var statut = document.getElementById('statut');
             var btn = document.getElementById('togglePassword');
-            if (!input || !btn) return;
+
+            function unlockField(el) {
+                if (el && el.hasAttribute('readonly')) {
+                    el.removeAttribute('readonly');
+                }
+            }
+
+            [login, password].forEach(function (el) {
+                if (!el) return;
+                el.addEventListener('focus', function () { unlockField(el); });
+                el.value = '';
+            });
+            if (statut) statut.selectedIndex = 0;
+
+            if (!password || !btn) return;
             btn.addEventListener('click', function () {
-                var show = input.type === 'password';
-                input.type = show ? 'text' : 'password';
+                unlockField(password);
+                var show = password.type === 'password';
+                password.type = show ? 'text' : 'password';
                 btn.classList.toggle('is-visible', show);
                 btn.setAttribute('aria-label', show ? 'Masquer le mot de passe' : 'Afficher le mot de passe');
             });

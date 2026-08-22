@@ -633,8 +633,9 @@
         </div>
     </div>
 
+    <script src="{{ asset('js/data-sync.js') }}?v=1"></script>
     <script src="{{ asset('js/table-actions.js') }}?v=7"></script>
-    <script src="{{ asset('js/stock-store.js') }}?v=6"></script>
+    <script src="{{ asset('js/stock-store.js') }}?v=9"></script>
     <script src="{{ asset('js/vente-store.js') }}?v=9"></script>
     <script>
 
@@ -971,7 +972,7 @@
                 lines.push({
                     produitId: p.id,
                     ref: p.ref || '',
-                    codeBarre: p.codeBarre || '',
+                    codeBarre: String(p.codeBarre || '').toUpperCase(),
                     produit: p.designation || '',
                     designation: p.designation || '',
                     categorie: p.categorie || '',
@@ -1102,8 +1103,18 @@
             TableActions.bind(bonsBody);
         }
 
-        renderBons();
-        initBonTableActions();
+        function refreshBonPage() {
+            renderBons();
+        }
+
+        window.onCatalogueSynced = refreshBonPage;
+        var bootBon = window.StockStore && StockStore.initCatalogFromServer
+            ? StockStore.initCatalogFromServer()
+            : Promise.resolve();
+        bootBon.then(function () {
+            renderBons();
+            initBonTableActions();
+        });
 
         document.getElementById('btnAjouter').addEventListener('click', openModal);
         document.getElementById('modalX').addEventListener('click', () => {

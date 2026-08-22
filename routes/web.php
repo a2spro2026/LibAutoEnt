@@ -57,3 +57,6 @@ Route::get('/stock/etat-produit', function () {
 Route::get('/configuration/utilisateurs', function () {
     return view('configuration.utilisateurs');
 })->name('utilisateurs');
+
+Route::get('/api/store/{key}', [App\Http\Controllers\DataStoreController::class, 'show']);
+Route::put('/api/store/{key}', [App\Http\Controllers\DataStoreController::class, 'update']);

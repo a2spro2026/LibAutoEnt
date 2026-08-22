@@ -6,6 +6,7 @@
 
     var KEY = 'libautoent_utilisateurs';
     var LOGIN_SUFFIX = '@LibAutoEnt.com';
+    var STATUES = ['Gérant', 'Assis', 'Vendeur'];
 
     function read() {
         try {
@@ -70,6 +71,15 @@
         return { ok: true };
     }
 
+    function validateStatue(statue) {
+        var value = String(statue || '').trim();
+        if (!value) return { ok: false, message: 'Sélectionnez une statue.' };
+        if (STATUES.indexOf(value) === -1) {
+            return { ok: false, message: 'Statue invalide.' };
+        }
+        return { ok: true, statue: value };
+    }
+
     function getUsers() {
         return read();
     }
@@ -80,6 +90,8 @@
         if (!loginCheck.ok) throw new Error(loginCheck.message);
         var pwdCheck = validatePassword(data.password);
         if (!pwdCheck.ok) throw new Error(pwdCheck.message);
+        var statueCheck = validateStatue(data.statue);
+        if (!statueCheck.ok) throw new Error(statueCheck.message);
 
         var dup = list.some(function (u) {
             return String(u.login).toLowerCase() === loginCheck.login.toLowerCase();
@@ -91,7 +103,8 @@
             idCode: data.idCode || nextId(),
             date: data.date || formatDateFR(),
             nomComplet: String(data.nomComplet || '').trim(),
-            statut: data.statut || 'Actif',
+            statue: statueCheck.statue,
+            statut: 'Actif',
             contact: String(data.contact || '').trim(),
             login: loginCheck.login,
             password: String(data.password)
@@ -113,6 +126,8 @@
             var pwd = data.password != null && data.password !== '' ? data.password : u.password;
             var pwdCheck = validatePassword(pwd);
             if (!pwdCheck.ok) throw new Error(pwdCheck.message);
+            var statueCheck = validateStatue(data.statue);
+            if (!statueCheck.ok) throw new Error(statueCheck.message);
 
             var dup = list.some(function (o) {
                 return o.id !== id && String(o.login).toLowerCase() === loginCheck.login.toLowerCase();
@@ -123,7 +138,8 @@
                 date: data.date || u.date,
                 idCode: data.idCode || u.idCode,
                 nomComplet: String(data.nomComplet != null ? data.nomComplet : u.nomComplet).trim(),
-                statut: data.statut || u.statut,
+                statue: statueCheck.statue,
+                statut: u.statut || 'Actif',
                 contact: String(data.contact != null ? data.contact : u.contact).trim(),
                 login: loginCheck.login,
                 password: String(pwd)
@@ -163,6 +179,7 @@
         nextId: nextId,
         formatDateFR: formatDateFR,
         normalizeLogin: normalizeLogin,
-        LOGIN_SUFFIX: LOGIN_SUFFIX
+        LOGIN_SUFFIX: LOGIN_SUFFIX,
+        STATUES: STATUES
     };
 })(window);

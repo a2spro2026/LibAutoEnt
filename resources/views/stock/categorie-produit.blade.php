@@ -145,6 +145,8 @@
             border-color: rgba(252,163,17,0.65); box-shadow: 0 0 0 3px rgba(252,163,17,0.15); background: #fff;
         }
         .field input.readonly { background: #eef2f7; font-weight: 600; cursor: default; }
+        #produitCodeBarre,
+        .code-barre-cell { text-transform: uppercase; letter-spacing: 0.04em; }
         .field input:disabled, .field select:disabled {
             opacity: 0.85; cursor: default; background: #eef2f7;
         }
@@ -231,7 +233,7 @@
                         </div>
                         <div class="field">
                             <label for="produitCodeBarre">Code Barre</label>
-                            <input type="text" id="produitCodeBarre" name="codeBarre">
+                            <input type="text" id="produitCodeBarre" name="codeBarre" style="text-transform:uppercase" autocomplete="off" spellcheck="false">
                         </div>
                         <div class="field">
                             <label for="produitDesignation">Désignation</label>
@@ -279,8 +281,9 @@
         </div>
     </div>
 
+    <script src="{{ asset('js/data-sync.js') }}?v=1"></script>
     <script src="{{ asset('js/table-actions.js') }}?v=7"></script>
-    <script src="{{ asset('js/stock-store.js') }}?v=7"></script>
+    <script src="{{ asset('js/stock-store.js') }}?v=9"></script>
     <script>
         const sidebar = document.getElementById('sidebar');
         const overlay = document.getElementById('overlay');
@@ -363,7 +366,7 @@
                     '<tr data-id="' + p.id + '">' +
                     '<td>' + photoCell(p) + '</td>' +
                     '<td><span class="ref-badge">' + (p.ref || '—') + '</span></td>' +
-                    '<td>' + (p.codeBarre || '—') + '</td>' +
+                    '<td class="code-barre-cell">' + (p.codeBarre ? String(p.codeBarre).toUpperCase() : '—') + '</td>' +
                     '<td class="desig-cell">' + (p.designation || '') + '</td>' +
                     '<td>' + (p.categorie || '—') + '</td>' +
                     '<td>' + (p.famille || '—') + '</td>' +
@@ -397,7 +400,7 @@
             document.getElementById('produitRef').value = produit && produit.ref
                 ? produit.ref
                 : (window.StockStore ? StockStore.nextCatalogRef() : 'PR-0001');
-            document.getElementById('produitCodeBarre').value = produit ? (produit.codeBarre || '') : '';
+            document.getElementById('produitCodeBarre').value = produit ? String(produit.codeBarre || '').toUpperCase() : '';
             document.getElementById('produitDesignation').value = produit ? (produit.designation || '') : '';
             document.getElementById('produitCategorie').value = produit ? (produit.categorie || '') : '';
             document.getElementById('produitFamille').value = produit ? (produit.famille || '') : '';
@@ -519,7 +522,21 @@
             });
         }
 
-        renderCatalogue();
+        window.onCatalogueSynced = renderCatalogue;
+        var bootCatalogue = window.StockStore && StockStore.initCatalogFromServer
+            ? StockStore.initCatalogFromServer()
+            : Promise.resolve();
+        bootCatalogue.then(renderCatalogue);
+
+        (function () {
+            var cb = document.getElementById('produitCodeBarre');
+            if (!cb) return;
+            cb.addEventListener('input', function () {
+                var pos = cb.selectionStart;
+                cb.value = cb.value.toUpperCase();
+                if (typeof pos === 'number') cb.setSelectionRange(pos, pos);
+            });
+        })();
     </script>
 </body>
 </html>

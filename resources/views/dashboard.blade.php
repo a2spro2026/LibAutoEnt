@@ -714,6 +714,7 @@
         }
         .lines-table input:focus, .lines-table select:focus { border-color: rgba(252,163,17,0.65); }
         .lines-table input.readonly { background: #eef2f7; font-weight: 600; }
+        .lines-table .ln-cb { text-transform: uppercase; letter-spacing: 0.04em; }
         .btn-plus {
             width: 32px; height: 32px; border-radius: 8px; border: none; cursor: pointer;
             background: linear-gradient(135deg, #ffb83a, #fca311); color: #0d1b2a;
@@ -1663,9 +1664,10 @@
         </div>
     </div>
 
+    <script src="{{ asset('js/data-sync.js') }}?v=1"></script>
     <script src="{{ asset('js/sidebar-menu.js') }}?v=3"></script>
     <script src="{{ asset('js/table-actions.js') }}?v=7"></script>
-    <script src="{{ asset('js/stock-store.js') }}?v=6"></script>
+    <script src="{{ asset('js/stock-store.js') }}?v=9"></script>
     <script src="{{ asset('js/vente-store.js') }}?v=9"></script>
     <script>
         const sidebar = document.getElementById('sidebar');
@@ -1827,7 +1829,7 @@
                 return;
             }
             tr.querySelector('.ln-ref').value = p.ref || '';
-            tr.querySelector('.ln-cb').value = p.codeBarre || '';
+            tr.querySelector('.ln-cb').value = String(p.codeBarre || '').toUpperCase();
             if (p.pv != null) tr.querySelector('.ln-pu').value = fmt(p.pv);
             recalcLine(tr);
         }
@@ -1888,7 +1890,7 @@
                 rows.push({
                     produitId: p.id,
                     ref: p.ref || '',
-                    codeBarre: p.codeBarre || '',
+                    codeBarre: String(p.codeBarre || '').toUpperCase(),
                     designation: p.designation || '',
                     produit: p.designation || '',
                     categorie: p.categorie || '',
@@ -2006,7 +2008,7 @@
             var mode = document.getElementById('bonMode').value || '';
             var lignes = collectLignes();
             var rows = lignes.map(function (l) {
-                return '<tr><td>' + (l.ref || '') + '</td><td>' + (l.codeBarre || '') + '</td><td>' + (l.designation || '') + '</td><td>' + l.qte + '</td><td>' + fmt(l.pu) + '</td><td>' + fmt(l.sousTotal) + '</td></tr>';
+                return '<tr><td>' + (l.ref || '') + '</td><td>' + String(l.codeBarre || '').toUpperCase() + '</td><td>' + (l.designation || '') + '</td><td>' + l.qte + '</td><td>' + fmt(l.pu) + '</td><td>' + fmt(l.sousTotal) + '</td></tr>';
             }).join('');
             var total = document.getElementById('bonGrandTotal').textContent;
             var w = window.open('', '_blank');
@@ -2047,9 +2049,19 @@
             renderBons();
         }
 
-        refreshDashboard();
+        window.onCatalogueSynced = refreshDashboard;
+        var bootDash = window.StockStore && StockStore.initCatalogFromServer
+            ? StockStore.initCatalogFromServer()
+            : Promise.resolve();
+        bootDash.then(refreshDashboard);
         window.addEventListener('storage', refreshDashboard);
-        window.addEventListener('focus', refreshDashboard);
+        window.addEventListener('focus', function () {
+            if (window.StockStore && StockStore.initCatalogFromServer) {
+                StockStore.initCatalogFromServer().then(refreshDashboard);
+            } else {
+                refreshDashboard();
+            }
+        });
     </script>
 </body>
 </html>

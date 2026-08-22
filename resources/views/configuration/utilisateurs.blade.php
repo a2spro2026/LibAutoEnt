@@ -76,6 +76,10 @@
             display: inline-block; min-width: 96px; padding: 0.35rem 0.7rem; border-radius: 999px;
             font-size: 0.72rem; font-weight: 700; letter-spacing: 0.03em; text-transform: uppercase;
         }
+        .statue-gerant { color: #8a6d0a; background: rgba(252,163,17,0.2); box-shadow: inset 0 0 0 1px rgba(252,163,17,0.45); }
+        .statue-admin { color: #0d1b2a; background: rgba(13,27,42,0.12); box-shadow: inset 0 0 0 1px rgba(13,27,42,0.25); }
+        .statue-assis { color: #1565c0; background: rgba(33,150,243,0.16); box-shadow: inset 0 0 0 1px rgba(33,150,243,0.35); }
+        .statue-vendeur { color: #1b5e20; background: rgba(76,175,80,0.18); box-shadow: inset 0 0 0 1px rgba(76,175,80,0.35); }
         .statut-actif { color: #1b5e20; background: rgba(76,175,80,0.18); box-shadow: inset 0 0 0 1px rgba(76,175,80,0.35); }
         .statut-suspendu { color: #e65100; background: rgba(255,152,0,0.18); box-shadow: inset 0 0 0 1px rgba(255,152,0,0.4); }
         .statut-inactif { color: #546e7a; background: rgba(120,144,156,0.18); box-shadow: inset 0 0 0 1px rgba(120,144,156,0.35); }
@@ -203,7 +207,7 @@
                             <thead>
                                 <tr>
                                     <th>Nom Complet</th>
-                                    <th>Statut</th>
+                                    <th>Statue</th>
                                     <th>Contact</th>
                                     <th>Login</th>
                                     <th>Mot de Passe</th>
@@ -247,12 +251,12 @@
                             <input type="text" id="userNom" required autocomplete="off">
                         </div>
                         <div class="field">
-                            <label for="userStatut">Statut</label>
-                            <select id="userStatut" required autocomplete="off">
+                            <label for="userStatue">Statue</label>
+                            <select id="userStatue" required autocomplete="off">
                                 <option value=""></option>
-                                <option value="Actif">Actif</option>
-                                <option value="Suspendu">Suspendu</option>
-                                <option value="Inactif">Inactif</option>
+                                <option value="Gérant">Gérant</option>
+                                <option value="Assis">Assis</option>
+                                <option value="Vendeur">Vendeur</option>
                             </select>
                         </div>
                         <div class="field">
@@ -284,7 +288,7 @@
     </div>
 
     <script src="{{ asset('js/table-actions.js') }}?v=6"></script>
-    <script src="{{ asset('js/users-store.js') }}?v=1"></script>
+    <script src="{{ asset('js/users-store.js') }}?v=3"></script>
     <script>
         const sidebar = document.getElementById('sidebar');
         const overlay = document.getElementById('overlay');
@@ -299,6 +303,14 @@
         const modalUser = document.getElementById('modalUser');
         const modalTitle = document.getElementById('modalUserTitle');
         let editMode = false;
+
+        function statueClass(s) {
+            var v = String(s || '').toLowerCase();
+            if (v === 'admin') return 'statue-admin';
+            if (v === 'assis') return 'statue-assis';
+            if (v === 'vendeur') return 'statue-vendeur';
+            return 'statue-gerant';
+        }
 
         function statutClass(s) {
             var v = String(s || '').toLowerCase();
@@ -332,7 +344,7 @@
                 return '' +
                     '<tr data-id="' + u.id + '">' +
                     '<td class="nom-cell">' + (u.nomComplet || '') + '</td>' +
-                    '<td><span class="statut-badge ' + statutClass(u.statut) + '">' + (u.statut || 'Actif') + '</span></td>' +
+                    '<td><span class="statut-badge ' + statueClass(u.statue) + '">' + (u.statue || '—') + '</span></td>' +
                     '<td>' + (u.contact || '—') + '</td>' +
                     '<td>' + (u.login || '') + '</td>' +
                     '<td><span class="pwd-mask" title="Mot de passe masqué">' + maskPwd(u.password) + '</span></td>' +
@@ -358,9 +370,9 @@
             document.getElementById('userNom').value = editMode ? (user.nomComplet || '') : '';
             document.getElementById('userContact').value = editMode ? (user.contact || '') : '';
 
-            // Statut, Login, Mot de passe : toujours vides — saisie obligatoire
-            document.getElementById('userStatut').value = '';
-            document.getElementById('userStatut').selectedIndex = 0;
+            // Statue, Login, Mot de passe : toujours vides — saisie obligatoire
+            document.getElementById('userStatue').value = '';
+            document.getElementById('userStatue').selectedIndex = 0;
             document.getElementById('userLogin').value = '';
             document.getElementById('userPassword').value = '';
             document.getElementById('userPassword').required = true;
@@ -386,14 +398,14 @@
                     date: UsersStore.formatDateFR(document.getElementById('userDate').value),
                     idCode: document.getElementById('userId').value.trim(),
                     nomComplet: document.getElementById('userNom').value.trim(),
-                    statut: document.getElementById('userStatut').value,
+                    statue: document.getElementById('userStatue').value,
                     contact: document.getElementById('userContact').value.trim(),
                     login: document.getElementById('userLogin').value.trim(),
                     password: document.getElementById('userPassword').value
                 };
 
-                if (!payload.statut) {
-                    alert('Sélectionnez un statut.');
+                if (!payload.statue) {
+                    alert('Sélectionnez une statue.');
                     return;
                 }
                 if (!payload.login) {
@@ -428,7 +440,8 @@
                         'ID : ' + (u.idCode || '') + '\n' +
                         'Date : ' + (u.date || '') + '\n' +
                         'Nom : ' + (u.nomComplet || '') + '\n' +
-                        'Statut : ' + (u.statut || '') + '\n' +
+                        'Statue : ' + (u.statue || '') + '\n' +
+                        'Statut compte : ' + (u.statut || 'Actif') + '\n' +
                         'Contact : ' + (u.contact || '') + '\n' +
                         'Login : ' + (u.login || '')
                     );

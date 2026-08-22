@@ -283,6 +283,16 @@
 
     function writeCatalog(list) {
         localStorage.setItem(KEY_CATALOG, JSON.stringify(list));
+        if (window.DataSync) {
+            DataSync.pushKey(KEY_CATALOG, list);
+        }
+    }
+
+    function initCatalogFromServer() {
+        if (!window.DataSync) {
+            return Promise.resolve();
+        }
+        return DataSync.pullKey(KEY_CATALOG);
     }
 
     function uid() {
@@ -320,7 +330,7 @@
         return {
             id: base.id || uid(),
             ref: ref,
-            codeBarre: String(payload.codeBarre || '').trim(),
+            codeBarre: String(payload.codeBarre || '').trim().toUpperCase(),
             designation: normName(payload.designation || payload.nom || ''),
             categorie: normName(payload.categorie || ''),
             famille: normName(payload.famille || ''),
@@ -422,6 +432,7 @@
         setStatut: setStatut,
         syncProducts: syncProducts,
         syncCategories: syncCategories,
+        initCatalogFromServer: initCatalogFromServer,
         getCatalogue: getCatalogue,
         getProduit: getProduit,
         saveProduit: saveProduit,
