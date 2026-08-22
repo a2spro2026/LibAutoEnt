@@ -32,18 +32,30 @@
         }
         .submenu a.is-active::before { background: var(--green-bright); }
 
+        html, body { height: 100%; overflow: hidden; }
+        .app { min-height: 100%; height: 100%; max-height: 100%; overflow: hidden; }
+        .main { min-height: 0; overflow: hidden; display: flex; flex-direction: column; }
+        .topbar { flex-shrink: 0; }
+
         .page-wrap {
             flex: 1;
             padding: 0 1.5rem 1.5rem;
             min-width: 0;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
         }
 
         .toolbar {
             display: flex;
             flex-wrap: wrap;
             gap: 0.65rem;
-            margin-bottom: 1rem;
+            margin-bottom: 0.75rem;
             justify-content: flex-end;
+            flex-shrink: 0;
+            position: relative;
+            z-index: 6;
         }
 
         .btn {
@@ -104,19 +116,31 @@
             border-radius: 18px;
             box-shadow: var(--shadow-card);
             border: 1px solid rgba(252, 163, 17, 0.14);
+            flex: 1;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
             overflow: hidden;
         }
 
+        .table-freeze-head {
+            flex-shrink: 0;
+            overflow: hidden;
+            z-index: 5;
+            background: linear-gradient(145deg, #14213d 0%, #07111c 48%, #3f7a22 100%);
+        }
+
         .table-scroll {
+            flex: 1;
+            min-height: 0;
             overflow: auto;
-            max-height: calc(100vh - 220px);
             -webkit-overflow-scrolling: touch;
         }
 
         table.data-table {
             width: 100%;
-            border-collapse: separate;
-            border-spacing: 0;
+            border-collapse: collapse;
+            table-layout: fixed;
             min-width: 900px;
         }
 
@@ -133,9 +157,6 @@
             border-bottom: none;
             white-space: nowrap;
             box-shadow: inset 0 -1px 0 rgba(252, 163, 17, 0.35);
-            position: sticky;
-            top: 0;
-            z-index: 3;
         }
 
         .data-table th + th {
@@ -504,8 +525,13 @@
                 </div>
 
                 <div class="table-card">
-                    <div class="table-scroll">
-                        <table class="data-table" id="bonsTable">
+                    <div class="table-freeze-head" id="bonsHeadScroll">
+                        <table class="data-table" aria-hidden="true">
+                            <colgroup>
+                                <col style="width:11%"><col style="width:10%"><col style="width:16%">
+                                <col style="width:12%"><col style="width:12%"><col style="width:12%">
+                                <col style="width:12%"><col style="width:15%">
+                            </colgroup>
                             <thead>
                                 <tr>
                                     <th>Date</th>
@@ -518,6 +544,15 @@
                                     <th>Action</th>
                                 </tr>
                             </thead>
+                        </table>
+                    </div>
+                    <div class="table-scroll" id="bonsBodyScroll">
+                        <table class="data-table" id="bonsTable">
+                            <colgroup>
+                                <col style="width:11%"><col style="width:10%"><col style="width:16%">
+                                <col style="width:12%"><col style="width:12%"><col style="width:12%">
+                                <col style="width:12%"><col style="width:15%">
+                            </colgroup>
                             <tbody id="bonsBody">
                                 <tr class="empty-row">
                                     <td colspan="8" class="empty">Aucun bon de vente — cliquez sur Ajouter</td>
@@ -643,6 +678,7 @@
     </div>
 
     <script src="{{ asset('js/data-sync.js') }}?v=5"></script>
+    <script src="{{ asset('js/seed-demo-local.js') }}?v=1"></script>
     <script src="{{ asset('js/table-actions.js') }}?v=7"></script>
     <script src="{{ asset('js/stock-store.js') }}?v=10"></script>
     <script src="{{ asset('js/vente-store.js') }}?v=12"></script>
@@ -1169,6 +1205,15 @@
             });
             TableActions.bind(bonsBody);
         }
+
+        (function () {
+            var head = document.getElementById('bonsHeadScroll');
+            var body = document.getElementById('bonsBodyScroll');
+            if (!head || !body) return;
+            body.addEventListener('scroll', function () {
+                head.scrollLeft = body.scrollLeft;
+            });
+        })();
 
         function refreshBonPage() {
             renderBons();

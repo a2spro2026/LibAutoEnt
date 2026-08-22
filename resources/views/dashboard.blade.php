@@ -418,7 +418,9 @@
             flex: 1;
             min-height: 0;
             padding: 0.85rem 1.25rem 1.25rem;
-            overflow: auto;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
         }
 
         .dash-stats {
@@ -426,6 +428,7 @@
             grid-template-columns: repeat(3, minmax(0, 1fr));
             gap: 0.7rem;
             margin-bottom: 0.85rem;
+            flex-shrink: 0;
         }
 
         .stat-card {
@@ -551,17 +554,29 @@
             border-radius: 18px;
             box-shadow: var(--shadow-card);
             border: 1px solid rgba(252, 163, 17, 0.14);
+            flex: 1;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
             overflow: hidden;
         }
+        .table-freeze-head {
+            flex-shrink: 0;
+            overflow: hidden;
+            border-bottom: 1px solid rgba(13, 27, 42, 0.08);
+            background: #f4f7fb;
+            z-index: 5;
+        }
         .table-scroll {
+            flex: 1;
+            min-height: 0;
             overflow: auto;
-            max-height: calc(100vh - 280px);
             -webkit-overflow-scrolling: touch;
         }
         table.data-table {
             width: 100%;
-            border-collapse: separate;
-            border-spacing: 0;
+            border-collapse: collapse;
+            table-layout: fixed;
             min-width: 980px;
         }
         .data-table th {
@@ -573,13 +588,8 @@
             text-transform: uppercase;
             color: var(--muted);
             background: #f4f7fb;
-            border-bottom: 1px solid rgba(13, 27, 42, 0.08);
             text-align: center;
             white-space: nowrap;
-            position: sticky;
-            top: 0;
-            z-index: 3;
-            box-shadow: 0 1px 0 rgba(13, 27, 42, 0.08);
         }
         .data-table td {
             padding: 0.7rem 0.55rem;
@@ -598,6 +608,7 @@
         .toolbar {
             display: flex; flex-wrap: wrap; gap: 0.65rem; margin-bottom: 0.85rem;
             align-items: flex-end; justify-content: space-between;
+            flex-shrink: 0;
         }
         .filters {
             display: flex; flex-wrap: wrap; gap: 0.65rem; align-items: flex-end; flex: 1;
@@ -1711,8 +1722,13 @@
                 </div>
 
                 <div class="table-card">
-                    <div class="table-scroll">
-                        <table class="data-table" id="bonsTable">
+                    <div class="table-freeze-head" id="bonsHeadScroll">
+                        <table class="data-table" aria-hidden="true">
+                            <colgroup>
+                                <col style="width:11%"><col style="width:10%"><col style="width:18%">
+                                <col style="width:12%"><col style="width:12%"><col style="width:11%">
+                                <col style="width:12%"><col style="width:14%">
+                            </colgroup>
                             <thead>
                                 <tr>
                                     <th>Date</th>
@@ -1725,6 +1741,15 @@
                                     <th>Action</th>
                                 </tr>
                             </thead>
+                        </table>
+                    </div>
+                    <div class="table-scroll" id="bonsBodyScroll">
+                        <table class="data-table" id="bonsTable">
+                            <colgroup>
+                                <col style="width:11%"><col style="width:10%"><col style="width:18%">
+                                <col style="width:12%"><col style="width:12%"><col style="width:11%">
+                                <col style="width:12%"><col style="width:14%">
+                            </colgroup>
                             <tbody id="bonsBody">
                                 <tr class="empty-row">
                                     <td colspan="8" class="empty">Aucun bon — cliquez sur Ajouter</td>
@@ -1851,6 +1876,7 @@
     </div>
 
     <script src="{{ asset('js/data-sync.js') }}?v=5"></script>
+    <script src="{{ asset('js/seed-demo-local.js') }}?v=1"></script>
     <script src="{{ asset('js/sidebar-menu.js') }}?v=3"></script>
     <script src="{{ asset('js/table-actions.js') }}?v=7"></script>
     <script src="{{ asset('js/stock-store.js') }}?v=11"></script>
@@ -2619,6 +2645,15 @@
             });
             TableActions.bind('#bonsBody');
         }
+
+        (function () {
+            var head = document.getElementById('bonsHeadScroll');
+            var body = document.getElementById('bonsBodyScroll');
+            if (!head || !body) return;
+            body.addEventListener('scroll', function () {
+                head.scrollLeft = body.scrollLeft;
+            });
+        })();
 
         function refreshDashboard() {
             refreshDashStats();

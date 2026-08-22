@@ -11,14 +11,32 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('css/shell.css') }}?v=2">
     <style>
+        /* Page figée : titre + boutons fixes, seules les lignes défilent */
+        html, body { height: 100%; overflow: hidden; }
+        .app { min-height: 100%; height: 100%; max-height: 100%; overflow: hidden; }
+        .main { min-height: 0; overflow: hidden; display: flex; flex-direction: column; }
+        .topbar { flex-shrink: 0; }
         .menu-link--quiet { background: transparent; box-shadow: none; color: rgba(255,255,255,0.82); }
         .menu-link--quiet:hover { background: rgba(252,163,17,0.12); color: #fff; transform: none; }
         .menu-link--quiet .menu-ico { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.08); box-shadow: none; }
         .submenu a.is-active { color: #fff; background: rgba(252,163,17,0.16); }
         .submenu a.is-active::before { background: var(--green-bright); }
 
-        .page-wrap { flex: 1; padding: 0 1.5rem 1.5rem; min-width: 0; }
-        .toolbar { display: flex; flex-wrap: wrap; gap: 0.65rem; margin-bottom: 1rem; justify-content: flex-end; }
+        .page-wrap {
+            flex: 1;
+            min-width: 0;
+            min-height: 0;
+            padding: 0 1.5rem 1.5rem;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .toolbar {
+            display: flex; flex-wrap: wrap; gap: 0.65rem; margin-bottom: 0.75rem;
+            justify-content: flex-end; flex-shrink: 0;
+            position: relative; z-index: 6;
+            background: transparent;
+        }
         .btn {
             display: inline-flex; align-items: center; gap: 0.45rem;
             padding: 0.7rem 1.15rem; border-radius: 11px; border: none;
@@ -42,27 +60,37 @@
 
         .table-card {
             background: var(--white); border-radius: 18px; box-shadow: var(--shadow-card);
-            border: 1px solid rgba(252,163,17,0.14); overflow: hidden;
+            border: 1px solid rgba(252,163,17,0.14);
+            flex: 1;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .table-freeze-head {
+            flex-shrink: 0;
+            overflow: hidden;
+            border-bottom: 1px solid rgba(13,27,42,0.08);
+            background: #f4f7fb;
+            z-index: 5;
         }
         .table-scroll {
+            flex: 1;
+            min-height: 0;
             overflow: auto;
-            max-height: calc(100vh - 210px);
             -webkit-overflow-scrolling: touch;
         }
         table.data-table {
             width: 100%;
-            border-collapse: separate;
-            border-spacing: 0;
+            border-collapse: collapse;
+            table-layout: fixed;
             min-width: 1100px;
         }
         .data-table th {
             padding: 0.85rem 0.7rem; font-family: 'Outfit', sans-serif; font-size: 0.78rem;
             font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase;
             color: var(--muted); background: #f4f7fb;
-            border-bottom: 1px solid rgba(13,27,42,0.08);
             text-align: center; white-space: nowrap;
-            position: sticky; top: 0; z-index: 3;
-            box-shadow: 0 1px 0 rgba(13,27,42,0.08);
         }
         .data-table td {
             padding: 0.8rem 0.7rem; font-size: 0.88rem;
@@ -202,8 +230,13 @@
                 </div>
 
                 <div class="table-card">
-                    <div class="table-scroll">
-                        <table class="data-table" id="catTable">
+                    <div class="table-freeze-head" id="catHeadScroll">
+                        <table class="data-table" aria-hidden="true">
+                            <colgroup>
+                                <col style="width:7%"><col style="width:9%"><col style="width:11%">
+                                <col style="width:18%"><col style="width:11%"><col style="width:11%">
+                                <col style="width:8%"><col style="width:9%"><col style="width:9%"><col style="width:7%">
+                            </colgroup>
                             <thead>
                                 <tr>
                                     <th>Photo</th>
@@ -218,6 +251,15 @@
                                     <th>Action</th>
                                 </tr>
                             </thead>
+                        </table>
+                    </div>
+                    <div class="table-scroll" id="catBodyScroll">
+                        <table class="data-table" id="catTable">
+                            <colgroup>
+                                <col style="width:7%"><col style="width:9%"><col style="width:11%">
+                                <col style="width:18%"><col style="width:11%"><col style="width:11%">
+                                <col style="width:8%"><col style="width:9%"><col style="width:9%"><col style="width:7%">
+                            </colgroup>
                             <tbody id="catBody">
                                 <tr class="empty-row">
                                     <td colspan="10" class="empty">Aucun produit — cliquez sur Ajouter</td>
@@ -295,6 +337,7 @@
     </div>
 
     <script src="{{ asset('js/data-sync.js') }}?v=5"></script>
+    <script src="{{ asset('js/seed-demo-local.js') }}?v=1"></script>
     <script src="{{ asset('js/table-actions.js') }}?v=7"></script>
     <script src="{{ asset('js/stock-store.js') }}?v=11"></script>
     <script>
@@ -642,6 +685,15 @@
             ? StockStore.initCatalogFromServer()
             : Promise.resolve();
         bootCatalogue.then(renderCatalogue);
+
+        (function () {
+            var head = document.getElementById('catHeadScroll');
+            var body = document.getElementById('catBodyScroll');
+            if (!head || !body) return;
+            body.addEventListener('scroll', function () {
+                head.scrollLeft = body.scrollLeft;
+            });
+        })();
 
         (function () {
             var cb = document.getElementById('produitCodeBarre');
