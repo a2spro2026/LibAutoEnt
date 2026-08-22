@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ asset('css/shell.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/shell.css') }}?v=2">
     <style>
         .menu-link--quiet {
             background: transparent;
@@ -107,11 +107,16 @@
             overflow: hidden;
         }
 
-        .table-scroll { overflow-x: auto; }
+        .table-scroll {
+            overflow: auto;
+            max-height: calc(100vh - 220px);
+            -webkit-overflow-scrolling: touch;
+        }
 
         table.data-table {
             width: 100%;
-            border-collapse: collapse;
+            border-collapse: separate;
+            border-spacing: 0;
             min-width: 900px;
         }
 
@@ -128,6 +133,9 @@
             border-bottom: none;
             white-space: nowrap;
             box-shadow: inset 0 -1px 0 rgba(252, 163, 17, 0.35);
+            position: sticky;
+            top: 0;
+            z-index: 3;
         }
 
         .data-table th + th {

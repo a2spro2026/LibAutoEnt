@@ -769,7 +769,7 @@
         .sidebar-show-btn {
             position: fixed;
             left: 0.85rem;
-            top: 1rem;
+            top: 1.15rem;
             z-index: 60;
             width: 44px;
             height: 44px;
@@ -797,6 +797,14 @@
             pointer-events: none;
             transform: translateX(-100%);
             transition: transform 0.28s ease, opacity 0.2s ease, width 0.28s ease;
+        }
+
+        /* Laisser de la place au bouton Afficher pour ne pas masquer le titre */
+        .app.sidebar-hidden .topbar {
+            padding-left: 4.5rem;
+        }
+        .app.sidebar-hidden .topbar > div:first-child {
+            padding-left: 0;
         }
 
         @media (max-width: 1200px) {

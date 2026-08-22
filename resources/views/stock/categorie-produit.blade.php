@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ asset('css/shell.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/shell.css') }}?v=2">
     <style>
         .menu-link--quiet { background: transparent; box-shadow: none; color: rgba(255,255,255,0.82); }
         .menu-link--quiet:hover { background: rgba(252,163,17,0.12); color: #fff; transform: none; }
@@ -44,13 +44,25 @@
             background: var(--white); border-radius: 18px; box-shadow: var(--shadow-card);
             border: 1px solid rgba(252,163,17,0.14); overflow: hidden;
         }
-        .table-scroll { overflow-x: auto; }
-        table.data-table { width: 100%; border-collapse: collapse; min-width: 1100px; }
+        .table-scroll {
+            overflow: auto;
+            max-height: calc(100vh - 210px);
+            -webkit-overflow-scrolling: touch;
+        }
+        table.data-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            min-width: 1100px;
+        }
         .data-table th {
             padding: 0.85rem 0.7rem; font-family: 'Outfit', sans-serif; font-size: 0.78rem;
             font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase;
-            color: var(--muted); background: #f4f7fb; border-bottom: 1px solid rgba(13,27,42,0.08);
+            color: var(--muted); background: #f4f7fb;
+            border-bottom: 1px solid rgba(13,27,42,0.08);
             text-align: center; white-space: nowrap;
+            position: sticky; top: 0; z-index: 3;
+            box-shadow: 0 1px 0 rgba(13,27,42,0.08);
         }
         .data-table td {
             padding: 0.8rem 0.7rem; font-size: 0.88rem;
