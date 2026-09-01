@@ -82,6 +82,7 @@
             border-color: rgba(252,163,17,0.65);
             box-shadow: 0 0 0 3px rgba(252,163,17,0.15);
         }
+        .search-field .btn { margin-top: 0; }
         .toolbar-actions { display: flex; flex-wrap: wrap; gap: 0.65rem; }
         .period-hint {
             margin: -0.35rem 0 0.85rem; font-size: 0.85rem; color: var(--muted); font-weight: 500;
@@ -105,6 +106,13 @@
             background: linear-gradient(135deg, #5a6570, #3d4650);
             box-shadow: 0 6px 14px rgba(0,0,0,0.12);
         }
+        .btn-reset {
+            color: #0d1b2a;
+            background: #f4f7fb;
+            border: 1px solid rgba(13,27,42,0.12);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.06);
+        }
+        .btn-reset:hover { background: #eef2f8; }
 
         .table-card {
             background: var(--white); border-radius: 18px; box-shadow: var(--shadow-card);
@@ -185,12 +193,19 @@
                 <div class="toolbar">
                     <div class="search-bar">
                         <div class="search-field">
-                            <label for="filterDateDe">De</label>
-                            <input type="date" id="filterDateDe" autocomplete="off">
+                            <label for="filterMoisDe">Mois — De</label>
+                            <input type="month" id="filterMoisDe" autocomplete="off">
                         </div>
                         <div class="search-field">
-                            <label for="filterDateA">À</label>
-                            <input type="date" id="filterDateA" autocomplete="off">
+                            <label for="filterMoisA">À</label>
+                            <input type="month" id="filterMoisA" autocomplete="off">
+                        </div>
+                        <div class="search-field">
+                            <label aria-hidden="true">&nbsp;</label>
+                            <button type="button" class="btn btn-reset" id="btnReset" title="Réinitialiser les filtres">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/><path d="M3 21v-5h5"/></svg>
+                                Reset
+                            </button>
                         </div>
                     </div>
                     <div class="toolbar-actions">
@@ -255,8 +270,9 @@
         sidebarClose?.addEventListener('click', closeSidebar);
         overlay?.addEventListener('click', closeSidebar);
 
-        const filterDateDe = document.getElementById('filterDateDe');
-        const filterDateA = document.getElementById('filterDateA');
+        const COMPANY_NAME = @json(config('app.name', 'LibAutoEnt'));
+        const filterMoisDe = document.getElementById('filterMoisDe');
+        const filterMoisA = document.getElementById('filterMoisA');
         const periodHint = document.getElementById('periodHint');
 
         function money(n) {
@@ -265,36 +281,30 @@
         function fmtMoneyHtml(n) {
             return (Number(n) || 0).toFixed(2) + ' <small>DH</small>';
         }
+        function escapeHtml(s) {
+            return String(s == null ? '' : s)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;');
+        }
 
-        function parseBonDateTs(dateStr) {
-            if (!dateStr || typeof dateStr !== 'string') return 0;
-            if (dateStr.indexOf('-') !== -1) {
-                var iso = dateStr.slice(0, 10).split('-');
-                if (iso.length !== 3) return 0;
-                return new Date(Number(iso[0]), Number(iso[1]) - 1, Number(iso[2])).getTime() || 0;
+        function bonMonthKey(dateStr) {
+            if (!dateStr || typeof dateStr !== 'string') return '';
+            if (dateStr.indexOf('-') !== -1 && dateStr.length >= 7) {
+                return dateStr.slice(0, 7);
             }
             var p = dateStr.split('/');
-            if (p.length !== 3) return 0;
-            return new Date(Number(p[2]), Number(p[1]) - 1, Number(p[0])).getTime() || 0;
+            if (p.length !== 3) return '';
+            var mm = String(p[1] || '').padStart(2, '0');
+            var yyyy = String(p[2] || '');
+            if (!yyyy || mm === '00') return '';
+            return yyyy + '-' + mm;
         }
 
-        function isoToTs(iso) {
-            if (!iso) return 0;
-            var p = iso.split('-');
-            if (p.length !== 3) return 0;
-            return new Date(Number(p[0]), Number(p[1]) - 1, Number(p[2])).getTime() || 0;
-        }
-
-        function formatIsoFr(iso) {
-            if (!iso) return '';
-            var p = iso.split('-');
-            if (p.length !== 3) return iso;
-            return p[2] + '/' + p[1] + '/' + p[0];
-        }
-
-        function getDateRange() {
-            var from = (filterDateDe && filterDateDe.value) || '';
-            var to = (filterDateA && filterDateA.value) || '';
+        function getMonthRange() {
+            var from = (filterMoisDe && filterMoisDe.value) || '';
+            var to = (filterMoisA && filterMoisA.value) || '';
             if (from && to && from > to) {
                 var tmp = from;
                 from = to;
@@ -303,31 +313,73 @@
             return { from: from, to: to };
         }
 
-        function periodLabel() {
-            var range = getDateRange();
-            if (!range.from && !range.to) return '';
-            if (range.from && range.to) {
-                if (range.from === range.to) return 'Période : ' + formatIsoFr(range.from);
-                return 'Période : De ' + formatIsoFr(range.from) + ' à ' + formatIsoFr(range.to);
-            }
-            if (range.from) return 'Période : À partir du ' + formatIsoFr(range.from);
-            return 'Période : Jusqu’au ' + formatIsoFr(range.to);
+        function formatMonthLabel(ym) {
+            if (!ym || ym.length < 7) return '';
+            var parts = ym.split('-');
+            var months = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
+            var mi = parseInt(parts[1], 10) - 1;
+            if (mi < 0 || mi > 11) return ym;
+            return months[mi] + ' ' + parts[0];
         }
 
-        function bonInDateRange(bon, range) {
+        function periodLabel() {
+            var range = getMonthRange();
+            if (!range.from && !range.to) return '';
+            if (range.from && range.to) {
+                if (range.from === range.to) return 'Période : ' + formatMonthLabel(range.from);
+                return 'Période : De ' + formatMonthLabel(range.from) + ' à ' + formatMonthLabel(range.to);
+            }
+            if (range.from) return 'Période : À partir de ' + formatMonthLabel(range.from);
+            return 'Période : Jusqu’à ' + formatMonthLabel(range.to);
+        }
+
+        function periodPrintLabel() {
+            var range = getMonthRange();
+            if (!range.from && !range.to) return 'Toutes périodes';
+            if (range.from && range.to) {
+                if (range.from === range.to) return formatMonthLabel(range.from);
+                return 'Du ' + formatMonthLabel(range.from) + ' au ' + formatMonthLabel(range.to);
+            }
+            if (range.from) return 'À partir de ' + formatMonthLabel(range.from);
+            return 'Jusqu’à ' + formatMonthLabel(range.to);
+        }
+
+        function bonInMonthRange(bon, range) {
             if (!range.from && !range.to) return true;
-            var ts = parseBonDateTs(bon && bon.date);
-            if (!ts) return false;
-            if (range.from) {
-                var fromTs = isoToTs(range.from);
-                if (ts < fromTs) return false;
-            }
-            if (range.to) {
-                var toTs = isoToTs(range.to);
-                // inclusif jusqu’à la fin de la journée
-                if (ts > toTs) return false;
-            }
+            var key = bonMonthKey(bon && bon.date);
+            if (!key) return false;
+            if (range.from && key < range.from) return false;
+            if (range.to && key > range.to) return false;
             return true;
+        }
+
+        function balanceEtatNumber() {
+            var d = new Date();
+            var y = d.getFullYear();
+            var m = String(d.getMonth() + 1).padStart(2, '0');
+            var day = String(d.getDate()).padStart(2, '0');
+            var h = String(d.getHours()).padStart(2, '0');
+            var min = String(d.getMinutes()).padStart(2, '0');
+            return 'BAL-V-' + y + m + day + '-' + h + min;
+        }
+
+        function formatPrintDate() {
+            var d = new Date();
+            var dd = String(d.getDate()).padStart(2, '0');
+            var mm = String(d.getMonth() + 1).padStart(2, '0');
+            return dd + '/' + mm + '/' + d.getFullYear();
+        }
+
+        function computeTotals(rows) {
+            var totals = { achats: 0, ventes: 0, paye: 0, solde: 0 };
+            (rows || []).forEach(function (r) {
+                totals.achats += Number(r.montantAchat) || 0;
+                totals.ventes += Number(r.montantVente) || 0;
+                totals.paye += Number(r.montantPaye) || 0;
+                totals.solde += Number(r.solde) || 0;
+            });
+            totals.marge = totals.ventes - totals.achats;
+            return totals;
         }
 
         function catalogMap() {
@@ -362,10 +414,10 @@
 
         function getBalanceRows() {
             var map = catalogMap();
-            var range = getDateRange();
+            var range = getMonthRange();
             var bons = (window.VenteStore && VenteStore.getBons) ? VenteStore.getBons() : [];
             return bons.filter(function (b) {
-                return bonInDateRange(b, range);
+                return bonInMonthRange(b, range);
             }).map(function (b) {
                 var achat = montantAchatBon(b, map);
                 var vente = Number(b.montant) || 0;
@@ -413,7 +465,7 @@
             updatePeriodHint();
             var rows = getBalanceRows();
             refreshBalanceStats(rows);
-            var filtered = !!(getDateRange().from || getDateRange().to);
+            var filtered = !!(getMonthRange().from || getMonthRange().to);
             if (!rows.length) {
                 body.innerHTML = '<tr class="empty-row"><td colspan="6" class="empty">' +
                     (filtered
@@ -435,39 +487,112 @@
             }).join('');
         }
 
-        filterDateDe.addEventListener('change', renderBalance);
-        filterDateA.addEventListener('change', renderBalance);
+        filterMoisDe.addEventListener('change', renderBalance);
+        filterMoisA.addEventListener('change', renderBalance);
+
+        document.getElementById('btnReset').addEventListener('click', function () {
+            if (filterMoisDe) filterMoisDe.value = '';
+            if (filterMoisA) filterMoisA.value = '';
+            renderBalance();
+        });
 
         document.getElementById('btnImprimer').addEventListener('click', function () {
             var rows = getBalanceRows();
-            var htmlRows = rows.map(function (r) {
-                return '<tr>' +
-                    '<td>' + r.date + '</td>' +
-                    '<td>' + r.numero + '</td>' +
-                    '<td>' + money(r.montantAchat) + '</td>' +
-                    '<td>' + money(r.montantVente) + '</td>' +
-                    '<td>' + money(r.montantPaye) + '</td>' +
-                    '<td>' + money(r.solde) + '</td>' +
+            var totals = computeTotals(rows);
+            var etatNum = balanceEtatNumber();
+            var periode = periodPrintLabel();
+            var printDate = formatPrintDate();
+            var range = getMonthRange();
+
+            var htmlRows = rows.map(function (r, i) {
+                var zebra = i % 2 ? ' class="alt"' : '';
+                return '<tr' + zebra + '>' +
+                    '<td>' + escapeHtml(r.date) + '</td>' +
+                    '<td>' + escapeHtml(r.numero) + '</td>' +
+                    '<td class="num">' + escapeHtml(money(r.montantAchat)) + '</td>' +
+                    '<td class="num">' + escapeHtml(money(r.montantVente)) + '</td>' +
+                    '<td class="num">' + escapeHtml(money(r.montantPaye)) + '</td>' +
+                    '<td class="num solde">' + escapeHtml(money(r.solde)) + '</td>' +
                     '</tr>';
             }).join('');
-            var periode = periodLabel();
 
-            var w = window.open('', '_blank', 'width=960,height=720');
+            var totalsRow =
+                '<tr class="totals-row">' +
+                '<td colspan="2"><strong>TOTAUX</strong></td>' +
+                '<td class="num"><strong>' + escapeHtml(money(totals.achats)) + '</strong></td>' +
+                '<td class="num highlight"><strong>' + escapeHtml(money(totals.ventes)) + '</strong></td>' +
+                '<td class="num"><strong>' + escapeHtml(money(totals.paye)) + '</strong></td>' +
+                '<td class="num solde"><strong>' + escapeHtml(money(totals.solde)) + '</strong></td>' +
+                '</tr>';
+
+            var summaryCards =
+                '<div class="summary-grid">' +
+                '<div class="summary-card"><span>Total Achats</span><strong>' + escapeHtml(money(totals.achats)) + '</strong></div>' +
+                '<div class="summary-card accent"><span>Total Ventes</span><strong>' + escapeHtml(money(totals.ventes)) + '</strong></div>' +
+                '<div class="summary-card"><span>Total Marge</span><strong>' + escapeHtml(money(totals.marge)) + '</strong></div>' +
+                '<div class="summary-card"><span>Total Payé</span><strong>' + escapeHtml(money(totals.paye)) + '</strong></div>' +
+                '</div>';
+
+            var printCss =
+                '*{box-sizing:border-box;margin:0;padding:0}' +
+                'body{font-family:"Segoe UI",Arial,sans-serif;color:#0d1b2a;background:#f8fafc;padding:28px}' +
+                '.sheet{max-width:980px;margin:0 auto;background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 12px 40px rgba(13,27,42,0.12)}' +
+                '.head{background:linear-gradient(135deg,#0d1b2a 0%,#14213d 55%,#1b4332 100%);color:#fff;padding:28px 32px 24px;position:relative}' +
+                '.head::after{content:"";position:absolute;bottom:0;left:0;right:0;height:4px;background:linear-gradient(90deg,#fca311,#ffd166,#fca311)}' +
+                '.company{font-size:26px;font-weight:800;letter-spacing:0.02em;margin-bottom:4px}' +
+                '.doc-title{font-size:15px;font-weight:600;opacity:0.92;text-transform:uppercase;letter-spacing:0.12em;color:#fca311}' +
+                '.meta{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;padding:18px 32px;background:#f4f7fb;border-bottom:1px solid rgba(13,27,42,0.08)}' +
+                '.meta-item label{display:block;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#5a6570;margin-bottom:4px}' +
+                '.meta-item span{font-size:13px;font-weight:600;color:#0d1b2a}' +
+                '.content{padding:24px 32px 32px}' +
+                '.summary-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:22px}' +
+                '.summary-card{background:#f8fafc;border:1px solid rgba(13,27,42,0.08);border-radius:10px;padding:12px 14px;text-align:center}' +
+                '.summary-card span{display:block;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:#5a6570;margin-bottom:6px}' +
+                '.summary-card strong{font-size:15px;font-weight:800;color:#0d1b2a}' +
+                '.summary-card.accent{background:linear-gradient(145deg,#fff8eb,#fff3d6);border-color:rgba(252,163,17,0.35)}' +
+                '.summary-card.accent strong{color:#c47e00}' +
+                'table{width:100%;border-collapse:collapse;font-size:12px}' +
+                'th{background:#14213d;color:#fff;padding:10px 8px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em}' +
+                'td{padding:9px 8px;border-bottom:1px solid rgba(13,27,42,0.08);text-align:center}' +
+                'tr.alt td{background:#fafbfd}' +
+                'td.num{font-variant-numeric:tabular-nums;font-weight:600}' +
+                'td.solde{color:#c47e00}' +
+                'tr.totals-row td{background:linear-gradient(90deg,#eef2f8,#f8fafc);border-top:2px solid #14213d;border-bottom:none;padding:12px 8px}' +
+                'td.highlight{color:#c47e00;font-size:13px}' +
+                '.foot{margin-top:20px;padding-top:14px;border-top:1px dashed rgba(13,27,42,0.15);font-size:11px;color:#5a6570;text-align:center}' +
+                '@media print{body{background:#fff;padding:0}.sheet{box-shadow:none;border-radius:0}}';
+
+            var printBody =
+                '<div class="sheet">' +
+                '<header class="head">' +
+                '<div class="company">' + escapeHtml(COMPANY_NAME) + '</div>' +
+                '<div class="doc-title">Balance des Ventes</div>' +
+                '</header>' +
+                '<div class="meta">' +
+                '<div class="meta-item"><label>N° État Balance</label><span>' + escapeHtml(etatNum) + '</span></div>' +
+                '<div class="meta-item"><label>Date de</label><span>' + escapeHtml(range.from ? formatMonthLabel(range.from) : '—') + '</span></div>' +
+                '<div class="meta-item"><label>Date à</label><span>' + escapeHtml(range.to ? formatMonthLabel(range.to) : '—') + '</span></div>' +
+                '<div class="meta-item"><label>Date impression</label><span>' + escapeHtml(printDate) + '</span></div>' +
+                '</div>' +
+                '<div class="content">' +
+                summaryCards +
+                '<table><thead><tr>' +
+                '<th>Date</th><th>N° Bn</th><th>Montant d\'Achat</th><th>Montant de Vente</th><th>Montant Payé</th><th>Solde</th>' +
+                '</tr></thead><tbody>' +
+                (htmlRows || '<tr><td colspan="6">Aucune donnée</td></tr>') +
+                (rows.length ? totalsRow : '') +
+                '</tbody></table>' +
+                '<p class="foot">Période : ' + escapeHtml(periode) + ' — Document généré par ' + escapeHtml(COMPANY_NAME) + '</p>' +
+                '</div></div>';
+
+            var w = window.open('', '_blank', 'width=1024,height=800');
             if (!w) {
                 window.print();
                 return;
             }
             w.document.write(
-                '<!DOCTYPE html><html lang="fr"><head><meta charset="utf-8"><title>Balance des Ventes</title>' +
-                '<style>body{font-family:Arial,sans-serif;padding:24px;color:#0d1b2a}h1{font-size:18px;margin:0 0 8px}' +
-                '.periode{margin:0 0 16px;color:#555;font-size:13px}' +
-                'table{width:100%;border-collapse:collapse}th,td{border:1px solid #ccc;padding:8px;text-align:center;font-size:13px}' +
-                'th{background:#14213d;color:#fff}</style></head><body>' +
-                '<h1>Balance des Ventes</h1>' +
-                (periode ? '<p class="periode">' + periode + '</p>' : '') +
-                '<table><thead><tr><th>Date</th><th>N° Bn</th><th>Montant d\'Achat</th><th>Montant de Vente</th><th>Montant Payé</th><th>Solde</th></tr></thead>' +
-                '<tbody>' + (htmlRows || '<tr><td colspan="6">Aucune donnée</td></tr>') + '</tbody></table>' +
-                '</body></html>'
+                '<!DOCTYPE html><html lang="fr"><head><meta charset="utf-8"><title>Balance des Ventes — ' + escapeHtml(etatNum) + '</title>' +
+                '<style>' + printCss + '</style></head><body>' + printBody + '</body></html>'
             );
             w.document.close();
             w.focus();
