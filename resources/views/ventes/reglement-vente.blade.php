@@ -82,6 +82,11 @@
             border-color: rgba(252,163,17,0.65);
             box-shadow: 0 0 0 3px rgba(252,163,17,0.15);
         }
+        .search-field input.date-fr {
+            width: min(100%, 148px);
+            font-variant-numeric: tabular-nums;
+            letter-spacing: 0.02em;
+        }
         .search-field .btn { margin-top: 0; }
         .toolbar-actions { display: flex; flex-wrap: wrap; gap: 0.65rem; }
         .period-hint {
@@ -136,6 +141,131 @@
         .money { font-variant-numeric: tabular-nums; font-weight: 600; }
         .col-solde { color: #c47e00; font-weight: 700; }
 
+        .print-preview {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 200;
+            background: #e8edf2;
+            overflow-y: auto;
+            padding: 1rem;
+        }
+        .print-preview.is-open { display: block; }
+        .print-preview-toolbar {
+            position: sticky;
+            top: 0;
+            z-index: 2;
+            display: flex;
+            gap: 0.65rem;
+            justify-content: center;
+            padding: 0.85rem;
+            margin-bottom: 1rem;
+            background: rgba(255,255,255,0.95);
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(13,27,42,0.12);
+        }
+        .print-preview-inner {
+            max-width: 980px;
+            margin: 0 auto 2rem;
+        }
+
+        .print-sheet {
+            background: #fff;
+            border-radius: 14px;
+            overflow: hidden;
+            box-shadow: 0 12px 40px rgba(13,27,42,0.12);
+            color: #0d1b2a;
+            font-family: "Segoe UI", Arial, sans-serif;
+        }
+        .print-head {
+            background: linear-gradient(135deg, #0d1b2a 0%, #14213d 55%, #1b4332 100%);
+            color: #fff;
+            padding: 28px 32px 24px;
+            border-bottom: 4px solid #fca311;
+        }
+        .print-company { font-size: 26px; font-weight: 800; margin-bottom: 4px; }
+        .print-doc-title {
+            font-size: 15px; font-weight: 600; text-transform: uppercase;
+            letter-spacing: 0.12em; color: #fca311;
+        }
+        .print-meta {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 12px;
+            padding: 18px 32px;
+            background: #f4f7fb;
+            border-bottom: 1px solid rgba(13,27,42,0.08);
+        }
+        .print-meta label {
+            display: block;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #5a6570;
+            margin-bottom: 4px;
+        }
+        .print-meta span { font-size: 13px; font-weight: 600; }
+        .print-content { padding: 24px 32px 32px; }
+        .print-summary {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 12px;
+            margin-bottom: 22px;
+        }
+        .print-summary-card {
+            background: #f8fafc;
+            border: 1px solid rgba(13,27,42,0.08);
+            border-radius: 10px;
+            padding: 12px 14px;
+            text-align: center;
+        }
+        .print-summary-card span {
+            display: block;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: #5a6570;
+            margin-bottom: 6px;
+        }
+        .print-summary-card strong { font-size: 15px; font-weight: 800; }
+        .print-summary-card.accent {
+            background: linear-gradient(145deg, #fff8eb, #fff3d6);
+            border-color: rgba(252,163,17,0.35);
+        }
+        .print-summary-card.accent strong { color: #c47e00; }
+        .print-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+        .print-table th {
+            background: #14213d;
+            color: #fff;
+            padding: 10px 8px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+        .print-table td {
+            padding: 9px 8px;
+            border-bottom: 1px solid rgba(13,27,42,0.08);
+            text-align: center;
+        }
+        .print-table tr.alt td { background: #fafbfd; }
+        .print-table td.num { font-variant-numeric: tabular-nums; font-weight: 600; }
+        .print-table td.solde { color: #c47e00; }
+        .print-table tr.totals-row td {
+            background: #eef2f8;
+            border-top: 2px solid #14213d;
+            font-weight: 700;
+        }
+        .print-table td.highlight { color: #c47e00; }
+        .print-foot {
+            margin-top: 20px;
+            padding-top: 14px;
+            border-top: 1px dashed rgba(13,27,42,0.15);
+            font-size: 11px;
+            color: #5a6570;
+            text-align: center;
+        }
+
         @media (max-width: 900px) {
             .balance-stats { grid-template-columns: 1fr; }
             .page-wrap { padding: 0 1rem 1.25rem; }
@@ -144,11 +274,18 @@
             .toolbar-actions { justify-content: flex-end; }
         }
         @media print {
-            .sidebar, .topbar, .toolbar, .overlay, .menu-toggle, .topbar-badge, .balance-stats, .period-hint { display: none !important; }
-            .app { display: block !important; }
-            .main { margin: 0 !important; width: 100% !important; }
-            .page-wrap { padding: 0 !important; }
-            .table-card { box-shadow: none; border: none; }
+            .sidebar, .topbar, .toolbar, .overlay, .menu-toggle, .topbar-badge,
+            .balance-stats, .period-hint, .app, .print-preview-toolbar { display: none !important; }
+            .print-preview {
+                display: block !important;
+                position: static !important;
+                inset: auto !important;
+                background: #fff !important;
+                padding: 0 !important;
+                overflow: visible !important;
+            }
+            .print-preview-inner { max-width: none !important; margin: 0 !important; }
+            .print-sheet { box-shadow: none !important; border-radius: 0 !important; }
         }
     </style>
 </head>
@@ -193,12 +330,12 @@
                 <div class="toolbar">
                     <div class="search-bar">
                         <div class="search-field">
-                            <label for="filterMoisDe">Mois — De</label>
-                            <input type="month" id="filterMoisDe" autocomplete="off">
+                            <label for="filterDateDe">De</label>
+                            <input type="text" class="date-fr" id="filterDateDe" inputmode="numeric" placeholder="jj/mm/aaaa" maxlength="10" autocomplete="off" spellcheck="false">
                         </div>
                         <div class="search-field">
-                            <label for="filterMoisA">À</label>
-                            <input type="month" id="filterMoisA" autocomplete="off">
+                            <label for="filterDateA">À</label>
+                            <input type="text" class="date-fr" id="filterDateA" inputmode="numeric" placeholder="jj/mm/aaaa" maxlength="10" autocomplete="off" spellcheck="false">
                         </div>
                         <div class="search-field">
                             <label aria-hidden="true">&nbsp;</label>
@@ -246,6 +383,14 @@
         </div>
     </div>
 
+    <div class="print-preview" id="printPreview" aria-hidden="true">
+        <div class="print-preview-toolbar">
+            <button type="button" class="btn btn-print" id="btnPrintConfirm">Imprimer</button>
+            <button type="button" class="btn btn-close" id="btnPrintClose">Fermer</button>
+        </div>
+        <div class="print-preview-inner" id="printPreviewContent"></div>
+    </div>
+
     <script src="{{ asset('js/data-sync.js') }}?v=5"></script>
     <script src="{{ asset('js/stock-store.js') }}?v=10"></script>
     <script src="{{ asset('js/achat-store.js') }}?v=8"></script>
@@ -271,8 +416,9 @@
         overlay?.addEventListener('click', closeSidebar);
 
         const COMPANY_NAME = @json(config('app.name', 'LibAutoEnt'));
-        const filterMoisDe = document.getElementById('filterMoisDe');
-        const filterMoisA = document.getElementById('filterMoisA');
+        const DEFAULT_YEAR = 2026;
+        const filterDateDe = document.getElementById('filterDateDe');
+        const filterDateA = document.getElementById('filterDateA');
         const periodHint = document.getElementById('periodHint');
 
         function money(n) {
@@ -289,23 +435,155 @@
                 .replace(/"/g, '&quot;');
         }
 
-        function bonMonthKey(dateStr) {
-            if (!dateStr || typeof dateStr !== 'string') return '';
-            if (dateStr.indexOf('-') !== -1 && dateStr.length >= 7) {
-                return dateStr.slice(0, 7);
+        function formatDateFr(dateStr) {
+            if (!dateStr || dateStr === '—') return '—';
+            dateStr = String(dateStr).trim();
+            if (dateStr.indexOf('-') !== -1) {
+                var iso = dateStr.slice(0, 10).split('-');
+                if (iso.length === 3 && iso[0].length === 4) {
+                    return String(iso[2]).padStart(2, '0') + '/' +
+                        String(iso[1]).padStart(2, '0') + '/' +
+                        iso[0];
+                }
             }
             var p = dateStr.split('/');
-            if (p.length !== 3) return '';
-            var mm = String(p[1] || '').padStart(2, '0');
-            var yyyy = String(p[2] || '');
-            if (!yyyy || mm === '00') return '';
-            return yyyy + '-' + mm;
+            if (p.length === 3) {
+                var dd = String(p[0]).padStart(2, '0');
+                var mm = String(p[1]).padStart(2, '0');
+                var yyyy = String(p[2] || '').trim();
+                if (yyyy.length === 2) yyyy = '20' + yyyy;
+                if (!yyyy || !/^\d{4}$/.test(yyyy)) yyyy = String(DEFAULT_YEAR);
+                return dd + '/' + mm + '/' + yyyy;
+            }
+            return dateStr;
         }
 
-        function getMonthRange() {
-            var from = (filterMoisDe && filterMoisDe.value) || '';
-            var to = (filterMoisA && filterMoisA.value) || '';
-            if (from && to && from > to) {
+        function parseBonDateTs(dateStr) {
+            if (!dateStr) return 0;
+            dateStr = String(dateStr).trim();
+            if (dateStr.indexOf('-') !== -1) {
+                var iso = dateStr.slice(0, 10).split('-');
+                if (iso.length !== 3) return 0;
+                return new Date(Number(iso[0]), Number(iso[1]) - 1, Number(iso[2])).getTime() || 0;
+            }
+            var p = dateStr.split('/');
+            if (p.length !== 3) return 0;
+            var yyyy = String(p[2] || '').trim();
+            if (yyyy.length === 2) yyyy = '20' + yyyy;
+            if (!yyyy || !/^\d{4}$/.test(yyyy)) yyyy = String(DEFAULT_YEAR);
+            return new Date(Number(yyyy), Number(p[1]) - 1, Number(p[0])).getTime() || 0;
+        }
+
+        function isoToTs(iso) {
+            if (!iso) return 0;
+            var p = iso.split('-');
+            if (p.length !== 3) return 0;
+            return new Date(Number(p[0]), Number(p[1]) - 1, Number(p[2])).getTime() || 0;
+        }
+
+        function dateDigits(value) {
+            return String(value || '').replace(/\D/g, '').slice(0, 8);
+        }
+
+        function maskFrDateInput(el) {
+            if (!el) return;
+            var d = dateDigits(el.value);
+            if (!d) {
+                el.value = '';
+                return;
+            }
+            if (d.length <= 2) {
+                el.value = d;
+            } else if (d.length <= 4) {
+                el.value = d.slice(0, 2) + '/' + d.slice(2);
+            } else {
+                el.value = d.slice(0, 2) + '/' + d.slice(2, 4) + '/' + d.slice(4);
+            }
+        }
+
+        function normalizeFrDateInput(value) {
+            value = String(value || '').trim();
+            if (!value) return '';
+
+            var digits = dateDigits(value);
+            if (digits.length === 8) {
+                value = digits.slice(0, 2) + '/' + digits.slice(2, 4) + '/' + digits.slice(4);
+            }
+
+            var p = value.split('/');
+            if (p.length === 2 && p[0] && p[1]) {
+                return String(p[0]).padStart(2, '0') + '/' +
+                    String(p[1]).padStart(2, '0') + '/' + DEFAULT_YEAR;
+            }
+            if (p.length !== 3 || !p[0] || !p[1]) return value;
+
+            var dd = String(p[0]).padStart(2, '0');
+            var mm = String(p[1]).padStart(2, '0');
+            var yyyy = String(p[2] || '').trim();
+            if (!yyyy) yyyy = String(DEFAULT_YEAR);
+            if (yyyy.length === 2) yyyy = '20' + yyyy;
+            return dd + '/' + mm + '/' + yyyy;
+        }
+
+        function isValidFrDate(value) {
+            if (!value) return true;
+            var normalized = normalizeFrDateInput(value);
+            if (!/^\d{2}\/\d{2}\/\d{4}$/.test(normalized)) return false;
+            var ts = parseBonDateTs(normalized);
+            if (!ts) return false;
+            var parts = normalized.split('/');
+            var day = Number(parts[0]);
+            var month = Number(parts[1]);
+            var year = Number(parts[2]);
+            var check = new Date(year, month - 1, day);
+            return check.getFullYear() === year &&
+                check.getMonth() === month - 1 &&
+                check.getDate() === day;
+        }
+
+        function getFilterDateValue(el) {
+            if (!el) return '';
+            var value = String(el.value || '').trim();
+            if (!value) return '';
+            var normalized = normalizeFrDateInput(value);
+            if (!isValidFrDate(normalized)) return '';
+            return normalized;
+        }
+
+        function prepareDateFilters() {
+            [filterDateDe, filterDateA].forEach(function (el) {
+                if (!el || !el.value.trim()) return;
+                el.value = normalizeFrDateInput(el.value);
+                el.style.borderColor = isValidFrDate(el.value) ? '' : '#c62828';
+            });
+        }
+
+        function showPrintPreview(html) {
+            var preview = document.getElementById('printPreview');
+            var content = document.getElementById('printPreviewContent');
+            if (!preview || !content) return;
+            content.innerHTML = html;
+            preview.classList.add('is-open');
+            preview.setAttribute('aria-hidden', 'false');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closePrintPreview() {
+            var preview = document.getElementById('printPreview');
+            if (!preview) return;
+            preview.classList.remove('is-open');
+            preview.setAttribute('aria-hidden', 'true');
+            document.body.style.overflow = '';
+        }
+
+        function formatIsoFr(iso) {
+            return formatDateFr(iso);
+        }
+
+        function getDateRange() {
+            var from = getFilterDateValue(filterDateDe);
+            var to = getFilterDateValue(filterDateA);
+            if (from && to && parseBonDateTs(from) > parseBonDateTs(to)) {
                 var tmp = from;
                 from = to;
                 to = tmp;
@@ -313,44 +591,42 @@
             return { from: from, to: to };
         }
 
-        function formatMonthLabel(ym) {
-            if (!ym || ym.length < 7) return '';
-            var parts = ym.split('-');
-            var months = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
-            var mi = parseInt(parts[1], 10) - 1;
-            if (mi < 0 || mi > 11) return ym;
-            return months[mi] + ' ' + parts[0];
+        function bonInDateRange(bon, range) {
+            if (!range.from && !range.to) return true;
+            var ts = parseBonDateTs(bon && bon.date);
+            if (!ts) return false;
+            if (range.from && ts < parseBonDateTs(range.from)) return false;
+            if (range.to && ts > parseBonDateTs(range.to)) return false;
+            return true;
+        }
+
+        function hasActiveFilters() {
+            var range = getDateRange();
+            return !!(range.from || range.to);
         }
 
         function periodLabel() {
-            var range = getMonthRange();
+            var range = getDateRange();
             if (!range.from && !range.to) return '';
             if (range.from && range.to) {
-                if (range.from === range.to) return 'Période : ' + formatMonthLabel(range.from);
-                return 'Période : De ' + formatMonthLabel(range.from) + ' à ' + formatMonthLabel(range.to);
+                if (range.from === range.to) return 'Période : ' + formatIsoFr(range.from);
+                return 'Période : De ' + formatIsoFr(range.from) + ' à ' + formatIsoFr(range.to);
             }
-            if (range.from) return 'Période : À partir de ' + formatMonthLabel(range.from);
-            return 'Période : Jusqu’à ' + formatMonthLabel(range.to);
+            if (range.from) return 'Période : À partir du ' + formatIsoFr(range.from);
+            return 'Période : Jusqu’au ' + formatIsoFr(range.to);
         }
 
         function periodPrintLabel() {
-            var range = getMonthRange();
-            if (!range.from && !range.to) return 'Toutes périodes';
-            if (range.from && range.to) {
-                if (range.from === range.to) return formatMonthLabel(range.from);
-                return 'Du ' + formatMonthLabel(range.from) + ' au ' + formatMonthLabel(range.to);
-            }
-            if (range.from) return 'À partir de ' + formatMonthLabel(range.from);
-            return 'Jusqu’à ' + formatMonthLabel(range.to);
+            var label = periodLabel();
+            return label ? label.replace(/^Période\s*:\s*/, '') : 'Toutes périodes';
         }
 
-        function bonInMonthRange(bon, range) {
-            if (!range.from && !range.to) return true;
-            var key = bonMonthKey(bon && bon.date);
-            if (!key) return false;
-            if (range.from && key < range.from) return false;
-            if (range.to && key > range.to) return false;
-            return true;
+        function getPrintPeriodBounds() {
+            var range = getDateRange();
+            return {
+                de: range.from ? formatIsoFr(range.from) : '—',
+                a: range.to ? formatIsoFr(range.to) : '—'
+            };
         }
 
         function balanceEtatNumber() {
@@ -365,9 +641,9 @@
 
         function formatPrintDate() {
             var d = new Date();
-            var dd = String(d.getDate()).padStart(2, '0');
-            var mm = String(d.getMonth() + 1).padStart(2, '0');
-            return dd + '/' + mm + '/' + d.getFullYear();
+            return String(d.getDate()).padStart(2, '0') + '/' +
+                String(d.getMonth() + 1).padStart(2, '0') + '/' +
+                d.getFullYear();
         }
 
         function computeTotals(rows) {
@@ -414,17 +690,16 @@
 
         function getBalanceRows() {
             var map = catalogMap();
-            var range = getMonthRange();
             var bons = (window.VenteStore && VenteStore.getBons) ? VenteStore.getBons() : [];
             return bons.filter(function (b) {
-                return bonInMonthRange(b, range);
+                return bonInDateRange(b, getDateRange());
             }).map(function (b) {
                 var achat = montantAchatBon(b, map);
                 var vente = Number(b.montant) || 0;
                 var paye = Number(b.montantPaye) || 0;
                 var solde = b.solde != null ? Number(b.solde) : Math.max(0, vente - paye);
                 return {
-                    date: b.date || '—',
+                    date: formatDateFr(b.date),
                     numero: b.numero || '—',
                     montantAchat: achat,
                     montantVente: vente,
@@ -465,7 +740,7 @@
             updatePeriodHint();
             var rows = getBalanceRows();
             refreshBalanceStats(rows);
-            var filtered = !!(getMonthRange().from || getMonthRange().to);
+            var filtered = hasActiveFilters();
             if (!rows.length) {
                 body.innerHTML = '<tr class="empty-row"><td colspan="6" class="empty">' +
                     (filtered
@@ -487,22 +762,55 @@
             }).join('');
         }
 
-        filterMoisDe.addEventListener('change', renderBalance);
-        filterMoisA.addEventListener('change', renderBalance);
+        function bindDateFilter(el) {
+            if (!el) return;
+            el.addEventListener('input', function () {
+                maskFrDateInput(el);
+                renderBalance();
+            });
+            el.addEventListener('blur', function () {
+                if (!el.value.trim()) {
+                    renderBalance();
+                    return;
+                }
+                el.value = normalizeFrDateInput(el.value);
+                if (!isValidFrDate(el.value)) {
+                    el.style.borderColor = '#c62828';
+                } else {
+                    el.style.borderColor = '';
+                }
+                renderBalance();
+            });
+        }
+
+        bindDateFilter(filterDateDe);
+        bindDateFilter(filterDateA);
 
         document.getElementById('btnReset').addEventListener('click', function () {
-            if (filterMoisDe) filterMoisDe.value = '';
-            if (filterMoisA) filterMoisA.value = '';
+            if (filterDateDe) {
+                filterDateDe.value = '';
+                filterDateDe.style.borderColor = '';
+            }
+            if (filterDateA) {
+                filterDateA.value = '';
+                filterDateA.style.borderColor = '';
+            }
             renderBalance();
         });
 
         document.getElementById('btnImprimer').addEventListener('click', function () {
+            prepareDateFilters();
             var rows = getBalanceRows();
             var totals = computeTotals(rows);
             var etatNum = balanceEtatNumber();
             var periode = periodPrintLabel();
             var printDate = formatPrintDate();
-            var range = getMonthRange();
+            var bounds = getPrintPeriodBounds();
+
+            if (!rows.length) {
+                alert('Aucun bon à imprimer pour cette période. Vérifiez les dates De/À ou cliquez Reset.');
+                return;
+            }
 
             var htmlRows = rows.map(function (r, i) {
                 var zebra = i % 2 ? ' class="alt"' : '';
@@ -525,78 +833,43 @@
                 '<td class="num solde"><strong>' + escapeHtml(money(totals.solde)) + '</strong></td>' +
                 '</tr>';
 
-            var summaryCards =
-                '<div class="summary-grid">' +
-                '<div class="summary-card"><span>Total Achats</span><strong>' + escapeHtml(money(totals.achats)) + '</strong></div>' +
-                '<div class="summary-card accent"><span>Total Ventes</span><strong>' + escapeHtml(money(totals.ventes)) + '</strong></div>' +
-                '<div class="summary-card"><span>Total Marge</span><strong>' + escapeHtml(money(totals.marge)) + '</strong></div>' +
-                '<div class="summary-card"><span>Total Payé</span><strong>' + escapeHtml(money(totals.paye)) + '</strong></div>' +
-                '</div>';
-
-            var printCss =
-                '*{box-sizing:border-box;margin:0;padding:0}' +
-                'body{font-family:"Segoe UI",Arial,sans-serif;color:#0d1b2a;background:#f8fafc;padding:28px}' +
-                '.sheet{max-width:980px;margin:0 auto;background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 12px 40px rgba(13,27,42,0.12)}' +
-                '.head{background:linear-gradient(135deg,#0d1b2a 0%,#14213d 55%,#1b4332 100%);color:#fff;padding:28px 32px 24px;position:relative}' +
-                '.head::after{content:"";position:absolute;bottom:0;left:0;right:0;height:4px;background:linear-gradient(90deg,#fca311,#ffd166,#fca311)}' +
-                '.company{font-size:26px;font-weight:800;letter-spacing:0.02em;margin-bottom:4px}' +
-                '.doc-title{font-size:15px;font-weight:600;opacity:0.92;text-transform:uppercase;letter-spacing:0.12em;color:#fca311}' +
-                '.meta{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;padding:18px 32px;background:#f4f7fb;border-bottom:1px solid rgba(13,27,42,0.08)}' +
-                '.meta-item label{display:block;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#5a6570;margin-bottom:4px}' +
-                '.meta-item span{font-size:13px;font-weight:600;color:#0d1b2a}' +
-                '.content{padding:24px 32px 32px}' +
-                '.summary-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:22px}' +
-                '.summary-card{background:#f8fafc;border:1px solid rgba(13,27,42,0.08);border-radius:10px;padding:12px 14px;text-align:center}' +
-                '.summary-card span{display:block;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:#5a6570;margin-bottom:6px}' +
-                '.summary-card strong{font-size:15px;font-weight:800;color:#0d1b2a}' +
-                '.summary-card.accent{background:linear-gradient(145deg,#fff8eb,#fff3d6);border-color:rgba(252,163,17,0.35)}' +
-                '.summary-card.accent strong{color:#c47e00}' +
-                'table{width:100%;border-collapse:collapse;font-size:12px}' +
-                'th{background:#14213d;color:#fff;padding:10px 8px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em}' +
-                'td{padding:9px 8px;border-bottom:1px solid rgba(13,27,42,0.08);text-align:center}' +
-                'tr.alt td{background:#fafbfd}' +
-                'td.num{font-variant-numeric:tabular-nums;font-weight:600}' +
-                'td.solde{color:#c47e00}' +
-                'tr.totals-row td{background:linear-gradient(90deg,#eef2f8,#f8fafc);border-top:2px solid #14213d;border-bottom:none;padding:12px 8px}' +
-                'td.highlight{color:#c47e00;font-size:13px}' +
-                '.foot{margin-top:20px;padding-top:14px;border-top:1px dashed rgba(13,27,42,0.15);font-size:11px;color:#5a6570;text-align:center}' +
-                '@media print{body{background:#fff;padding:0}.sheet{box-shadow:none;border-radius:0}}';
-
             var printBody =
-                '<div class="sheet">' +
-                '<header class="head">' +
-                '<div class="company">' + escapeHtml(COMPANY_NAME) + '</div>' +
-                '<div class="doc-title">Balance des Ventes</div>' +
+                '<div class="print-sheet">' +
+                '<header class="print-head">' +
+                '<div class="print-company">' + escapeHtml(COMPANY_NAME) + '</div>' +
+                '<div class="print-doc-title">Balance des Ventes</div>' +
                 '</header>' +
-                '<div class="meta">' +
-                '<div class="meta-item"><label>N° État Balance</label><span>' + escapeHtml(etatNum) + '</span></div>' +
-                '<div class="meta-item"><label>Date de</label><span>' + escapeHtml(range.from ? formatMonthLabel(range.from) : '—') + '</span></div>' +
-                '<div class="meta-item"><label>Date à</label><span>' + escapeHtml(range.to ? formatMonthLabel(range.to) : '—') + '</span></div>' +
-                '<div class="meta-item"><label>Date impression</label><span>' + escapeHtml(printDate) + '</span></div>' +
+                '<div class="print-meta">' +
+                '<div><label>N° État Balance</label><span>' + escapeHtml(etatNum) + '</span></div>' +
+                '<div><label>Date de</label><span>' + escapeHtml(bounds.de) + '</span></div>' +
+                '<div><label>Date à</label><span>' + escapeHtml(bounds.a) + '</span></div>' +
+                '<div><label>Date impression</label><span>' + escapeHtml(printDate) + '</span></div>' +
                 '</div>' +
-                '<div class="content">' +
-                summaryCards +
-                '<table><thead><tr>' +
+                '<div class="print-content">' +
+                '<div class="print-summary">' +
+                '<div class="print-summary-card"><span>Total Achats</span><strong>' + escapeHtml(money(totals.achats)) + '</strong></div>' +
+                '<div class="print-summary-card accent"><span>Total Ventes</span><strong>' + escapeHtml(money(totals.ventes)) + '</strong></div>' +
+                '<div class="print-summary-card"><span>Total Marge</span><strong>' + escapeHtml(money(totals.marge)) + '</strong></div>' +
+                '<div class="print-summary-card"><span>Total Payé</span><strong>' + escapeHtml(money(totals.paye)) + '</strong></div>' +
+                '</div>' +
+                '<table class="print-table"><thead><tr>' +
                 '<th>Date</th><th>N° Bn</th><th>Montant d\'Achat</th><th>Montant de Vente</th><th>Montant Payé</th><th>Solde</th>' +
                 '</tr></thead><tbody>' +
-                (htmlRows || '<tr><td colspan="6">Aucune donnée</td></tr>') +
-                (rows.length ? totalsRow : '') +
+                htmlRows +
+                totalsRow +
                 '</tbody></table>' +
-                '<p class="foot">Période : ' + escapeHtml(periode) + ' — Document généré par ' + escapeHtml(COMPANY_NAME) + '</p>' +
+                '<p class="print-foot">Période : ' + escapeHtml(periode) + ' — Document généré par ' + escapeHtml(COMPANY_NAME) + '</p>' +
                 '</div></div>';
 
-            var w = window.open('', '_blank', 'width=1024,height=800');
-            if (!w) {
-                window.print();
-                return;
-            }
-            w.document.write(
-                '<!DOCTYPE html><html lang="fr"><head><meta charset="utf-8"><title>Balance des Ventes — ' + escapeHtml(etatNum) + '</title>' +
-                '<style>' + printCss + '</style></head><body>' + printBody + '</body></html>'
-            );
-            w.document.close();
-            w.focus();
-            w.print();
+            showPrintPreview(printBody);
+        });
+
+        document.getElementById('btnPrintConfirm').addEventListener('click', function () {
+            window.print();
+        });
+        document.getElementById('btnPrintClose').addEventListener('click', closePrintPreview);
+        document.getElementById('printPreview').addEventListener('click', function (e) {
+            if (e.target === document.getElementById('printPreview')) closePrintPreview();
         });
 
         renderBalance();
