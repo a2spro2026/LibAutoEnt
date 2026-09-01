@@ -1,5 +1,6 @@
 @php
     $activePage = $activePage ?? '';
+    $isVendeur = strtolower((string) session('libautoent_statut', 'gerant')) === 'vendeur';
 @endphp
 <aside class="sidebar" id="sidebar">
     <div class="brand">
@@ -50,8 +51,8 @@
             </div>
         </div>
 
-        <div class="menu-group" data-menu="client">
-            <button type="button" class="menu-btn" aria-expanded="false">
+        <div class="menu-group{{ $isVendeur ? ' is-muted' : '' }}" data-menu="client" @if($isVendeur) aria-disabled="true" @endif>
+            <button type="button" class="menu-btn" aria-expanded="false" @if($isVendeur) disabled tabindex="-1" @endif>
                 <span class="menu-ico">
                     <svg viewBox="0 0 24 24"><path d="M16 19a4 4 0 0 0-8 0"/><circle cx="12" cy="9" r="3.5"/><path d="M19 19a3.5 3.5 0 0 0-2.2-3.2M5 19a3.5 3.5 0 0 1 2.2-3.2M17.5 8.2a3 3 0 1 1-1.2-4"/></svg>
                 </span>
@@ -59,13 +60,13 @@
                 <svg class="chevron" viewBox="0 0 24 24" fill="none"><path d="m6 9 6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
             </button>
             <div class="submenu">
-                <a href="{{ route('reglement-vente') }}" class="{{ $activePage === 'reglement-vente' ? 'is-active' : '' }}">Balance des Ventes</a>
-                <a href="{{ route('balance-vente') }}" class="{{ $activePage === 'balance-vente' ? 'is-active' : '' }}">Rapport Revenue</a>
+                <a href="{{ route('reglement-vente') }}" class="{{ $activePage === 'reglement-vente' ? 'is-active' : '' }}" @if($isVendeur) tabindex="-1" @endif>Balance des Ventes</a>
+                <a href="{{ route('balance-vente') }}" class="{{ $activePage === 'balance-vente' ? 'is-active' : '' }}" @if($isVendeur) tabindex="-1" @endif>Rapport Revenue</a>
             </div>
         </div>
 
-        <div class="menu-group" data-menu="configuration">
-            <button type="button" class="menu-btn" aria-expanded="false">
+        <div class="menu-group{{ $isVendeur ? ' is-muted' : '' }}" data-menu="configuration" @if($isVendeur) aria-disabled="true" @endif>
+            <button type="button" class="menu-btn" aria-expanded="false" @if($isVendeur) disabled tabindex="-1" @endif>
                 <span class="menu-ico">
                     <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 3.5v2.2M12 18.3v2.2M4.9 6.5l1.6 1.5M17.5 16l1.6 1.5M3.5 12h2.2M18.3 12h2.2M4.9 17.5l1.6-1.5M17.5 8l1.6-1.5"/></svg>
                 </span>
@@ -73,8 +74,8 @@
                 <svg class="chevron" viewBox="0 0 24 24" fill="none"><path d="m6 9 6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
             </button>
             <div class="submenu">
-                <a href="{{ route('utilisateurs') }}" class="{{ $activePage === 'utilisateurs' ? 'is-active' : '' }}">Utilisateurs</a>
-                <a href="#">Paramètres Système</a>
+                <a href="{{ route('utilisateurs') }}" class="{{ $activePage === 'utilisateurs' ? 'is-active' : '' }}" @if($isVendeur) tabindex="-1" @endif>Utilisateurs</a>
+                <a href="#" @if($isVendeur) tabindex="-1" @endif>Paramètres Système</a>
             </div>
         </div>
 
@@ -129,9 +130,11 @@
             <strong>Administrateur</strong>
             <span>admin@libautoent.com</span>
         </div>
-        <a href="{{ route('login') }}" class="logout-btn" title="Déconnexion" aria-label="Déconnexion">
+        <a href="{{ route('logout') }}" class="logout-btn" title="Déconnexion" aria-label="Déconnexion">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M10 7V5a2 2 0 0 1 2-2h7v18h-7a2 2 0 0 1-2-2v-2"/><path d="M15 12H3m0 0 3-3m-3 3 3 3" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </a>
     </div>
 </aside>
+<script>window.__LIBAUTOENT_STATUT__=@json(strtolower((string) session('libautoent_statut', 'gerant')));</script>
+<script src="{{ asset('js/user-role.js') }}?v=1"></script>
 <script src="{{ asset('js/sidebar-menu.js') }}?v=3"></script>

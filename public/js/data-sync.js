@@ -98,6 +98,23 @@
         });
     }
 
+    function fetchServerKeyOnly(key) {
+        return fetch(API + '/' + encodeURIComponent(key), {
+            headers: { Accept: 'application/json' },
+            credentials: 'same-origin'
+        })
+            .then(function (r) {
+                if (!r.ok) return null;
+                return r.json();
+            })
+            .then(function (data) {
+                return normalizePulled(key, data);
+            })
+            .catch(function () {
+                return null;
+            });
+    }
+
     function pullKeyRaw(key) {
         var localAtStart = readLocal(key);
         return fetch(API + '/' + encodeURIComponent(key), {
@@ -123,6 +140,10 @@
 
                 if (data === null || data === undefined) {
                     if (local != null && JSON.stringify(local) !== '[]' && JSON.stringify(local) !== '{}') {
+                        // Catalogue : ne pas pousser si le serveur est injoignable (évite d'écraser des données)
+                        if (key === 'libautoent_catalogue_produits') {
+                            return local;
+                        }
                         var normalizedLocal = normalizePulled(key, local);
                         if (normalizedLocal == null) return null;
                         return pushKeyRaw(key, normalizedLocal).then(function () {
@@ -141,6 +162,15 @@
                     return pushKeyRaw(key, local).then(function () {
                         return local;
                     });
+                }
+
+                // Ne pas laisser un ancien catalogue local (moins complet) écraser le serveur
+                if (key === 'libautoent_catalogue_produits' &&
+                    Array.isArray(normalized) && Array.isArray(local) &&
+                    local.length > 0 && normalized.length > local.length) {
+                    normalized = mergeCatalogue(normalized, local);
+                    localStorage.setItem(key, JSON.stringify(normalized));
+                    return normalized;
                 }
 
                 // Suppressions locales non encore sur le serveur
@@ -174,11 +204,11 @@
     }
 
     function sanitizeForPush(key, data) {
-        // Ne jamais pousser les photos base64 (trop lourdes → sync échoue → photos perdues)
         if (key === 'libautoent_catalogue_produits' && Array.isArray(data)) {
             return data.map(function (p) {
                 if (!p || typeof p !== 'object') return p;
                 var photo = String(p.photo || '');
+                // Ne pas pousser de base64 (trop lourd) — garder les URLs /storage déjà uploadées
                 if (photo.indexOf('data:') === 0) {
                     return Object.assign({}, p, { photo: '' });
                 }
@@ -189,6 +219,38 @@
     }
 
     function pushKeyRaw(key, data) {
+        if (key === 'libautoent_catalogue_produits' && Array.isArray(data)) {
+            return fetchServerKeyOnly(key).then(function (remote) {
+                if (Array.isArray(remote) && remote.length > data.length) {
+                    console.warn('Sync catalogue: refus d\'écraser le serveur (' + remote.length + ' produits) avec une copie locale plus petite (' + data.length + ').');
+                    var merged = mergeCatalogue(remote, data);
+                    try {
+                        localStorage.setItem(key, JSON.stringify(merged));
+                    } catch (e) { /* ignore */ }
+                    if (typeof window.onCatalogueSynced === 'function') {
+                        window.onCatalogueSynced();
+                    }
+                    return { ok: true, skipped: true };
+                }
+                var body = sanitizeForPush(key, data);
+                return fetch(API + '/' + encodeURIComponent(key), {
+                    method: 'PUT',
+                    headers: getSyncHeaders(true),
+                    credentials: 'same-origin',
+                    body: JSON.stringify(body)
+                }).then(function (r) {
+                    if (!r.ok) {
+                        return r.text().then(function () {
+                            return { ok: false, status: r.status };
+                        });
+                    }
+                    return { ok: true };
+                }).catch(function () {
+                    return { ok: false };
+                });
+            });
+        }
+
         var body = sanitizeForPush(key, data);
         return fetch(API + '/' + encodeURIComponent(key), {
             method: 'PUT',

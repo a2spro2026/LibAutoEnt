@@ -601,7 +601,7 @@
         }
         .data-table tbody tr:hover { background: rgba(252, 163, 17, 0.06); }
         .data-table .empty { text-align: center; color: var(--muted); padding: 2.5rem 1rem; }
-        .nom-cell { font-weight: 600; text-align: left !important; padding-left: 0.85rem !important; }
+        .nom-cell { font-weight: 600; }
         .money { font-variant-numeric: tabular-nums; font-weight: 600; }
         .col-solde { color: #c47e00; font-weight: 700; }
 
@@ -700,7 +700,17 @@
         .icon-btn svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 1.8; pointer-events: none; }
         .icon-btn.icon-view:hover { background: rgba(61,126,166,0.12); color: #3d7ea6; }
         .icon-btn.icon-edit:hover { background: rgba(252,163,17,0.15); color: #c47e00; }
+        .icon-btn.icon-print:hover { background: rgba(47, 143, 107, 0.14); color: #2f8f6b; }
         .icon-btn.icon-delete:hover { background: rgba(184,92,56,0.12); color: #b85c38; }
+        .icon-btn.is-disabled,
+        .icon-btn.is-disabled:hover {
+            opacity: 0.38;
+            filter: grayscale(1);
+            cursor: not-allowed;
+            pointer-events: none;
+            background: rgba(120, 144, 156, 0.12) !important;
+            color: #90a4ae !important;
+        }
 
         .modal-backdrop {
             position: fixed; inset: 0; background: rgba(7,17,28,0.55); backdrop-filter: blur(4px);
@@ -1493,6 +1503,7 @@
     </style>
 </head>
 <body class="notranslate" translate="no">
+@php $isVendeur = strtolower((string) session('libautoent_statut', 'gerant')) === 'vendeur'; @endphp
     <div class="overlay" id="overlay"></div>
 
     <div class="app">
@@ -1545,8 +1556,8 @@
                     </div>
                 </div>
 
-                <div class="menu-group" data-menu="client">
-                    <button type="button" class="menu-btn" aria-expanded="false">
+                <div class="menu-group{{ $isVendeur ? ' is-muted' : '' }}" data-menu="client" @if($isVendeur) aria-disabled="true" @endif>
+                    <button type="button" class="menu-btn" aria-expanded="false" @if($isVendeur) disabled tabindex="-1" @endif>
                         <span class="menu-ico">
                             <svg viewBox="0 0 24 24"><path d="M16 19a4 4 0 0 0-8 0"/><circle cx="12" cy="9" r="3.5"/><path d="M19 19a3.5 3.5 0 0 0-2.2-3.2M5 19a3.5 3.5 0 0 1 2.2-3.2M17.5 8.2a3 3 0 1 1-1.2-4"/></svg>
                         </span>
@@ -1554,13 +1565,13 @@
                         <svg class="chevron" viewBox="0 0 24 24" fill="none"><path d="m6 9 6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
                     </button>
                     <div class="submenu">
-                        <a href="{{ route('reglement-vente') }}">Balance des Ventes</a>
-                        <a href="{{ route('balance-vente') }}">Rapport Revenue</a>
+                        <a href="{{ route('reglement-vente') }}" @if($isVendeur) tabindex="-1" @endif>Balance des Ventes</a>
+                        <a href="{{ route('balance-vente') }}" @if($isVendeur) tabindex="-1" @endif>Rapport Revenue</a>
                     </div>
                 </div>
 
-                <div class="menu-group" data-menu="configuration">
-                    <button type="button" class="menu-btn" aria-expanded="false">
+                <div class="menu-group{{ $isVendeur ? ' is-muted' : '' }}" data-menu="configuration" @if($isVendeur) aria-disabled="true" @endif>
+                    <button type="button" class="menu-btn" aria-expanded="false" @if($isVendeur) disabled tabindex="-1" @endif>
                         <span class="menu-ico">
                             <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 3.5v2.2M12 18.3v2.2M4.9 6.5l1.6 1.5M17.5 16l1.6 1.5M3.5 12h2.2M18.3 12h2.2M4.9 17.5l1.6-1.5M17.5 8l1.6-1.5"/></svg>
                         </span>
@@ -1568,8 +1579,8 @@
                         <svg class="chevron" viewBox="0 0 24 24" fill="none"><path d="m6 9 6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
                     </button>
                     <div class="submenu">
-                        <a href="{{ route('utilisateurs') }}">Utilisateurs</a>
-                        <a href="#">Paramètres Système</a>
+                        <a href="{{ route('utilisateurs') }}" @if($isVendeur) tabindex="-1" @endif>Utilisateurs</a>
+                        <a href="#" @if($isVendeur) tabindex="-1" @endif>Paramètres Système</a>
                     </div>
                 </div>
 
@@ -1624,7 +1635,7 @@
                     <strong>Administrateur</strong>
                     <span>admin@libautoent.com</span>
                 </div>
-                <a href="{{ route('login') }}" class="logout-btn" title="Déconnexion" aria-label="Déconnexion">
+                <a href="{{ route('logout') }}" class="logout-btn" title="Déconnexion" aria-label="Déconnexion">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M10 7V5a2 2 0 0 1 2-2h7v18h-7a2 2 0 0 1-2-2v-2"/><path d="M15 12H3m0 0 3-3m-3 3 3 3" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 </a>
             </div>
@@ -1725,9 +1736,9 @@
                     <div class="table-freeze-head" id="bonsHeadScroll">
                         <table class="data-table" aria-hidden="true">
                             <colgroup>
-                                <col style="width:11%"><col style="width:10%"><col style="width:18%">
+                                <col style="width:11%"><col style="width:10%"><col style="width:16%">
                                 <col style="width:12%"><col style="width:12%"><col style="width:11%">
-                                <col style="width:12%"><col style="width:14%">
+                                <col style="width:12%"><col style="width:16%">
                             </colgroup>
                             <thead>
                                 <tr>
@@ -1746,9 +1757,9 @@
                     <div class="table-scroll" id="bonsBodyScroll">
                         <table class="data-table" id="bonsTable">
                             <colgroup>
-                                <col style="width:11%"><col style="width:10%"><col style="width:18%">
+                                <col style="width:11%"><col style="width:10%"><col style="width:16%">
                                 <col style="width:12%"><col style="width:12%"><col style="width:11%">
-                                <col style="width:12%"><col style="width:14%">
+                                <col style="width:12%"><col style="width:16%">
                             </colgroup>
                             <tbody id="bonsBody">
                                 <tr class="empty-row">
@@ -1878,7 +1889,9 @@
     <script src="{{ asset('js/data-sync.js') }}?v=5"></script>
     <script src="{{ asset('js/seed-demo-local.js') }}?v=1"></script>
     <script src="{{ asset('js/sidebar-menu.js') }}?v=3"></script>
-    <script src="{{ asset('js/table-actions.js') }}?v=7"></script>
+    <script>window.__LIBAUTOENT_STATUT__=@json(strtolower((string) session('libautoent_statut', 'gerant')));</script>
+    <script src="{{ asset('js/user-role.js') }}?v=1"></script>
+    <script src="{{ asset('js/table-actions.js') }}?v=8"></script>
     <script src="{{ asset('js/stock-store.js') }}?v=11"></script>
     <script src="{{ asset('js/vente-store.js') }}?v=12"></script>
     <script>
@@ -1986,7 +1999,7 @@
                     '</tr>';
             }).join('');
             if (window.TableActions) {
-                TableActions.fillCells('#bonsBody .actions-cell', ['view', 'edit', 'delete']);
+                TableActions.fillCells('#bonsBody .actions-cell', ['view', 'edit', 'print', 'delete']);
             }
         }
 
@@ -2507,12 +2520,14 @@
                 .replace(/"/g, '&quot;');
         }
 
-        function buildBonDoc() {
-            var client = document.getElementById('bonClient').value.trim() || '—';
-            var date = document.getElementById('bonDate').value || '';
-            var num = document.getElementById('bonNumero').value.trim() || '—';
-            var mode = document.getElementById('bonMode').value || '';
-            var lignes = collectLignes();
+        function buildBonPrintDoc(opts) {
+            opts = opts || {};
+            var client = opts.client || '—';
+            var date = opts.date || '';
+            var num = opts.numero || '—';
+            var mode = opts.mode || '';
+            var lignes = opts.lignes || [];
+            var total = opts.total || '0.00 DH';
             var rows = lignes.length
                 ? lignes.map(function (l) {
                     return '<tr><td>' + escapeHtml(l.ref || '') + '</td><td>' +
@@ -2521,7 +2536,6 @@
                         escapeHtml(fmt(l.pu)) + '</td><td>' + escapeHtml(fmt(l.sousTotal)) + '</td></tr>';
                 }).join('')
                 : '<tr><td colspan="6">Aucun article</td></tr>';
-            var total = document.getElementById('bonGrandTotal').textContent || '0.00 DH';
             var body =
                 '<h1>Bon de vente</h1>' +
                 '<p>Date : ' + escapeHtml(date) + ' | N° : ' + escapeHtml(num) +
@@ -2538,6 +2552,29 @@
                 'th{background:#14213d;color:#fff}h1{margin:0 0 8px;font-size:20px}' +
                 '@media print{body{padding:12px}}</style></head><body>' + body + '</body></html>';
             return { title: title, body: body, html: html };
+        }
+
+        function buildBonDoc() {
+            return buildBonPrintDoc({
+                client: document.getElementById('bonClient').value.trim(),
+                date: document.getElementById('bonDate').value,
+                numero: document.getElementById('bonNumero').value.trim(),
+                mode: document.getElementById('bonMode').value || '',
+                lignes: collectLignes(),
+                total: document.getElementById('bonGrandTotal').textContent || '0.00 DH'
+            });
+        }
+
+        function buildBonDocFromBon(bon) {
+            if (!bon) return null;
+            return buildBonPrintDoc({
+                client: bon.client || '—',
+                date: bon.date || '',
+                numero: bon.numero || '—',
+                mode: bon.typePaie || '',
+                lignes: bon.lignes || [],
+                total: money(bon.montant)
+            });
         }
 
         function writeFrame(frame, html) {
@@ -2631,7 +2668,14 @@
                     var b = VenteStore.getBon(tr.getAttribute('data-id'));
                     if (b) openModal(b, 'edit');
                 },
+                print: function (tr) {
+                    var b = VenteStore.getBon(tr.getAttribute('data-id'));
+                    if (!b) return;
+                    var doc = buildBonDocFromBon(b);
+                    if (doc) printHtml(doc.title, doc.body);
+                },
                 delete: function (tr) {
+                    if (window.UserRole && !UserRole.canDelete()) return;
                     var id = tr.getAttribute('data-id');
                     var b = VenteStore.getBon(id);
                     if (!confirm('Supprimer le bon ' + ((b && b.numero) || '') + ' ?')) return;

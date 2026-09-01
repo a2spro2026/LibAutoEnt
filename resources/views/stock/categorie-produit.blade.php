@@ -358,7 +358,7 @@
 
     <script src="{{ asset('js/data-sync.js') }}?v=5"></script>
     <script src="{{ asset('js/seed-demo-local.js') }}?v=1"></script>
-    <script src="{{ asset('js/table-actions.js') }}?v=7"></script>
+    <script src="{{ asset('js/table-actions.js') }}?v=8"></script>
     <script src="{{ asset('js/stock-store.js') }}?v=11"></script>
     <script>
         const sidebar = document.getElementById('sidebar');
@@ -690,6 +690,7 @@
                     if (p) openModal(p, 'edit');
                 },
                 delete: function (tr) {
+                    if (window.UserRole && !UserRole.canDelete()) return;
                     var id = tr.getAttribute('data-id');
                     var p = StockStore.getProduit(id);
                     var label = p ? (p.designation || 'ce produit') : 'ce produit';

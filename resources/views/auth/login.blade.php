@@ -477,6 +477,16 @@
             });
             if (statut) statut.selectedIndex = 0;
 
+            var form = document.querySelector('.login-panel');
+            if (form) {
+                form.addEventListener('submit', function () {
+                    if (!statut || !statut.value) return;
+                    try {
+                        sessionStorage.setItem('libautoent_statut', String(statut.value).toLowerCase());
+                    } catch (e) { /* ignore */ }
+                });
+            }
+
             if (!password || !btn) return;
             btn.addEventListener('click', function () {
                 unlockField(password);

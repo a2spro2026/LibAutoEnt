@@ -6,8 +6,13 @@
 
     var pageHandlers = {};
 
-    function iconsHtml(actions) {
+    function iconsHtml(actions, options) {
         actions = actions || ['view', 'edit', 'delete'];
+        options = options || {};
+        var disabled = options.disabled || [];
+        if (!disabled.length && window.UserRole && UserRole.isVendeur()) {
+            disabled = ['delete'];
+        }
         var map = {
             view: { title: 'Voir', svg: '<path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/>' },
             edit: { title: 'Modifier', svg: '<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/>' },
@@ -23,12 +28,15 @@
             var key = actions[i];
             var a = map[key];
             if (!a) continue;
+            var isDisabled = disabled.indexOf(key) !== -1;
             html +=
-                '<button type="button" class="icon-btn icon-' + key + '"' +
+                '<button type="button" class="icon-btn icon-' + key + (isDisabled ? ' is-disabled' : '') + '"' +
                 ' data-action="' + key + '"' +
-                ' title="' + a.title + '"' +
+                (isDisabled ? ' disabled tabindex="-1"' : '') +
+                ' title="' + (isDisabled ? a.title + ' (non autorisé)' : a.title) + '"' +
                 ' aria-label="' + a.title + '"' +
-                ' onclick="return window.TableActions.handle(event,\'' + key + '\')">' +
+                (isDisabled ? '' : ' onclick="return window.TableActions.handle(event,\'' + key + '\')"') +
+                '>' +
                 '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" style="pointer-events:none">' +
                 a.svg +
                 '</svg></button>';
@@ -59,6 +67,7 @@
                 btn = btn.parentNode;
             }
             if (!btn || btn.tagName !== 'BUTTON') return false;
+            if (btn.disabled || (btn.classList && btn.classList.contains('is-disabled'))) return false;
 
             var tr = findRow(btn);
             if (!tr) return false;
@@ -114,10 +123,10 @@
         };
     }
 
-    function fillCells(selector, actions) {
+    function fillCells(selector, actions, options) {
         var nodes = document.querySelectorAll(selector);
         for (var i = 0; i < nodes.length; i++) {
-            nodes[i].innerHTML = iconsHtml(actions);
+            nodes[i].innerHTML = iconsHtml(actions, options);
         }
     }
 
