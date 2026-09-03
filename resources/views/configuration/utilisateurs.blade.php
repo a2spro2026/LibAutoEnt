@@ -39,13 +39,25 @@
             background: linear-gradient(135deg, #ffb83a, var(--green-bright));
             box-shadow: 0 0 16px rgba(252,163,17,0.35);
         }
+        .btn-ghost {
+            color: var(--ink-soft); background: #eef2f7;
+            border: 1px solid rgba(13,27,42,0.1);
+            box-shadow: none; padding: 0.45rem 0.8rem; font-size: 0.78rem;
+        }
+        .btn-ghost:hover { background: #e4e9f0; transform: none; }
 
         .table-card {
             background: var(--white); border-radius: 18px; box-shadow: var(--shadow-card);
             border: 1px solid rgba(252,163,17,0.14); overflow: hidden;
         }
         .table-scroll { overflow-x: auto; }
-        table.data-table { width: 100%; border-collapse: collapse; min-width: 980px; }
+        table.data-table { width: 100%; border-collapse: collapse; min-width: 1080px; }
+        .data-table th {
+            padding: 0.85rem 0.75rem; font-family: 'Outfit', sans-serif;
+            font-size: 0.72rem; font-weight: 700; letter-spacing: 0.03em;
+            text-transform: uppercase; color: var(--muted); background: #f4f7fb;
+            text-align: center; border-bottom: 1px solid rgba(13,27,42,0.08);
+        }
         .data-table td {
             padding: 0.8rem 0.75rem; font-size: 0.88rem;
             border-bottom: 1px solid rgba(21,32,20,0.06); color: var(--ink);
@@ -54,6 +66,8 @@
         .data-table tbody tr:hover { background: rgba(252,163,17,0.06); }
         .data-table .empty { text-align: center; color: var(--muted); padding: 2.5rem 1rem; }
         .nom-cell { font-weight: 600; text-align: left !important; padding-left: 1rem !important; }
+        .user-cell { display: flex; flex-direction: column; align-items: flex-start; gap: 0.15rem; }
+        .user-cell small { font-weight: 500; color: var(--muted); font-size: 0.72rem; }
 
         .actions { display: flex; gap: 0.35rem; justify-content: center; flex-wrap: wrap; position: relative; z-index: 2; }
         .icon-btn {
@@ -78,37 +92,72 @@
             font-size: 0.72rem; font-weight: 700; letter-spacing: 0.03em; text-transform: uppercase;
         }
         .statue-gerant { color: #8a6d0a; background: rgba(252,163,17,0.2); box-shadow: inset 0 0 0 1px rgba(252,163,17,0.45); }
-        .statue-admin { color: #0d1b2a; background: rgba(13,27,42,0.12); box-shadow: inset 0 0 0 1px rgba(13,27,42,0.25); }
         .statue-assis { color: #1565c0; background: rgba(33,150,243,0.16); box-shadow: inset 0 0 0 1px rgba(33,150,243,0.35); }
         .statue-vendeur { color: #1b5e20; background: rgba(76,175,80,0.18); box-shadow: inset 0 0 0 1px rgba(76,175,80,0.35); }
-        .statut-actif { color: #1b5e20; background: rgba(76,175,80,0.18); box-shadow: inset 0 0 0 1px rgba(76,175,80,0.35); }
-        .statut-suspendu { color: #e65100; background: rgba(255,152,0,0.18); box-shadow: inset 0 0 0 1px rgba(255,152,0,0.4); }
-        .statut-inactif { color: #546e7a; background: rgba(120,144,156,0.18); box-shadow: inset 0 0 0 1px rgba(120,144,156,0.35); }
-
         .pwd-mask { font-family: monospace; letter-spacing: 0.08em; color: var(--muted); }
+
+        .perm-chip {
+            display: inline-flex; align-items: center; gap: 0.35rem;
+            padding: 0.32rem 0.65rem; border-radius: 999px;
+            background: rgba(20,33,61,0.06); color: var(--ink-soft);
+            font-size: 0.72rem; font-weight: 700;
+        }
+        .perm-chip strong { color: var(--ink); }
 
         .modal-backdrop {
             position: fixed; inset: 0; background: rgba(10,16,8,0.55); backdrop-filter: blur(4px);
             z-index: 80; display: none; pointer-events: none;
-            align-items: flex-start; justify-content: center; padding: 1.25rem; overflow-y: auto;
+            align-items: flex-start; justify-content: center; padding: 1rem; overflow-y: auto;
         }
         .modal-backdrop.show { display: flex; pointer-events: auto; }
         .modal {
-            width: min(100%, 720px); margin: 1.5rem auto; background: var(--white);
-            border-radius: 20px;
+            width: min(100%, 920px); margin: 1.1rem auto; background: var(--white);
+            border-radius: 22px;
             box-shadow: 0 24px 60px rgba(16,24,14,0.35), 0 0 0 1px rgba(252,163,17,0.2);
             overflow: hidden;
         }
         .modal-head {
             display: flex; align-items: center; justify-content: space-between; gap: 1rem;
             padding: 1.1rem 1.35rem;
-            background: linear-gradient(125deg, #14213d, #0d1b2a 60%, #243016); color: #fff;
+            background: linear-gradient(125deg, #14213d, #0d1b2a 55%, #1a2a18); color: #fff;
         }
         .modal-head h2 { font-family: 'Outfit', sans-serif; font-size: 1.2rem; font-weight: 700; }
         .modal-head h2 span { color: var(--gold); }
-        .modal-body { padding: 1.25rem 1.35rem 1.4rem; }
+        .modal-body { padding: 1.15rem 1.35rem 1.35rem; background:
+            radial-gradient(1200px 280px at 10% -10%, rgba(252,163,17,0.08), transparent 55%),
+            #fff;
+        }
+
+        .form-section {
+            margin-bottom: 1.15rem;
+            border: 1px solid rgba(13,27,42,0.08);
+            border-radius: 16px;
+            background: rgba(244,247,251,0.65);
+            overflow: hidden;
+        }
+        .form-section-head {
+            display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem;
+            padding: 0.9rem 1.05rem;
+            border-bottom: 1px solid rgba(13,27,42,0.07);
+            background: linear-gradient(180deg, rgba(255,255,255,0.9), rgba(244,247,251,0.4));
+        }
+        .form-section-head h3 {
+            margin: 0; font-family: 'Outfit', sans-serif; font-size: 0.95rem; font-weight: 700;
+            color: var(--ink); display: flex; align-items: center; gap: 0.55rem;
+        }
+        .form-section-head h3 .sec-num {
+            width: 24px; height: 24px; border-radius: 8px; display: inline-grid; place-items: center;
+            font-size: 0.72rem; font-weight: 800; color: #0d1b2a;
+            background: linear-gradient(135deg, #ffb83a, #fca311);
+            box-shadow: 0 4px 10px rgba(252,163,17,0.28);
+        }
+        .form-section-head p {
+            margin: 0.25rem 0 0; font-size: 0.78rem; color: var(--muted); font-weight: 500;
+        }
+        .form-section-body { padding: 1rem 1.05rem 1.1rem; }
+
         .form-grid {
-            display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.9rem; margin-bottom: 1rem;
+            display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.85rem;
         }
         .field label {
             display: block; margin-bottom: 0.35rem; font-size: 0.72rem; font-weight: 700;
@@ -116,59 +165,117 @@
         }
         .field input, .field select {
             width: 100%; padding: 0.7rem 0.85rem; border-radius: 10px;
-            border: 1px solid rgba(21,32,20,0.12); background: #f7faf3;
+            border: 1px solid rgba(21,32,20,0.12); background: #fff;
             font-family: inherit; font-size: 0.92rem; color: var(--ink); outline: none; text-align: center;
         }
         .field input:focus, .field select:focus {
-            border-color: rgba(252,163,17,0.65); box-shadow: 0 0 0 3px rgba(252,163,17,0.15); background: #fff;
+            border-color: rgba(252,163,17,0.65); box-shadow: 0 0 0 3px rgba(252,163,17,0.15);
         }
         .field input.readonly { background: #eef2f7; font-weight: 600; cursor: default; }
-        .login-wrap { display: flex; align-items: stretch; gap: 0; }
-        .login-wrap input { border-radius: 10px 0 0 10px; text-align: left; flex: 1; min-width: 0; }
-        .login-suffix {
-            display: inline-flex; align-items: center; padding: 0 0.75rem;
-            border: 1px solid rgba(21,32,20,0.12); border-left: none; border-radius: 0 10px 10px 0;
-            background: #e4e9f0; color: var(--ink-soft); font-size: 0.82rem; font-weight: 600; white-space: nowrap;
-        }
-        .password-wrap {
-            position: relative;
-            display: flex;
-            align-items: center;
-        }
-        .password-wrap input {
-            width: 100%;
-            padding-right: 2.75rem;
-            text-align: left;
-        }
+        .field-span { grid-column: 1 / -1; }
+
+        .password-wrap { position: relative; display: flex; align-items: center; }
+        .password-wrap input { width: 100%; padding-right: 2.75rem; text-align: left; }
         .toggle-password {
-            position: absolute;
-            right: 0.4rem;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 34px;
-            height: 34px;
-            border: none;
-            border-radius: 8px;
-            background: transparent;
-            color: var(--muted);
-            cursor: pointer;
-            display: grid;
-            place-items: center;
-            padding: 0;
+            position: absolute; right: 0.4rem; top: 50%; transform: translateY(-50%);
+            width: 34px; height: 34px; border: none; border-radius: 8px;
+            background: transparent; color: var(--muted); cursor: pointer;
+            display: grid; place-items: center; padding: 0;
         }
         .toggle-password:hover { color: var(--ink); background: rgba(21,32,20,0.06); }
-        .toggle-password svg {
-            width: 17px; height: 17px; stroke: currentColor; fill: none; stroke-width: 1.8;
-        }
+        .toggle-password svg { width: 17px; height: 17px; stroke: currentColor; fill: none; stroke-width: 1.8; }
         .toggle-password .icon-hide { display: none; }
         .toggle-password.is-visible .icon-show { display: none; }
         .toggle-password.is-visible .icon-hide { display: block; }
         .hint-field { margin-top: 0.3rem; font-size: 0.75rem; color: var(--muted); text-align: left; }
-        .modal-actions { display: flex; flex-wrap: wrap; gap: 0.65rem; justify-content: flex-end; }
+
+        .role-presets {
+            display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.65rem;
+            margin-bottom: 1rem;
+        }
+        .role-card {
+            border: 1px solid rgba(13,27,42,0.1);
+            border-radius: 14px; padding: 0.75rem 0.8rem;
+            background: #fff; cursor: pointer; text-align: left;
+            transition: border-color 0.15s, box-shadow 0.15s, transform 0.15s;
+        }
+        .role-card:hover { transform: translateY(-1px); border-color: rgba(252,163,17,0.45); }
+        .role-card.is-active {
+            border-color: rgba(252,163,17,0.7);
+            box-shadow: 0 0 0 3px rgba(252,163,17,0.15), 0 8px 18px rgba(13,27,42,0.08);
+            background: linear-gradient(180deg, #fff8eb, #fff);
+        }
+        .role-card strong {
+            display: block; font-family: 'Outfit', sans-serif; font-size: 0.88rem;
+            color: var(--ink); margin-bottom: 0.2rem;
+        }
+        .role-card span { font-size: 0.72rem; color: var(--muted); line-height: 1.35; display: block; }
+
+        .perm-toolbar {
+            display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center;
+            justify-content: space-between; margin-bottom: 0.85rem;
+        }
+        .perm-toolbar .left { display: flex; flex-wrap: wrap; gap: 0.45rem; }
+        .perm-count {
+            font-size: 0.78rem; font-weight: 700; color: var(--ink-soft);
+            padding: 0.35rem 0.7rem; border-radius: 999px; background: rgba(13,27,42,0.06);
+        }
+        .perm-count em { font-style: normal; color: #c47e00; }
+
+        .perm-grid {
+            display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.75rem;
+        }
+        .perm-module {
+            border: 1px solid rgba(13,27,42,0.09);
+            border-radius: 14px; background: #fff; overflow: hidden;
+            box-shadow: 0 4px 14px rgba(13,27,42,0.04);
+        }
+        .perm-module-head {
+            display: flex; align-items: flex-start; justify-content: space-between; gap: 0.75rem;
+            padding: 0.75rem 0.85rem; background: linear-gradient(135deg, #14213d, #1f3358);
+            color: #fff;
+        }
+        .perm-module-head h4 {
+            margin: 0; font-family: 'Outfit', sans-serif; font-size: 0.86rem; font-weight: 700;
+        }
+        .perm-module-head p {
+            margin: 0.2rem 0 0; font-size: 0.7rem; color: rgba(255,255,255,0.72); line-height: 1.35;
+        }
+        .perm-module-toggle {
+            flex-shrink: 0; border: 1px solid rgba(255,255,255,0.2);
+            background: rgba(252,163,17,0.18); color: #ffd27a;
+            border-radius: 8px; padding: 0.28rem 0.55rem; font-size: 0.68rem;
+            font-weight: 700; cursor: pointer; font-family: 'Outfit', sans-serif;
+        }
+        .perm-module-toggle:hover { background: rgba(252,163,17,0.32); }
+        .perm-module-body {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 0.35rem 0.55rem;
+            padding: 0.75rem 0.85rem 0.9rem;
+        }
+        .perm-check {
+            display: flex; align-items: center; gap: 0.45rem;
+            padding: 0.4rem 0.45rem; border-radius: 9px;
+            cursor: pointer; user-select: none;
+            transition: background 0.12s;
+        }
+        .perm-check:hover { background: rgba(252,163,17,0.08); }
+        .perm-check input {
+            width: 16px; height: 16px; accent-color: #fca311; cursor: pointer; flex-shrink: 0;
+        }
+        .perm-check span {
+            font-size: 0.8rem; font-weight: 600; color: var(--ink-soft); text-align: left;
+        }
+        .perm-check input:checked + span { color: var(--ink); }
+
+        .modal-actions {
+            display: flex; flex-wrap: wrap; gap: 0.65rem; justify-content: flex-end;
+            padding-top: 0.35rem;
+        }
 
         @media (max-width: 900px) {
             .page-wrap { padding: 0 1rem 1.25rem; }
-            .form-grid { grid-template-columns: 1fr; }
+            .form-grid, .perm-grid, .role-presets { grid-template-columns: 1fr; }
+            .perm-module-body { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -209,6 +316,7 @@
                                 <tr>
                                     <th>Nom Complet</th>
                                     <th>Statue</th>
+                                    <th>Autorisations</th>
                                     <th>Contact</th>
                                     <th>Login</th>
                                     <th>Mot de Passe</th>
@@ -217,7 +325,7 @@
                             </thead>
                             <tbody id="usersBody">
                                 <tr class="empty-row">
-                                    <td colspan="6" class="empty">Aucun utilisateur — cliquez sur Ajouter</td>
+                                    <td colspan="7" class="empty">Aucun utilisateur — cliquez sur Ajouter</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -238,47 +346,108 @@
                     <input type="hidden" id="userEditId" value="">
                     <input type="text" name="fakeuser" style="display:none" tabindex="-1" autocomplete="username">
                     <input type="password" name="fakepass" style="display:none" tabindex="-1" autocomplete="current-password">
-                    <div class="form-grid">
-                        <div class="field">
-                            <label for="userDate">Date</label>
-                            <input type="date" id="userDate" required>
-                        </div>
-                        <div class="field">
-                            <label for="userId">ID</label>
-                            <input type="text" id="userId" class="readonly" readonly tabindex="-1">
-                        </div>
-                        <div class="field">
-                            <label for="userNom">Nom Complet</label>
-                            <input type="text" id="userNom" required autocomplete="off">
-                        </div>
-                        <div class="field">
-                            <label for="userStatue">Statue</label>
-                            <select id="userStatue" required autocomplete="off">
-                                <option value=""></option>
-                                <option value="Gérant">Gérant</option>
-                                <option value="Assis">Assis</option>
-                                <option value="Vendeur">Vendeur</option>
-                            </select>
-                        </div>
-                        <div class="field">
-                            <label for="userContact">Contact</label>
-                            <input type="text" id="userContact" autocomplete="off">
-                        </div>
-                        <div class="field">
-                            <label for="userLogin">Login</label>
-                            <input type="text" id="userLogin" name="user_login_field" required autocomplete="off">
-                        </div>
-                        <div class="field" style="grid-column: 1 / -1;">
-                            <label for="userPassword">Mot de Passe</label>
-                            <div class="password-wrap">
-                                <input type="password" id="userPassword" name="user_password_field" minlength="8" required autocomplete="new-password">
-                                <button type="button" class="toggle-password" id="toggleUserPassword" aria-label="Afficher le mot de passe" title="Afficher / masquer">
-                                    <svg class="icon-show" viewBox="0 0 24 24"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg>
-                                    <svg class="icon-hide" viewBox="0 0 24 24"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 19c-6 0-10-7-10-7a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c6 0 10 7 10 7a18.5 18.5 0 0 1-2.16 3.19"/><path d="M14.12 14.12a3 3 0 1 1-4.24-4.24"/><path d="M1 1l22 22"/></svg>
-                                </button>
+
+                    <section class="form-section">
+                        <div class="form-section-head">
+                            <div>
+                                <h3><span class="sec-num">1</span> Identité</h3>
+                                <p>Informations de base du compte collaborateur</p>
                             </div>
                         </div>
-                    </div>
+                        <div class="form-section-body">
+                            <div class="form-grid">
+                                <div class="field">
+                                    <label for="userDate">Date</label>
+                                    <input type="date" id="userDate" required>
+                                </div>
+                                <div class="field">
+                                    <label for="userId">ID</label>
+                                    <input type="text" id="userId" class="readonly" readonly tabindex="-1">
+                                </div>
+                                <div class="field">
+                                    <label for="userNom">Nom Complet</label>
+                                    <input type="text" id="userNom" required autocomplete="off">
+                                </div>
+                                <div class="field">
+                                    <label for="userContact">Contact</label>
+                                    <input type="text" id="userContact" autocomplete="off" placeholder="Tél. / e-mail">
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="form-section">
+                        <div class="form-section-head">
+                            <div>
+                                <h3><span class="sec-num">2</span> Accès &amp; authentification</h3>
+                                <p>Statue, identifiants de connexion et mot de passe</p>
+                            </div>
+                        </div>
+                        <div class="form-section-body">
+                            <div class="role-presets" id="rolePresets">
+                                <button type="button" class="role-card" data-statue="Gérant">
+                                    <strong>Gérant</strong>
+                                    <span>Accès complet : ventes, stock, rapports et configuration.</span>
+                                </button>
+                                <button type="button" class="role-card" data-statue="Assis">
+                                    <strong>Assis</strong>
+                                    <span>Exploitation quotidienne sans gestion avancée des comptes.</span>
+                                </button>
+                                <button type="button" class="role-card" data-statue="Vendeur">
+                                    <strong>Vendeur</strong>
+                                    <span>Tableau de bord + stock. Suppression désactivée.</span>
+                                </button>
+                            </div>
+                            <div class="form-grid">
+                                <div class="field">
+                                    <label for="userStatue">Statue</label>
+                                    <select id="userStatue" required autocomplete="off">
+                                        <option value=""></option>
+                                        <option value="Gérant">Gérant</option>
+                                        <option value="Assis">Assis</option>
+                                        <option value="Vendeur">Vendeur</option>
+                                    </select>
+                                </div>
+                                <div class="field">
+                                    <label for="userLogin">Login</label>
+                                    <input type="text" id="userLogin" name="user_login_field" required autocomplete="off" placeholder="ex. ahmed">
+                                    <div class="hint-field">Suffixe automatique : @LibAutoEnt.com</div>
+                                </div>
+                                <div class="field field-span">
+                                    <label for="userPassword">Mot de Passe</label>
+                                    <div class="password-wrap">
+                                        <input type="password" id="userPassword" name="user_password_field" minlength="8" required autocomplete="new-password">
+                                        <button type="button" class="toggle-password" id="toggleUserPassword" aria-label="Afficher le mot de passe" title="Afficher / masquer">
+                                            <svg class="icon-show" viewBox="0 0 24 24"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg>
+                                            <svg class="icon-hide" viewBox="0 0 24 24"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 19c-6 0-10-7-10-7a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c6 0 10 7 10 7a18.5 18.5 0 0 1-2.16 3.19"/><path d="M14.12 14.12a3 3 0 1 1-4.24-4.24"/><path d="M1 1l22 22"/></svg>
+                                        </button>
+                                    </div>
+                                    <div class="hint-field">Minimum 8 caractères</div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="form-section">
+                        <div class="form-section-head">
+                            <div>
+                                <h3><span class="sec-num">3</span> Autorisations</h3>
+                                <p>Cochez les modules et actions autorisés pour cet utilisateur</p>
+                            </div>
+                        </div>
+                        <div class="form-section-body">
+                            <div class="perm-toolbar">
+                                <div class="left">
+                                    <button type="button" class="btn btn-ghost" id="btnPermAll">Tout cocher</button>
+                                    <button type="button" class="btn btn-ghost" id="btnPermNone">Tout décocher</button>
+                                    <button type="button" class="btn btn-ghost" id="btnPermPreset">Réappliquer le profil statue</button>
+                                </div>
+                                <div class="perm-count" id="permCount">0 / 0 actives</div>
+                            </div>
+                            <div class="perm-grid" id="permGrid"></div>
+                        </div>
+                    </section>
+
                     <div class="modal-actions">
                         <button type="button" class="btn btn-validate" id="btnUserValider">Valider</button>
                         <button type="button" class="btn btn-close" id="btnUserFermer">Fermer</button>
@@ -288,9 +457,9 @@
         </div>
     </div>
 
-    <script src="{{ asset('js/data-sync.js') }}?v=7"></script>
-    <script src="{{ asset('js/table-actions.js') }}?v=7"></script>
-    <script src="{{ asset('js/users-store.js') }}?v=5"></script>
+    <script src="{{ asset('js/data-sync.js') }}?v=9"></script>
+    <script src="{{ asset('js/table-actions.js') }}?v=8"></script>
+    <script src="{{ asset('js/users-store.js') }}?v=6"></script>
     <script>
         const sidebar = document.getElementById('sidebar');
         const overlay = document.getElementById('overlay');
@@ -304,21 +473,15 @@
 
         const modalUser = document.getElementById('modalUser');
         const modalTitle = document.getElementById('modalUserTitle');
+        const permGrid = document.getElementById('permGrid');
         let editMode = false;
+        let skipStatuePreset = false;
 
         function statueClass(s) {
             var v = String(s || '').toLowerCase();
-            if (v === 'admin') return 'statue-admin';
             if (v === 'assis') return 'statue-assis';
             if (v === 'vendeur') return 'statue-vendeur';
             return 'statue-gerant';
-        }
-
-        function statutClass(s) {
-            var v = String(s || '').toLowerCase();
-            if (v === 'suspendu') return 'statut-suspendu';
-            if (v === 'inactif') return 'statut-inactif';
-            return 'statut-actif';
         }
 
         function maskPwd(pwd) {
@@ -334,19 +497,97 @@
             return new Date().toISOString().slice(0, 10);
         }
 
+        function totalPermKeys() {
+            var n = 0;
+            (UsersStore.PERMISSION_GROUPS || []).forEach(function (g) {
+                n += (g.items || []).length;
+            });
+            return n;
+        }
+
+        function updatePermCount() {
+            var boxes = permGrid.querySelectorAll('input[type="checkbox"][data-perm]');
+            var on = 0;
+            boxes.forEach(function (b) { if (b.checked) on += 1; });
+            document.getElementById('permCount').innerHTML =
+                '<em>' + on + '</em> / ' + boxes.length + ' actives';
+        }
+
+        function setRoleCardActive(statue) {
+            document.querySelectorAll('#rolePresets .role-card').forEach(function (card) {
+                card.classList.toggle('is-active', card.getAttribute('data-statue') === statue);
+            });
+        }
+
+        function applyPermissionsMap(map) {
+            permGrid.querySelectorAll('input[type="checkbox"][data-perm]').forEach(function (box) {
+                var key = box.getAttribute('data-perm');
+                box.checked = !!(map && map[key]);
+            });
+            updatePermCount();
+        }
+
+        function collectPermissions() {
+            var out = {};
+            permGrid.querySelectorAll('input[type="checkbox"][data-perm]').forEach(function (box) {
+                out[box.getAttribute('data-perm')] = !!box.checked;
+            });
+            return out;
+        }
+
+        function buildPermGrid() {
+            var groups = UsersStore.PERMISSION_GROUPS || [];
+            permGrid.innerHTML = groups.map(function (g) {
+                var checks = (g.items || []).map(function (it) {
+                    return '' +
+                        '<label class="perm-check">' +
+                        '<input type="checkbox" data-perm="' + it.key + '">' +
+                        '<span>' + it.label + '</span>' +
+                        '</label>';
+                }).join('');
+                return '' +
+                    '<article class="perm-module" data-group="' + g.id + '">' +
+                    '<div class="perm-module-head">' +
+                    '<div><h4>' + g.title + '</h4><p>' + (g.hint || '') + '</p></div>' +
+                    '<button type="button" class="perm-module-toggle" data-group-toggle="' + g.id + '">Groupe</button>' +
+                    '</div>' +
+                    '<div class="perm-module-body">' + checks + '</div>' +
+                    '</article>';
+            }).join('');
+
+            permGrid.querySelectorAll('input[type="checkbox"][data-perm]').forEach(function (box) {
+                box.addEventListener('change', updatePermCount);
+            });
+            permGrid.querySelectorAll('[data-group-toggle]').forEach(function (btn) {
+                btn.addEventListener('click', function () {
+                    var gid = btn.getAttribute('data-group-toggle');
+                    var module = permGrid.querySelector('.perm-module[data-group="' + gid + '"]');
+                    if (!module) return;
+                    var boxes = module.querySelectorAll('input[type="checkbox"][data-perm]');
+                    var allOn = Array.prototype.every.call(boxes, function (b) { return b.checked; });
+                    boxes.forEach(function (b) { b.checked = !allOn; });
+                    updatePermCount();
+                });
+            });
+        }
+
         function renderUsers() {
             var body = document.getElementById('usersBody');
             if (!body || !window.UsersStore) return;
             var list = UsersStore.getUsers();
             if (!list.length) {
-                body.innerHTML = '<tr class="empty-row"><td colspan="6" class="empty">Aucun utilisateur — cliquez sur Ajouter</td></tr>';
+                body.innerHTML = '<tr class="empty-row"><td colspan="7" class="empty">Aucun utilisateur — cliquez sur Ajouter</td></tr>';
                 return;
             }
+            var total = totalPermKeys();
             body.innerHTML = list.map(function (u) {
+                var perms = UsersStore.normalizePermissions(u.permissions, u.statue);
+                var n = UsersStore.countEnabled(perms);
                 return '' +
                     '<tr data-id="' + u.id + '">' +
-                    '<td class="nom-cell">' + (u.nomComplet || '') + '</td>' +
+                    '<td class="nom-cell"><div class="user-cell"><span>' + (u.nomComplet || '') + '</span><small>' + (u.idCode || '') + ' · ' + (u.date || '') + '</small></div></td>' +
                     '<td><span class="statut-badge ' + statueClass(u.statue) + '">' + (u.statue || '—') + '</span></td>' +
+                    '<td><span class="perm-chip"><strong>' + n + '</strong> / ' + total + '</span></td>' +
                     '<td>' + (u.contact || '—') + '</td>' +
                     '<td>' + (u.login || '') + '</td>' +
                     '<td><span class="pwd-mask" title="Mot de passe masqué">' + maskPwd(u.password) + '</span></td>' +
@@ -372,12 +613,23 @@
             document.getElementById('userNom').value = editMode ? (user.nomComplet || '') : '';
             document.getElementById('userContact').value = editMode ? (user.contact || '') : '';
 
-            // Statue, Login, Mot de passe : toujours vides — saisie obligatoire
-            document.getElementById('userStatue').value = '';
-            document.getElementById('userStatue').selectedIndex = 0;
-            document.getElementById('userLogin').value = '';
+            skipStatuePreset = true;
+            document.getElementById('userStatue').value = editMode ? (user.statue || '') : '';
+            setRoleCardActive(editMode ? (user.statue || '') : '');
+            skipStatuePreset = false;
+
+            document.getElementById('userLogin').value = editMode ? String(user.login || '').replace(/@LibAutoEnt\.com$/i, '') : '';
             document.getElementById('userPassword').value = '';
-            document.getElementById('userPassword').required = true;
+            document.getElementById('userPassword').required = !editMode;
+            document.getElementById('userPassword').placeholder = editMode
+                ? 'Laisser vide pour conserver'
+                : '';
+
+            if (editMode) {
+                applyPermissionsMap(UsersStore.normalizePermissions(user.permissions, user.statue));
+            } else {
+                applyPermissionsMap(UsersStore.defaultPermissions('Vendeur'));
+            }
 
             modalUser.classList.add('show');
             document.body.style.overflow = 'hidden';
@@ -389,10 +641,51 @@
             editMode = false;
         }
 
+        function applyStatuePreset(statue) {
+            if (!statue) return;
+            skipStatuePreset = true;
+            document.getElementById('userStatue').value = statue;
+            skipStatuePreset = false;
+            setRoleCardActive(statue);
+            applyPermissionsMap(UsersStore.defaultPermissions(statue));
+        }
+
+        buildPermGrid();
+
         document.getElementById('btnAjouter').addEventListener('click', function () { openModal(null); });
         document.getElementById('userModalX').addEventListener('click', closeModal);
         document.getElementById('btnUserFermer').addEventListener('click', closeModal);
         modalUser.addEventListener('click', function (e) { if (e.target === modalUser) closeModal(); });
+
+        document.getElementById('rolePresets').addEventListener('click', function (e) {
+            var card = e.target.closest('.role-card');
+            if (!card) return;
+            applyStatuePreset(card.getAttribute('data-statue'));
+        });
+
+        document.getElementById('userStatue').addEventListener('change', function () {
+            if (skipStatuePreset) return;
+            var statue = this.value;
+            setRoleCardActive(statue);
+            if (statue) applyPermissionsMap(UsersStore.defaultPermissions(statue));
+        });
+
+        document.getElementById('btnPermAll').addEventListener('click', function () {
+            permGrid.querySelectorAll('input[type="checkbox"][data-perm]').forEach(function (b) { b.checked = true; });
+            updatePermCount();
+        });
+        document.getElementById('btnPermNone').addEventListener('click', function () {
+            permGrid.querySelectorAll('input[type="checkbox"][data-perm]').forEach(function (b) { b.checked = false; });
+            updatePermCount();
+        });
+        document.getElementById('btnPermPreset').addEventListener('click', function () {
+            var statue = document.getElementById('userStatue').value;
+            if (!statue) {
+                alert('Sélectionnez d’abord une statue.');
+                return;
+            }
+            applyPermissionsMap(UsersStore.defaultPermissions(statue));
+        });
 
         document.getElementById('btnUserValider').addEventListener('click', function () {
             try {
@@ -403,7 +696,8 @@
                     statue: document.getElementById('userStatue').value,
                     contact: document.getElementById('userContact').value.trim(),
                     login: document.getElementById('userLogin').value.trim(),
-                    password: document.getElementById('userPassword').value
+                    password: document.getElementById('userPassword').value,
+                    permissions: collectPermissions()
                 };
 
                 if (!payload.statue) {
@@ -414,13 +708,18 @@
                     alert('Saisissez un login.');
                     return;
                 }
-                if (!payload.password || payload.password.length < 8) {
+                if (!editMode && (!payload.password || payload.password.length < 8)) {
                     alert('Saisissez un mot de passe (8 caractères minimum).');
+                    return;
+                }
+                if (editMode && payload.password && payload.password.length < 8) {
+                    alert('Le nouveau mot de passe doit contenir au moins 8 caractères.');
                     return;
                 }
 
                 if (editMode) {
                     var id = document.getElementById('userEditId').value;
+                    if (!payload.password) delete payload.password;
                     UsersStore.updateUser(id, payload);
                 } else {
                     UsersStore.addUser(payload);
@@ -438,6 +737,15 @@
                     var id = tr.getAttribute('data-id');
                     var u = UsersStore.getUser(id);
                     if (!u) return;
+                    var perms = UsersStore.normalizePermissions(u.permissions, u.statue);
+                    var lines = [];
+                    (UsersStore.PERMISSION_GROUPS || []).forEach(function (g) {
+                        var enabled = (g.items || []).filter(function (it) { return perms[it.key]; })
+                            .map(function (it) { return it.label; });
+                        if (enabled.length) {
+                            lines.push(g.title + ' : ' + enabled.join(', '));
+                        }
+                    });
                     alert(
                         'ID : ' + (u.idCode || '') + '\n' +
                         'Date : ' + (u.date || '') + '\n' +
@@ -445,7 +753,9 @@
                         'Statue : ' + (u.statue || '') + '\n' +
                         'Statut compte : ' + (u.statut || 'Actif') + '\n' +
                         'Contact : ' + (u.contact || '') + '\n' +
-                        'Login : ' + (u.login || '')
+                        'Login : ' + (u.login || '') + '\n\n' +
+                        'Autorisations (' + UsersStore.countEnabled(perms) + ') :\n' +
+                        (lines.length ? lines.join('\n') : 'Aucune')
                     );
                 },
                 edit: function (tr) {

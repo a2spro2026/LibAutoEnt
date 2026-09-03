@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
 class DataStoreController extends Controller
@@ -11,6 +12,16 @@ class DataStoreController extends Controller
     private const PREFIX = 'libautoent_';
 
     private const ARRAY_KEYS = [
+        'libautoent_catalogue_produits',
+        'libautoent_utilisateurs',
+        'libautoent_bons_achat',
+        'libautoent_bons_vente',
+        'libautoent_reglements_achat',
+        'libautoent_reglements_vente',
+    ];
+
+    /** Clés où on fusionne toujours par id (jamais d'écrasement destructif). */
+    private const UNION_KEYS = [
         'libautoent_catalogue_produits',
         'libautoent_utilisateurs',
         'libautoent_bons_achat',
@@ -43,6 +54,37 @@ class DataStoreController extends Controller
         }
 
         return is_array($data) && ! array_is_list($data) ? $data : (object) [];
+    }
+
+    /**
+     * Fusion par id : le serveur ne perd jamais une ligne existante.
+     * Les lignes entrantes mettent à jour les ids connus ; le reste est ajouté.
+     */
+    private function mergeById(array $existing, array $incoming): array
+    {
+        $byId = [];
+        foreach ($existing as $row) {
+            if (! is_array($row)) {
+                continue;
+            }
+            if (! empty($row['id'])) {
+                $byId[(string) $row['id']] = $row;
+            } else {
+                $byId['anon_e_'.count($byId)] = $row;
+            }
+        }
+        foreach ($incoming as $row) {
+            if (! is_array($row)) {
+                continue;
+            }
+            if (! empty($row['id'])) {
+                $byId[(string) $row['id']] = $row;
+            } else {
+                $byId['anon_i_'.count($byId)] = $row;
+            }
+        }
+
+        return array_values($byId);
     }
 
     public function show(string $key)
@@ -84,39 +126,40 @@ class DataStoreController extends Controller
         }
 
         $payload = $this->normalizePayload($safe, $decoded);
-
-        // Ne jamais écraser le catalogue par une liste vide accidentelle
-        // (les bons / règlements peuvent être volontairement vidés après suppression)
         $force = $request->headers->get('X-Libautoent-Force') === '1';
         $path = $this->filePath($safe);
-        $protected = [
-            'libautoent_catalogue_produits',
-            'libautoent_utilisateurs',
-            'libautoent_bons_vente',
-            'libautoent_bons_achat',
-        ];
-        if (! $force && in_array($safe, $protected, true) && is_file($path)) {
+        $existingCount = 0;
+        $existing = [];
+
+        if (is_file($path)) {
             $existing = json_decode((string) file_get_contents($path), true);
-            if (is_array($existing) && count($existing) > 0) {
-                if ($payload === []) {
-                    return response()->json(['message' => 'Refus d’écraser les données par une liste vide'], Response::HTTP_UNPROCESSABLE_ENTITY);
-                }
-                // Toujours fusionner par id (évite de perdre des ventes saisies sur un autre appareil)
-                if (is_array($payload)) {
-                    $byId = [];
-                    foreach ($existing as $row) {
-                        if (is_array($row) && ! empty($row['id'])) {
-                            $byId[(string) $row['id']] = $row;
-                        }
-                    }
-                    foreach ($payload as $row) {
-                        if (is_array($row) && ! empty($row['id'])) {
-                            $byId[(string) $row['id']] = $row;
-                        } elseif (is_array($row)) {
-                            $byId['anon_'.count($byId)] = $row;
-                        }
-                    }
-                    $payload = array_values($byId);
+            if (! is_array($existing)) {
+                $existing = [];
+            }
+            $existingCount = count($existing);
+        }
+
+        if (! $force && in_array($safe, self::UNION_KEYS, true) && $existingCount > 0) {
+            if ($payload === []) {
+                return response()->json([
+                    'message' => 'Refus d’écraser les données par une liste vide',
+                    'kept' => $existingCount,
+                ], Response::HTTP_UNPROCESSABLE_ENTITY);
+            }
+
+            if (is_array($payload)) {
+                $incomingCount = count($payload);
+                $payload = $this->mergeById($existing, $payload);
+
+                // Garde-fou : après fusion, on ne doit jamais descendre sous l’existant
+                if (count($payload) < $existingCount) {
+                    Log::warning('libautoent sync: refus baisse de volume', [
+                        'key' => $safe,
+                        'existing' => $existingCount,
+                        'incoming' => $incomingCount,
+                        'merged' => count($payload),
+                    ]);
+                    $payload = $existing;
                 }
             }
         }
@@ -126,9 +169,10 @@ class DataStoreController extends Controller
             mkdir($dir, 0755, true);
         }
 
-        // Snapshot avant chaque écriture des données critiques
-        if (in_array($safe, $protected, true) && is_file($path)) {
+        // Snapshot avant écriture + copie journalière durable
+        if (in_array($safe, self::UNION_KEYS, true) && is_file($path)) {
             $this->snapshotKey($safe, $path);
+            $this->dailyBackup($safe, $path);
         }
 
         file_put_contents(
@@ -136,7 +180,11 @@ class DataStoreController extends Controller
             json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT)
         );
 
-        return response()->json(['ok' => true, 'count' => is_array($payload) ? count($payload) : null]);
+        return response()->json([
+            'ok' => true,
+            'count' => is_array($payload) ? count($payload) : null,
+            'previous' => $existingCount,
+        ]);
     }
 
     private function snapshotKey(string $key, string $path): void
@@ -150,9 +198,25 @@ class DataStoreController extends Controller
 
         $files = glob($snapDir.'/'.$key.'-*.json') ?: [];
         rsort($files);
-        foreach (array_slice($files, 40) as $old) {
+        // Garder plus d’historique pour pouvoir restaurer une journée
+        foreach (array_slice($files, 120) as $old) {
             @unlink($old);
         }
+    }
+
+    /** Une copie par jour, non écrasée dans la journée (premier + dernier). */
+    private function dailyBackup(string $key, string $path): void
+    {
+        $dayDir = storage_path('app/backups/libautoent-daily/'.date('Y-m-d'));
+        if (! is_dir($dayDir)) {
+            mkdir($dayDir, 0755, true);
+        }
+        $first = $dayDir.'/'.$key.'-first.json';
+        $last = $dayDir.'/'.$key.'-last.json';
+        if (! is_file($first)) {
+            @copy($path, $first);
+        }
+        @copy($path, $last);
     }
 
     public function uploadPhoto(Request $request)

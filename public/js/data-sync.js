@@ -245,18 +245,49 @@
         return data;
     }
 
-    function putJson(key, data, options) {
+    function refreshCsrfToken() {
+        return fetch('/login', {
+            method: 'GET',
+            credentials: 'same-origin',
+            headers: { Accept: 'text/html', 'X-Requested-With': 'XMLHttpRequest' }
+        }).then(function (r) {
+            return r.text();
+        }).then(function (html) {
+            var m = html.match(/name="csrf-token"\s+content="([^"]+)"/);
+            if (!m) {
+                m = html.match(/name="_token"\s+value="([^"]+)"/);
+            }
+            if (m && m[1]) {
+                var meta = document.querySelector('meta[name="csrf-token"]');
+                if (meta) {
+                    meta.content = m[1];
+                }
+            }
+            return true;
+        }).catch(function () {
+            return false;
+        });
+    }
+
+    function putJson(key, data, options, retried) {
         options = options || {};
         var headers = getSyncHeaders(true);
         if (options.force) {
             headers['X-Libautoent-Force'] = '1';
         }
+        var body = JSON.stringify(sanitizeForPush(key, data));
         return fetch(API + '/' + encodeURIComponent(key), {
             method: 'PUT',
             headers: headers,
             credentials: 'same-origin',
-            body: JSON.stringify(sanitizeForPush(key, data))
+            body: body
         }).then(function (r) {
+            // Session expirée : rafraîchir le token CSRF et réessayer une fois
+            if (r.status === 419 && !retried) {
+                return refreshCsrfToken().then(function () {
+                    return putJson(key, data, options, true);
+                });
+            }
             if (!r.ok) {
                 return r.text().then(function () {
                     return { ok: false, status: r.status };

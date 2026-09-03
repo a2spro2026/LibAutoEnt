@@ -356,7 +356,7 @@
         </div>
     </div>
 
-    <script src="{{ asset('js/data-sync.js') }}?v=5"></script>
+    <script src="{{ asset('js/data-sync.js') }}?v=9"></script>
     <script src="{{ asset('js/seed-demo-local.js') }}?v=1"></script>
     <script src="{{ asset('js/table-actions.js') }}?v=8"></script>
     <script src="{{ asset('js/stock-store.js') }}?v=11"></script>

@@ -1,5 +1,5 @@
 /**
- * Utilisateurs — stockage localStorage
+ * Utilisateurs — stockage localStorage + autorisations
  */
 (function (window) {
     'use strict';
@@ -8,11 +8,118 @@
     var LOGIN_SUFFIX = '@LibAutoEnt.com';
     var STATUES = ['Gérant', 'Assis', 'Vendeur'];
 
+    var PERMISSION_GROUPS = [
+        {
+            id: 'dashboard',
+            title: 'Tableau de bord',
+            hint: 'Bons de vente du jour et actions rapides',
+            items: [
+                { key: 'dashboard.view', label: 'Consulter' },
+                { key: 'dashboard.create', label: 'Ajouter un bon' },
+                { key: 'dashboard.edit', label: 'Modifier' },
+                { key: 'dashboard.print', label: 'Imprimer' },
+                { key: 'dashboard.delete', label: 'Supprimer' }
+            ]
+        },
+        {
+            id: 'stock',
+            title: 'Stock',
+            hint: 'Catégorie produit et état du stock',
+            items: [
+                { key: 'stock.view', label: 'Consulter' },
+                { key: 'stock.create', label: 'Ajouter' },
+                { key: 'stock.edit', label: 'Modifier' },
+                { key: 'stock.delete', label: 'Supprimer' }
+            ]
+        },
+        {
+            id: 'ventes',
+            title: 'État Vente',
+            hint: 'Balance des ventes et rapport revenue',
+            items: [
+                { key: 'ventes.view', label: 'Consulter' },
+                { key: 'ventes.print', label: 'Imprimer / exporter' }
+            ]
+        },
+        {
+            id: 'config',
+            title: 'Configuration',
+            hint: 'Utilisateurs et paramètres système',
+            items: [
+                { key: 'config.view', label: 'Consulter' },
+                { key: 'config.manage', label: 'Gérer les comptes' }
+            ]
+        }
+    ];
+
+    var ALL_KEYS = [];
+    PERMISSION_GROUPS.forEach(function (g) {
+        g.items.forEach(function (it) { ALL_KEYS.push(it.key); });
+    });
+
+    var ROLE_PRESETS = {
+        'Gérant': ALL_KEYS.slice(),
+        'Assis': [
+            'dashboard.view', 'dashboard.create', 'dashboard.edit', 'dashboard.print',
+            'stock.view', 'stock.create', 'stock.edit',
+            'ventes.view', 'ventes.print',
+            'config.view'
+        ],
+        'Vendeur': [
+            'dashboard.view', 'dashboard.create', 'dashboard.edit', 'dashboard.print',
+            'stock.view'
+        ]
+    };
+
+    function emptyPermissions() {
+        var out = {};
+        ALL_KEYS.forEach(function (k) { out[k] = false; });
+        return out;
+    }
+
+    function permissionsFromList(list) {
+        var out = emptyPermissions();
+        (list || []).forEach(function (k) {
+            if (Object.prototype.hasOwnProperty.call(out, k)) out[k] = true;
+        });
+        return out;
+    }
+
+    function defaultPermissions(statue) {
+        return permissionsFromList(ROLE_PRESETS[statue] || ROLE_PRESETS['Vendeur']);
+    }
+
+    function normalizePermissions(raw, statue) {
+        var base = defaultPermissions(statue || 'Vendeur');
+        if (!raw || typeof raw !== 'object') return base;
+        var out = emptyPermissions();
+        ALL_KEYS.forEach(function (k) {
+            if (Object.prototype.hasOwnProperty.call(raw, k)) {
+                out[k] = !!raw[k];
+            } else {
+                out[k] = !!base[k];
+            }
+        });
+        return out;
+    }
+
+    function countEnabled(perms) {
+        var n = 0;
+        ALL_KEYS.forEach(function (k) { if (perms && perms[k]) n += 1; });
+        return n;
+    }
+
     function read() {
         try {
             var raw = localStorage.getItem(KEY);
             var data = raw ? JSON.parse(raw) : [];
-            return Array.isArray(data) ? data : [];
+            if (!Array.isArray(data)) return [];
+            return data.map(function (u) {
+                if (!u || typeof u !== 'object') return u;
+                return Object.assign({}, u, {
+                    permissions: normalizePermissions(u.permissions, u.statue)
+                });
+            });
         } catch (e) {
             return [];
         }
@@ -60,7 +167,6 @@
         var raw = String(login || '').trim();
         if (!raw) return '';
         if (raw.toLowerCase().endsWith(LOGIN_SUFFIX.toLowerCase())) return raw;
-        // strip accidental @domain then append official suffix
         var local = raw.split('@')[0].trim();
         if (!local) return '';
         return local + LOGIN_SUFFIX;
@@ -118,7 +224,8 @@
             statut: 'Actif',
             contact: String(data.contact || '').trim(),
             login: loginCheck.login,
-            password: String(data.password)
+            password: String(data.password),
+            permissions: normalizePermissions(data.permissions, statueCheck.statue)
         };
         if (!item.nomComplet) throw new Error('Saisissez le nom complet.');
 
@@ -137,7 +244,7 @@
             var pwd = data.password != null && data.password !== '' ? data.password : u.password;
             var pwdCheck = validatePassword(pwd);
             if (!pwdCheck.ok) throw new Error(pwdCheck.message);
-            var statueCheck = validateStatue(data.statue);
+            var statueCheck = validateStatue(data.statue != null ? data.statue : u.statue);
             if (!statueCheck.ok) throw new Error(statueCheck.message);
 
             var dup = list.some(function (o) {
@@ -153,7 +260,11 @@
                 statut: u.statut || 'Actif',
                 contact: String(data.contact != null ? data.contact : u.contact).trim(),
                 login: loginCheck.login,
-                password: String(pwd)
+                password: String(pwd),
+                permissions: normalizePermissions(
+                    data.permissions != null ? data.permissions : u.permissions,
+                    statueCheck.statue
+                )
             });
             return found;
         });
@@ -191,6 +302,11 @@
         nextId: nextId,
         formatDateFR: formatDateFR,
         normalizeLogin: normalizeLogin,
+        defaultPermissions: defaultPermissions,
+        normalizePermissions: normalizePermissions,
+        countEnabled: countEnabled,
+        PERMISSION_GROUPS: PERMISSION_GROUPS,
+        ROLE_PRESETS: ROLE_PRESETS,
         LOGIN_SUFFIX: LOGIN_SUFFIX,
         STATUES: STATUES
     };

@@ -10,8 +10,10 @@
         actions = actions || ['view', 'edit', 'delete'];
         options = options || {};
         var disabled = options.disabled || [];
-        if (!disabled.length && window.UserRole && UserRole.isVendeur()) {
-            disabled = ['delete'];
+        if (!disabled.length && window.UserRole) {
+            if (!UserRole.can('dashboard.delete') && !UserRole.can('stock.delete')) {
+                disabled = ['delete'];
+            }
         }
         var map = {
             view: { title: 'Voir', svg: '<path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/>' },

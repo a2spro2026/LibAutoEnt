@@ -1902,7 +1902,7 @@
         </div>
     </div>
 
-    <script src="{{ asset('js/data-sync.js') }}?v=8"></script>
+    <script src="{{ asset('js/data-sync.js') }}?v=9"></script>
     <script src="{{ asset('js/seed-demo-local.js') }}?v=1"></script>
     <script src="{{ asset('js/sidebar-menu.js') }}?v=3"></script>
     <script>window.__LIBAUTOENT_STATUT__=@json(strtolower((string) session('libautoent_statut', 'gerant')));</script>
@@ -2769,15 +2769,16 @@
         document.getElementById('filterDe').value = '';
         document.getElementById('filterA').value = '';
 
-        var bootDash = Promise.all([
-            (window.StockStore && StockStore.initCatalogFromServer) ? StockStore.initCatalogFromServer() : Promise.resolve(),
-            (window.VenteStore && VenteStore.initFromServer) ? VenteStore.initFromServer() : Promise.resolve()
-        ]);
+        // D'abord pousser le local (récupération), puis tirer le serveur
+        var bootDash = Promise.resolve();
+        if (window.DataSync && DataSync.pushKeyFromLocal) {
+            bootDash = DataSync.pushKeyFromLocal('libautoent_bons_vente');
+        }
         bootDash.then(function () {
-            // Si le navigateur a encore des ventes absentes du serveur, les renvoyer
-            if (window.DataSync && window.VenteStore) {
-                return DataSync.pushKeyFromLocal('libautoent_bons_vente');
-            }
+            return Promise.all([
+                (window.StockStore && StockStore.initCatalogFromServer) ? StockStore.initCatalogFromServer() : Promise.resolve(),
+                (window.VenteStore && VenteStore.initFromServer) ? VenteStore.initFromServer() : Promise.resolve()
+            ]);
         }).then(refreshDashboard);
         window.addEventListener('storage', refreshDashboard);
         window.addEventListener('focus', function () {

@@ -1,5 +1,16 @@
 @php
     $activePage = $activePage ?? '';
+    $perms = session('libautoent_permissions');
+    if (! is_array($perms)) {
+        $statue = strtolower((string) session('libautoent_statut', 'gerant'));
+        $perms = function_exists('libautoent_default_permissions')
+            ? libautoent_default_permissions($statue)
+            : [];
+    }
+    $canDash = ! empty($perms['dashboard.view']);
+    $canStock = ! empty($perms['stock.view']);
+    $canVentes = ! empty($perms['ventes.view']);
+    $canConfig = ! empty($perms['config.view']);
     $isVendeur = strtolower((string) session('libautoent_statut', 'gerant')) === 'vendeur';
 @endphp
 <aside class="sidebar" id="sidebar">
@@ -37,8 +48,8 @@
             <span class="menu-label">Tableau de Bord</span>
         </a>
 
-        <div class="menu-group" data-menu="stock">
-            <button type="button" class="menu-btn" aria-expanded="false">
+        <div class="menu-group{{ $canStock ? '' : ' is-muted' }}" data-menu="stock" @if(! $canStock) aria-disabled="true" @endif>
+            <button type="button" class="menu-btn" aria-expanded="false" @if(! $canStock) disabled tabindex="-1" @endif>
                 <span class="menu-ico">
                     <svg viewBox="0 0 24 24"><path d="M3 8.5 12 4l9 4.5-9 4.5L3 8.5Z"/><path d="M3 12.5 12 17l9-4.5"/><path d="M3 16.5 12 21l9-4.5"/></svg>
                 </span>
@@ -46,13 +57,13 @@
                 <svg class="chevron" viewBox="0 0 24 24" fill="none"><path d="m6 9 6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
             </button>
             <div class="submenu">
-                <a href="{{ route('categorie-produit') }}" class="{{ $activePage === 'categorie-produit' ? 'is-active' : '' }}">Catégorie Produit</a>
-                <a href="{{ route('etat-produit') }}" class="{{ $activePage === 'etat-produit' ? 'is-active' : '' }}">État Produit</a>
+                <a href="{{ route('categorie-produit') }}" class="{{ $activePage === 'categorie-produit' ? 'is-active' : '' }}" @if(! $canStock) tabindex="-1" @endif>Catégorie Produit</a>
+                <a href="{{ route('etat-produit') }}" class="{{ $activePage === 'etat-produit' ? 'is-active' : '' }}" @if(! $canStock) tabindex="-1" @endif>État Produit</a>
             </div>
         </div>
 
-        <div class="menu-group{{ $isVendeur ? ' is-muted' : '' }}" data-menu="client" @if($isVendeur) aria-disabled="true" @endif>
-            <button type="button" class="menu-btn" aria-expanded="false" @if($isVendeur) disabled tabindex="-1" @endif>
+        <div class="menu-group{{ $canVentes ? '' : ' is-muted' }}" data-menu="client" @if(! $canVentes) aria-disabled="true" @endif>
+            <button type="button" class="menu-btn" aria-expanded="false" @if(! $canVentes) disabled tabindex="-1" @endif>
                 <span class="menu-ico">
                     <svg viewBox="0 0 24 24"><path d="M16 19a4 4 0 0 0-8 0"/><circle cx="12" cy="9" r="3.5"/><path d="M19 19a3.5 3.5 0 0 0-2.2-3.2M5 19a3.5 3.5 0 0 1 2.2-3.2M17.5 8.2a3 3 0 1 1-1.2-4"/></svg>
                 </span>
@@ -60,13 +71,13 @@
                 <svg class="chevron" viewBox="0 0 24 24" fill="none"><path d="m6 9 6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
             </button>
             <div class="submenu">
-                <a href="{{ route('reglement-vente') }}" class="{{ $activePage === 'reglement-vente' ? 'is-active' : '' }}" @if($isVendeur) tabindex="-1" @endif>Balance des Ventes</a>
-                <a href="{{ route('balance-vente') }}" class="{{ $activePage === 'balance-vente' ? 'is-active' : '' }}" @if($isVendeur) tabindex="-1" @endif>Rapport Revenue</a>
+                <a href="{{ route('reglement-vente') }}" class="{{ $activePage === 'reglement-vente' ? 'is-active' : '' }}" @if(! $canVentes) tabindex="-1" @endif>Balance des Ventes</a>
+                <a href="{{ route('balance-vente') }}" class="{{ $activePage === 'balance-vente' ? 'is-active' : '' }}" @if(! $canVentes) tabindex="-1" @endif>Rapport Revenue</a>
             </div>
         </div>
 
-        <div class="menu-group{{ $isVendeur ? ' is-muted' : '' }}" data-menu="configuration" @if($isVendeur) aria-disabled="true" @endif>
-            <button type="button" class="menu-btn" aria-expanded="false" @if($isVendeur) disabled tabindex="-1" @endif>
+        <div class="menu-group{{ $canConfig ? '' : ' is-muted' }}" data-menu="configuration" @if(! $canConfig) aria-disabled="true" @endif>
+            <button type="button" class="menu-btn" aria-expanded="false" @if(! $canConfig) disabled tabindex="-1" @endif>
                 <span class="menu-ico">
                     <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 3.5v2.2M12 18.3v2.2M4.9 6.5l1.6 1.5M17.5 16l1.6 1.5M3.5 12h2.2M18.3 12h2.2M4.9 17.5l1.6-1.5M17.5 8l1.6-1.5"/></svg>
                 </span>
@@ -74,8 +85,8 @@
                 <svg class="chevron" viewBox="0 0 24 24" fill="none"><path d="m6 9 6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
             </button>
             <div class="submenu">
-                <a href="{{ route('utilisateurs') }}" class="{{ $activePage === 'utilisateurs' ? 'is-active' : '' }}" @if($isVendeur) tabindex="-1" @endif>Utilisateurs</a>
-                <a href="#" @if($isVendeur) tabindex="-1" @endif>Paramètres Système</a>
+                <a href="{{ route('utilisateurs') }}" class="{{ $activePage === 'utilisateurs' ? 'is-active' : '' }}" @if(! $canConfig) tabindex="-1" @endif>Utilisateurs</a>
+                <a href="#" @if(! $canConfig) tabindex="-1" @endif>Paramètres Système</a>
             </div>
         </div>
 
@@ -136,5 +147,6 @@
     </div>
 </aside>
 <script>window.__LIBAUTOENT_STATUT__=@json(strtolower((string) session('libautoent_statut', 'gerant')));</script>
-<script src="{{ asset('js/user-role.js') }}?v=1"></script>
+<script>window.__LIBAUTOENT_PERMISSIONS__=@json(session('libautoent_permissions') ?: new \stdClass);</script>
+<script src="{{ asset('js/user-role.js') }}?v=2"></script>
 <script src="{{ asset('js/sidebar-menu.js') }}?v=3"></script>

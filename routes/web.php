@@ -17,9 +17,13 @@ Route::post('/login', function (Request $request) {
         $statut = 'gerant';
     }
 
+    $login = trim((string) $request->input('login', ''));
+    $permissions = libautoent_find_user_permissions($login, $statut);
+
     session([
         'libautoent_statut' => $statut,
-        'libautoent_login' => trim((string) $request->input('login', '')),
+        'libautoent_login' => $login,
+        'libautoent_permissions' => $permissions,
     ]);
 
     return redirect()->route('dashboard');
@@ -30,7 +34,7 @@ Route::post('/', function (Request $request) {
 });
 
 Route::get('/logout', function () {
-    session()->forget(['libautoent_statut', 'libautoent_login']);
+    session()->forget(['libautoent_statut', 'libautoent_login', 'libautoent_permissions']);
 
     return redirect()->route('login');
 })->name('logout');
@@ -39,6 +43,10 @@ Route::middleware('restrict.vendeur')->group(function () {
     Route::get('/dashboard', function () {
         return view('dashboard');
     })->name('dashboard');
+
+    Route::get('/recuperation-ventes', function () {
+        return view('recuperation-ventes');
+    })->name('recuperation-ventes');
 
     Route::get('/achats/bon-achat', function () {
         return view('achats.bon-achat');

@@ -628,7 +628,7 @@
         </div>
     </div>
 
-    <script src="{{ asset('js/data-sync.js') }}?v=5"></script>
+    <script src="{{ asset('js/data-sync.js') }}?v=9"></script>
     <script src="{{ asset('js/table-actions.js') }}?v=7"></script>
     <script src="{{ asset('js/achat-store.js') }}?v=8"></script>
     <script>
