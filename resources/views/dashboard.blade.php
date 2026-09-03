@@ -1891,7 +1891,7 @@
         </div>
     </div>
 
-    <script src="{{ asset('js/data-sync.js') }}?v=6"></script>
+    <script src="{{ asset('js/data-sync.js') }}?v=7"></script>
     <script src="{{ asset('js/seed-demo-local.js') }}?v=1"></script>
     <script src="{{ asset('js/sidebar-menu.js') }}?v=3"></script>
     <script>window.__LIBAUTOENT_STATUT__=@json(strtolower((string) session('libautoent_statut', 'gerant')));</script>

@@ -288,9 +288,9 @@
         </div>
     </div>
 
-    <script src="{{ asset('js/data-sync.js') }}?v=5"></script>
+    <script src="{{ asset('js/data-sync.js') }}?v=7"></script>
     <script src="{{ asset('js/table-actions.js') }}?v=7"></script>
-    <script src="{{ asset('js/users-store.js') }}?v=4"></script>
+    <script src="{{ asset('js/users-store.js') }}?v=5"></script>
     <script>
         const sidebar = document.getElementById('sidebar');
         const overlay = document.getElementById('overlay');
@@ -473,11 +473,10 @@
             TableActions.bind(document.getElementById('usersBody'));
         }
 
+        window.onUsersSynced = renderUsers;
         renderUsers();
-        if (window.DataSync) {
-            DataSync.pullKey('libautoent_utilisateurs').then(function () {
-                renderUsers();
-            });
+        if (window.UsersStore && UsersStore.initFromServer) {
+            UsersStore.initFromServer().then(renderUsers);
         }
 
         (function () {

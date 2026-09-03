@@ -18,12 +18,18 @@
         }
     }
 
-    function write(list) {
+    function write(list, options) {
         var safe = Array.isArray(list) ? list : [];
         localStorage.setItem(KEY, JSON.stringify(safe));
         if (window.DataSync) {
-            DataSync.pushKey(KEY, safe);
+            return DataSync.pushKey(KEY, safe, options);
         }
+        return Promise.resolve({ ok: true });
+    }
+
+    function initFromServer() {
+        if (!window.DataSync) return Promise.resolve();
+        return DataSync.pullKey(KEY);
     }
 
     function formatDateFR(isoOrDate) {
@@ -157,7 +163,7 @@
     }
 
     function deleteUser(id) {
-        write(read().filter(function (u) { return u.id !== id; }));
+        write(read().filter(function (u) { return u.id !== id; }), { force: true });
     }
 
     function suspendUser(id) {
@@ -181,6 +187,7 @@
         updateUser: updateUser,
         deleteUser: deleteUser,
         suspendUser: suspendUser,
+        initFromServer: initFromServer,
         nextId: nextId,
         formatDateFR: formatDateFR,
         normalizeLogin: normalizeLogin,

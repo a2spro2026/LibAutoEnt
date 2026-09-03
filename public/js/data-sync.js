@@ -26,6 +26,21 @@
         libautoent_reglements_vente: true
     };
 
+    var UNION_KEYS = {
+        libautoent_utilisateurs: true,
+        libautoent_bons_achat: true,
+        libautoent_bons_vente: true,
+        libautoent_reglements_achat: true,
+        libautoent_reglements_vente: true
+    };
+
+    var PROTECTED_KEYS = {
+        libautoent_catalogue_produits: true,
+        libautoent_utilisateurs: true,
+        libautoent_bons_achat: true,
+        libautoent_bons_vente: true
+    };
+
     // File d'attente : un pull ne doit jamais écraser un push de suppression en cours
     var syncChain = Promise.resolve();
 
@@ -98,7 +113,7 @@
         });
     }
 
-    function mergeBons(remote, local) {
+    function mergeById(remote, local) {
         if (!Array.isArray(remote)) return Array.isArray(local) ? local : [];
         if (!Array.isArray(local) || !local.length) return remote;
         var byId = {};
@@ -120,6 +135,10 @@
             }
         });
         return merged;
+    }
+
+    function mergeBons(remote, local) {
+        return mergeById(remote, local);
     }
 
     function fetchServerKeyOnly(key) {
@@ -164,11 +183,10 @@
 
                 if (data === null || data === undefined) {
                     if (local != null && JSON.stringify(local) !== '[]' && JSON.stringify(local) !== '{}') {
-                        // Ne pas pousser si le serveur est injoignable (évite d'écraser des données)
-                        if (key === 'libautoent_catalogue_produits' ||
-                            key === 'libautoent_bons_vente' ||
-                            key === 'libautoent_bons_achat') {
-                            return local;
+                        if (PROTECTED_KEYS[key]) {
+                            return pushKeyRaw(key, local).then(function () {
+                                return local;
+                            });
                         }
                         var normalizedLocal = normalizePulled(key, local);
                         if (normalizedLocal == null) return null;
@@ -181,8 +199,8 @@
 
                 var normalized = normalizePulled(key, data);
 
-                // Ne pas écraser un catalogue local non vide par une liste serveur vide
-                if (key === 'libautoent_catalogue_produits' &&
+                // Ne pas écraser une liste locale non vide par une liste serveur vide
+                if (PROTECTED_KEYS[key] &&
                     Array.isArray(normalized) && normalized.length === 0 &&
                     Array.isArray(local) && local.length > 0) {
                     return pushKeyRaw(key, local).then(function () {
@@ -190,25 +208,19 @@
                     });
                 }
 
-                // Fusionner un catalogue / des bons serveur plus complets avec le local
-                if (key === 'libautoent_catalogue_produits' &&
-                    Array.isArray(normalized) && Array.isArray(local) &&
-                    local.length > 0 && normalized.length > local.length) {
-                    normalized = mergeCatalogue(normalized, local);
-                    localStorage.setItem(key, JSON.stringify(normalized));
-                    return normalized;
-                }
-
-                if ((key === 'libautoent_bons_vente' || key === 'libautoent_bons_achat') &&
-                    Array.isArray(normalized) && Array.isArray(local) &&
-                    local.length > 0 && normalized.length > local.length) {
-                    normalized = mergeBons(normalized, local);
-                    localStorage.setItem(key, JSON.stringify(normalized));
-                    return normalized;
-                }
-
                 if (key === 'libautoent_catalogue_produits' && Array.isArray(normalized)) {
                     normalized = mergeCatalogue(normalized, local);
+                }
+
+                if (UNION_KEYS[key] && Array.isArray(normalized) && Array.isArray(local) && local.length > 0) {
+                    var mergedUnion = mergeById(normalized, local);
+                    if (mergedUnion.length > normalized.length) {
+                        localStorage.setItem(key, JSON.stringify(mergedUnion));
+                        return pushKeyRaw(key, mergedUnion).then(function () {
+                            return mergedUnion;
+                        });
+                    }
+                    normalized = mergedUnion;
                 }
 
                 localStorage.setItem(key, JSON.stringify(normalized));
@@ -224,7 +236,6 @@
             return data.map(function (p) {
                 if (!p || typeof p !== 'object') return p;
                 var photo = String(p.photo || '');
-                // Ne pas pousser de base64 (trop lourd) — garder les URLs /storage déjà uploadées
                 if (photo.indexOf('data:') === 0) {
                     return Object.assign({}, p, { photo: '' });
                 }
@@ -232,6 +243,29 @@
             });
         }
         return data;
+    }
+
+    function putJson(key, data, options) {
+        options = options || {};
+        var headers = getSyncHeaders(true);
+        if (options.force) {
+            headers['X-Libautoent-Force'] = '1';
+        }
+        return fetch(API + '/' + encodeURIComponent(key), {
+            method: 'PUT',
+            headers: headers,
+            credentials: 'same-origin',
+            body: JSON.stringify(sanitizeForPush(key, data))
+        }).then(function (r) {
+            if (!r.ok) {
+                return r.text().then(function () {
+                    return { ok: false, status: r.status };
+                });
+            }
+            return { ok: true };
+        }).catch(function () {
+            return { ok: false };
+        });
     }
 
     function pushKeyRaw(key, data, options) {
@@ -249,76 +283,33 @@
                     }
                     return { ok: true, skipped: true };
                 }
-                var body = sanitizeForPush(key, data);
-                return fetch(API + '/' + encodeURIComponent(key), {
-                    method: 'PUT',
-                    headers: getSyncHeaders(true),
-                    credentials: 'same-origin',
-                    body: JSON.stringify(body)
-                }).then(function (r) {
-                    if (!r.ok) {
-                        return r.text().then(function () {
-                            return { ok: false, status: r.status };
-                        });
-                    }
-                    return { ok: true };
-                }).catch(function () {
-                    return { ok: false };
-                });
+                return putJson(key, data, options);
             });
         }
 
-        if ((key === 'libautoent_bons_vente' || key === 'libautoent_bons_achat') &&
-            Array.isArray(data) && !options.force) {
+        if (UNION_KEYS[key] && Array.isArray(data) && !options.force) {
             return fetchServerKeyOnly(key).then(function (remote) {
                 if (Array.isArray(remote) && remote.length > data.length) {
-                    var mergedBons = mergeBons(remote, data);
+                    var mergedItems = mergeById(remote, data);
                     try {
-                        localStorage.setItem(key, JSON.stringify(mergedBons));
+                        localStorage.setItem(key, JSON.stringify(mergedItems));
                     } catch (e) { /* ignore */ }
-                    if (mergedBons.length > data.length) {
-                        console.warn('Sync bons: copie locale incomplète fusionnée (' + data.length + ' → ' + mergedBons.length + ').');
+                    if (mergedItems.length > data.length) {
+                        console.warn('Sync ' + key + ': copie locale incomplète fusionnée (' + data.length + ' → ' + mergedItems.length + ').');
                         if (key === 'libautoent_bons_vente' && typeof window.onVentesSynced === 'function') {
                             window.onVentesSynced();
+                        }
+                        if (key === 'libautoent_utilisateurs' && typeof window.onUsersSynced === 'function') {
+                            window.onUsersSynced();
                         }
                         return { ok: true, skipped: true };
                     }
                 }
-                var body = sanitizeForPush(key, data);
-                return fetch(API + '/' + encodeURIComponent(key), {
-                    method: 'PUT',
-                    headers: getSyncHeaders(true),
-                    credentials: 'same-origin',
-                    body: JSON.stringify(body)
-                }).then(function (r) {
-                    if (!r.ok) {
-                        return r.text().then(function () {
-                            return { ok: false, status: r.status };
-                        });
-                    }
-                    return { ok: true };
-                }).catch(function () {
-                    return { ok: false };
-                });
+                return putJson(key, data, options);
             });
         }
 
-        var body = sanitizeForPush(key, data);
-        return fetch(API + '/' + encodeURIComponent(key), {
-            method: 'PUT',
-            headers: getSyncHeaders(true),
-            credentials: 'same-origin',
-            body: JSON.stringify(body)
-        }).then(function (r) {
-            if (!r.ok) {
-                return r.text().then(function () {
-                    return { ok: false, status: r.status };
-                });
-            }
-            return { ok: true };
-        }).catch(function () {
-            return { ok: false };
-        });
+        return putJson(key, data, options);
     }
 
     function pullKey(key) {
