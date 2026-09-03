@@ -139,8 +139,9 @@
             lignes: bon.lignes || []
         };
         list.unshift(item);
-        write(KEY_BONS, list);
-        return item;
+        return write(KEY_BONS, list).then(function (res) {
+            return { item: item, ok: !res || res.ok !== false, sync: res };
+        });
     }
 
     function updateBon(id, payload) {
@@ -160,8 +161,9 @@
             });
             return updated;
         });
-        write(KEY_BONS, list);
-        return updated;
+        return write(KEY_BONS, list).then(function (res) {
+            return { item: updated, ok: !res || res.ok !== false, sync: res };
+        });
     }
 
     function getBon(id) {

@@ -1507,7 +1507,18 @@
     </style>
 </head>
 <body class="notranslate" translate="no">
-@php $isVendeur = strtolower((string) session('libautoent_statut', 'gerant')) === 'vendeur'; @endphp
+@php
+    $perms = session('libautoent_permissions');
+    if (! is_array($perms)) {
+        $statue = strtolower((string) session('libautoent_statut', 'gerant'));
+        $perms = function_exists('libautoent_default_permissions')
+            ? libautoent_default_permissions($statue)
+            : [];
+    }
+    $canStock = ! empty($perms['stock.view']);
+    $canVentes = ! empty($perms['ventes.view']);
+    $canConfig = ! empty($perms['config.view']);
+@endphp
     <div class="overlay" id="overlay"></div>
 
     <div class="app">
@@ -1546,8 +1557,8 @@
                     <span class="menu-label">Tableau de Bord</span>
                 </a>
 
-                <div class="menu-group" data-menu="stock">
-                    <button type="button" class="menu-btn" aria-expanded="false">
+                <div class="menu-group{{ $canStock ? '' : ' is-muted' }}" data-menu="stock" @if(! $canStock) aria-disabled="true" @endif>
+                    <button type="button" class="menu-btn" aria-expanded="false" @if(! $canStock) disabled tabindex="-1" @endif>
                         <span class="menu-ico">
                             <svg viewBox="0 0 24 24"><path d="M3 8.5 12 4l9 4.5-9 4.5L3 8.5Z"/><path d="M3 12.5 12 17l9-4.5"/><path d="M3 16.5 12 21l9-4.5"/></svg>
                         </span>
@@ -1555,13 +1566,13 @@
                         <svg class="chevron" viewBox="0 0 24 24" fill="none"><path d="m6 9 6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
                     </button>
                     <div class="submenu">
-                        <a href="{{ route('categorie-produit') }}">Catégorie Produit</a>
-                        <a href="{{ route('etat-produit') }}">État Produit</a>
+                        <a href="{{ route('categorie-produit') }}" @if(! $canStock) tabindex="-1" @endif>Catégorie Produit</a>
+                        <a href="{{ route('etat-produit') }}" @if(! $canStock) tabindex="-1" @endif>État Produit</a>
                     </div>
                 </div>
 
-                <div class="menu-group{{ $isVendeur ? ' is-muted' : '' }}" data-menu="client" @if($isVendeur) aria-disabled="true" @endif>
-                    <button type="button" class="menu-btn" aria-expanded="false" @if($isVendeur) disabled tabindex="-1" @endif>
+                <div class="menu-group{{ $canVentes ? '' : ' is-muted' }}" data-menu="client" @if(! $canVentes) aria-disabled="true" @endif>
+                    <button type="button" class="menu-btn" aria-expanded="false" @if(! $canVentes) disabled tabindex="-1" @endif>
                         <span class="menu-ico">
                             <svg viewBox="0 0 24 24"><path d="M16 19a4 4 0 0 0-8 0"/><circle cx="12" cy="9" r="3.5"/><path d="M19 19a3.5 3.5 0 0 0-2.2-3.2M5 19a3.5 3.5 0 0 1 2.2-3.2M17.5 8.2a3 3 0 1 1-1.2-4"/></svg>
                         </span>
@@ -1569,13 +1580,13 @@
                         <svg class="chevron" viewBox="0 0 24 24" fill="none"><path d="m6 9 6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
                     </button>
                     <div class="submenu">
-                        <a href="{{ route('reglement-vente') }}" @if($isVendeur) tabindex="-1" @endif>Balance des Ventes</a>
-                        <a href="{{ route('balance-vente') }}" @if($isVendeur) tabindex="-1" @endif>Rapport Revenue</a>
+                        <a href="{{ route('reglement-vente') }}" @if(! $canVentes) tabindex="-1" @endif>Balance des Ventes</a>
+                        <a href="{{ route('balance-vente') }}" @if(! $canVentes) tabindex="-1" @endif>Rapport Revenue</a>
                     </div>
                 </div>
 
-                <div class="menu-group{{ $isVendeur ? ' is-muted' : '' }}" data-menu="configuration" @if($isVendeur) aria-disabled="true" @endif>
-                    <button type="button" class="menu-btn" aria-expanded="false" @if($isVendeur) disabled tabindex="-1" @endif>
+                <div class="menu-group{{ $canConfig ? '' : ' is-muted' }}" data-menu="configuration" @if(! $canConfig) aria-disabled="true" @endif>
+                    <button type="button" class="menu-btn" aria-expanded="false" @if(! $canConfig) disabled tabindex="-1" @endif>
                         <span class="menu-ico">
                             <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 3.5v2.2M12 18.3v2.2M4.9 6.5l1.6 1.5M17.5 16l1.6 1.5M3.5 12h2.2M18.3 12h2.2M4.9 17.5l1.6-1.5M17.5 8l1.6-1.5"/></svg>
                         </span>
@@ -1583,8 +1594,8 @@
                         <svg class="chevron" viewBox="0 0 24 24" fill="none"><path d="m6 9 6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
                     </button>
                     <div class="submenu">
-                        <a href="{{ route('utilisateurs') }}" @if($isVendeur) tabindex="-1" @endif>Utilisateurs</a>
-                        <a href="#" @if($isVendeur) tabindex="-1" @endif>Paramètres Système</a>
+                        <a href="{{ route('utilisateurs') }}" @if(! $canConfig) tabindex="-1" @endif>Utilisateurs</a>
+                        <a href="#" @if(! $canConfig) tabindex="-1" @endif>Paramètres Système</a>
                     </div>
                 </div>
 
@@ -1730,9 +1741,9 @@
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14" stroke-linecap="round"/></svg>
                             Ajouter
                         </button>
-                        <button type="button" class="btn btn-close" id="btnFermerFiltres">
+                        <button type="button" class="btn btn-close" id="btnFermerFiltres" title="Réinitialiser les filtres">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6 6 18" stroke-linecap="round"/></svg>
-                            Fermer
+                            Tout afficher
                         </button>
                     </div>
                 </div>
@@ -1891,14 +1902,15 @@
         </div>
     </div>
 
-    <script src="{{ asset('js/data-sync.js') }}?v=7"></script>
+    <script src="{{ asset('js/data-sync.js') }}?v=8"></script>
     <script src="{{ asset('js/seed-demo-local.js') }}?v=1"></script>
     <script src="{{ asset('js/sidebar-menu.js') }}?v=3"></script>
     <script>window.__LIBAUTOENT_STATUT__=@json(strtolower((string) session('libautoent_statut', 'gerant')));</script>
-    <script src="{{ asset('js/user-role.js') }}?v=1"></script>
+    <script>window.__LIBAUTOENT_PERMISSIONS__=@json(session('libautoent_permissions') ?: new \stdClass);</script>
+    <script src="{{ asset('js/user-role.js') }}?v=2"></script>
     <script src="{{ asset('js/table-actions.js') }}?v=8"></script>
     <script src="{{ asset('js/stock-store.js') }}?v=11"></script>
-    <script src="{{ asset('js/vente-store.js') }}?v=12"></script>
+    <script src="{{ asset('js/vente-store.js') }}?v=13"></script>
     <script>
         const sidebar = document.getElementById('sidebar');
         const overlay = document.getElementById('overlay');
@@ -1976,11 +1988,23 @@
         function updateBonFilterHint(shown, total) {
             var hint = document.getElementById('bonsFilterHint');
             if (!hint) return;
+            var all = window.VenteStore ? VenteStore.getBons() : [];
+            var dates = all.map(function (b) { return parseDateTs(b.date); }).filter(Boolean).sort(function (a, b) { return a - b; });
+            var span = '';
+            if (dates.length) {
+                var d0 = new Date(dates[0]);
+                var d1 = new Date(dates[dates.length - 1]);
+                function fr(d) {
+                    return String(d.getDate()).padStart(2, '0') + '/' +
+                        String(d.getMonth() + 1).padStart(2, '0') + '/' + d.getFullYear();
+                }
+                span = ' (du ' + fr(d0) + ' au ' + fr(d1) + ')';
+            }
             if (!hasActiveBonFilters()) {
-                hint.textContent = total ? (total + ' vente' + (total > 1 ? 's' : '') + ' au total') : '';
+                hint.textContent = total ? (total + ' vente' + (total > 1 ? 's' : '') + ' au total' + span) : '';
                 return;
             }
-            hint.textContent = shown + ' affichée' + (shown > 1 ? 's' : '') + ' sur ' + total + ' — cliquez Fermer pour tout voir';
+            hint.textContent = shown + ' affichée' + (shown > 1 ? 's' : '') + ' sur ' + total + span + ' — cliquez « Tout afficher »';
         }
 
         function filteredBons() {
@@ -2533,10 +2557,16 @@
                 lignes: lignes
             };
             var id = document.getElementById('bonEditId').value;
-            if (id) VenteStore.updateBon(id, payload);
-            else VenteStore.addBon(payload);
-            closeModal();
-            refreshDashboard();
+            var savePromise = id
+                ? VenteStore.updateBon(id, payload)
+                : VenteStore.addBon(payload);
+            Promise.resolve(savePromise).then(function (res) {
+                closeModal();
+                refreshDashboard();
+                if (res && res.ok === false) {
+                    alert('Le bon est enregistré ici, mais la sync serveur a échoué. Gardez cette page ouverte et réessayez dans un instant.');
+                }
+            });
         });
 
         function escapeHtml(s) {
@@ -2733,11 +2763,22 @@
 
         window.onCatalogueSynced = refreshDashboard;
         window.onVentesSynced = refreshDashboard;
+
+        // Toujours démarrer sans filtre (évite de « cacher » des ventes)
+        document.getElementById('filterMois').value = '';
+        document.getElementById('filterDe').value = '';
+        document.getElementById('filterA').value = '';
+
         var bootDash = Promise.all([
             (window.StockStore && StockStore.initCatalogFromServer) ? StockStore.initCatalogFromServer() : Promise.resolve(),
             (window.VenteStore && VenteStore.initFromServer) ? VenteStore.initFromServer() : Promise.resolve()
         ]);
-        bootDash.then(refreshDashboard);
+        bootDash.then(function () {
+            // Si le navigateur a encore des ventes absentes du serveur, les renvoyer
+            if (window.DataSync && window.VenteStore) {
+                return DataSync.pushKeyFromLocal('libautoent_bons_vente');
+            }
+        }).then(refreshDashboard);
         window.addEventListener('storage', refreshDashboard);
         window.addEventListener('focus', function () {
             var jobs = [];

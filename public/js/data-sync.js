@@ -289,23 +289,30 @@
 
         if (UNION_KEYS[key] && Array.isArray(data) && !options.force) {
             return fetchServerKeyOnly(key).then(function (remote) {
-                if (Array.isArray(remote) && remote.length > data.length) {
-                    var mergedItems = mergeById(remote, data);
+                var toSend = data;
+                if (Array.isArray(remote) && remote.length) {
+                    toSend = mergeById(remote, data);
                     try {
-                        localStorage.setItem(key, JSON.stringify(mergedItems));
+                        localStorage.setItem(key, JSON.stringify(toSend));
                     } catch (e) { /* ignore */ }
-                    if (mergedItems.length > data.length) {
-                        console.warn('Sync ' + key + ': copie locale incomplète fusionnée (' + data.length + ' → ' + mergedItems.length + ').');
+                    if (toSend.length > data.length) {
+                        console.warn('Sync ' + key + ': fusion avant envoi (' + data.length + ' → ' + toSend.length + ').');
                         if (key === 'libautoent_bons_vente' && typeof window.onVentesSynced === 'function') {
                             window.onVentesSynced();
                         }
                         if (key === 'libautoent_utilisateurs' && typeof window.onUsersSynced === 'function') {
                             window.onUsersSynced();
                         }
-                        return { ok: true, skipped: true };
                     }
                 }
-                return putJson(key, data, options);
+                return putJson(key, toSend, options).then(function (res) {
+                    if (res && res.ok && Array.isArray(toSend)) {
+                        try {
+                            localStorage.setItem(key, JSON.stringify(toSend));
+                        } catch (e) { /* ignore */ }
+                    }
+                    return res;
+                });
             });
         }
 

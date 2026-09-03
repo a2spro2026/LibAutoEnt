@@ -1112,7 +1112,25 @@
 
             let saved = bon;
             if (window.VenteStore) {
-                saved = VenteStore.addBon(bon);
+                var result = VenteStore.addBon(bon);
+                // Compat sync async : l’item est déjà en localStorage
+                if (result && typeof result.then === 'function') {
+                    result.then(function (res) {
+                        if (res && res.ok === false) {
+                            alert('Bon enregistré localement, sync serveur échouée.');
+                        }
+                    });
+                    saved = Object.assign({}, bon, {
+                        id: bon.id || ('bonv_' + Date.now())
+                    });
+                    // Relire depuis le store pour récupérer l’id réel
+                    var list = VenteStore.getBons();
+                    if (list && list[0]) saved = list[0];
+                } else if (result && result.item) {
+                    saved = result.item;
+                } else {
+                    saved = result || bon;
+                }
             }
 
             removeEmptyRow();

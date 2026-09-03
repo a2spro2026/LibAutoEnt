@@ -101,7 +101,8 @@ class DataStoreController extends Controller
                 if ($payload === []) {
                     return response()->json(['message' => 'Refus d’écraser les données par une liste vide'], Response::HTTP_UNPROCESSABLE_ENTITY);
                 }
-                if (is_array($payload) && count($payload) < count($existing)) {
+                // Toujours fusionner par id (évite de perdre des ventes saisies sur un autre appareil)
+                if (is_array($payload)) {
                     $byId = [];
                     foreach ($existing as $row) {
                         if (is_array($row) && ! empty($row['id'])) {
@@ -111,6 +112,8 @@ class DataStoreController extends Controller
                     foreach ($payload as $row) {
                         if (is_array($row) && ! empty($row['id'])) {
                             $byId[(string) $row['id']] = $row;
+                        } elseif (is_array($row)) {
+                            $byId['anon_'.count($byId)] = $row;
                         }
                     }
                     $payload = array_values($byId);
@@ -123,12 +126,33 @@ class DataStoreController extends Controller
             mkdir($dir, 0755, true);
         }
 
+        // Snapshot avant chaque écriture des données critiques
+        if (in_array($safe, $protected, true) && is_file($path)) {
+            $this->snapshotKey($safe, $path);
+        }
+
         file_put_contents(
             $path,
             json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT)
         );
 
-        return response()->json(['ok' => true]);
+        return response()->json(['ok' => true, 'count' => is_array($payload) ? count($payload) : null]);
+    }
+
+    private function snapshotKey(string $key, string $path): void
+    {
+        $snapDir = storage_path('app/backups/libautoent-snapshots/'.$key);
+        if (! is_dir($snapDir)) {
+            mkdir($snapDir, 0755, true);
+        }
+        $dest = $snapDir.'/'.$key.'-'.date('YmdHis').'.json';
+        @copy($path, $dest);
+
+        $files = glob($snapDir.'/'.$key.'-*.json') ?: [];
+        rsort($files);
+        foreach (array_slice($files, 40) as $old) {
+            @unlink($old);
+        }
     }
 
     public function uploadPhoto(Request $request)
