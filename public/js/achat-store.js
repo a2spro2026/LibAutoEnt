@@ -17,11 +17,11 @@
         }
     }
 
-    function write(key, data) {
+    function write(key, data, options) {
         var safe = Array.isArray(data) ? data : [];
         localStorage.setItem(key, JSON.stringify(safe));
         if (window.DataSync) {
-            DataSync.pushKey(key, safe);
+            DataSync.pushKey(key, safe, options);
         }
     }
 
@@ -143,7 +143,7 @@
 
     function deleteBon(id) {
         var list = read(KEY_BONS).filter(function (b) { return b.id !== id; });
-        write(KEY_BONS, list);
+        write(KEY_BONS, list, { force: true });
         return list;
     }
 

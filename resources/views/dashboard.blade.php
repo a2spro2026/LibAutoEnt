@@ -628,6 +628,10 @@
         }
         .filter-range { display: flex; align-items: center; gap: 0.4rem; }
         .filter-range span { color: var(--muted); font-size: 0.8rem; font-weight: 600; }
+        .filter-hint {
+            font-size: 0.78rem; color: var(--muted); font-weight: 600;
+            padding: 0.35rem 0; min-height: 1.1rem;
+        }
         .toolbar-actions { display: flex; flex-wrap: wrap; gap: 0.55rem; }
 
         .btn {
@@ -1719,6 +1723,7 @@
                                 <input type="date" id="filterA" aria-label="Date fin">
                             </div>
                         </div>
+                        <p class="filter-hint" id="bonsFilterHint" aria-live="polite"></p>
                     </div>
                     <div class="toolbar-actions">
                         <button type="button" class="btn btn-add" id="btnAjouter">
@@ -1886,7 +1891,7 @@
         </div>
     </div>
 
-    <script src="{{ asset('js/data-sync.js') }}?v=5"></script>
+    <script src="{{ asset('js/data-sync.js') }}?v=6"></script>
     <script src="{{ asset('js/seed-demo-local.js') }}?v=1"></script>
     <script src="{{ asset('js/sidebar-menu.js') }}?v=3"></script>
     <script>window.__LIBAUTOENT_STATUT__=@json(strtolower((string) session('libautoent_statut', 'gerant')));</script>
@@ -1961,6 +1966,23 @@
             document.getElementById('statTotalSolde').innerHTML = fmtMoneyHtml(stats.totalSolde);
         }
 
+        function hasActiveBonFilters() {
+            var mois = document.getElementById('filterMois').value;
+            var de = document.getElementById('filterDe').value;
+            var a = document.getElementById('filterA').value;
+            return !!(mois || de || a);
+        }
+
+        function updateBonFilterHint(shown, total) {
+            var hint = document.getElementById('bonsFilterHint');
+            if (!hint) return;
+            if (!hasActiveBonFilters()) {
+                hint.textContent = total ? (total + ' vente' + (total > 1 ? 's' : '') + ' au total') : '';
+                return;
+            }
+            hint.textContent = shown + ' affichée' + (shown > 1 ? 's' : '') + ' sur ' + total + ' — cliquez Fermer pour tout voir';
+        }
+
         function filteredBons() {
             if (!window.VenteStore) return [];
             var mois = document.getElementById('filterMois').value;
@@ -1980,9 +2002,14 @@
         function renderBons() {
             var body = document.getElementById('bonsBody');
             if (!body) return;
+            var total = window.VenteStore ? VenteStore.getBons().length : 0;
             var list = filteredBons();
+            updateBonFilterHint(list.length, total);
             if (!list.length) {
-                body.innerHTML = '<tr class="empty-row"><td colspan="8" class="empty">Aucun bon — cliquez sur Ajouter</td></tr>';
+                var msg = total && hasActiveBonFilters()
+                    ? 'Aucun bon pour ce filtre — cliquez sur Fermer pour afficher les ' + total + ' ventes'
+                    : 'Aucun bon — cliquez sur Ajouter';
+                body.innerHTML = '<tr class="empty-row"><td colspan="8" class="empty">' + msg + '</td></tr>';
                 return;
             }
             body.innerHTML = list.map(function (b) {

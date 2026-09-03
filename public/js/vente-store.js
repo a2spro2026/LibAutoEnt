@@ -17,11 +17,11 @@
         }
     }
 
-    function write(key, data) {
+    function write(key, data, options) {
         var safe = Array.isArray(data) ? data : [];
         localStorage.setItem(key, JSON.stringify(safe));
         if (window.DataSync) {
-            return DataSync.pushKey(key, safe);
+            return DataSync.pushKey(key, safe, options);
         }
         return Promise.resolve({ ok: true });
     }
@@ -178,7 +178,7 @@
         var list = read(KEY_BONS).filter(function (b) {
             return String(b.id) !== sid;
         });
-        return write(KEY_BONS, list).then(function (res) {
+        return write(KEY_BONS, list, { force: true }).then(function (res) {
             return { ok: !res || res.ok !== false, list: list, sync: res };
         });
     }

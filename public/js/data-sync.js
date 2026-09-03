@@ -98,6 +98,30 @@
         });
     }
 
+    function mergeBons(remote, local) {
+        if (!Array.isArray(remote)) return Array.isArray(local) ? local : [];
+        if (!Array.isArray(local) || !local.length) return remote;
+        var byId = {};
+        local.forEach(function (b) {
+            if (b && b.id) byId[String(b.id)] = b;
+        });
+        var merged = remote.map(function (b) {
+            if (!b || !b.id) return b;
+            var loc = byId[String(b.id)];
+            return loc ? Object.assign({}, b, loc) : b;
+        });
+        var remoteIds = {};
+        remote.forEach(function (b) {
+            if (b && b.id) remoteIds[String(b.id)] = true;
+        });
+        local.forEach(function (b) {
+            if (b && b.id && !remoteIds[String(b.id)]) {
+                merged.unshift(b);
+            }
+        });
+        return merged;
+    }
+
     function fetchServerKeyOnly(key) {
         return fetch(API + '/' + encodeURIComponent(key), {
             headers: { Accept: 'application/json' },
@@ -140,8 +164,10 @@
 
                 if (data === null || data === undefined) {
                     if (local != null && JSON.stringify(local) !== '[]' && JSON.stringify(local) !== '{}') {
-                        // Catalogue : ne pas pousser si le serveur est injoignable (évite d'écraser des données)
-                        if (key === 'libautoent_catalogue_produits') {
+                        // Ne pas pousser si le serveur est injoignable (évite d'écraser des données)
+                        if (key === 'libautoent_catalogue_produits' ||
+                            key === 'libautoent_bons_vente' ||
+                            key === 'libautoent_bons_achat') {
                             return local;
                         }
                         var normalizedLocal = normalizePulled(key, local);
@@ -164,7 +190,7 @@
                     });
                 }
 
-                // Ne pas laisser un ancien catalogue local (moins complet) écraser le serveur
+                // Fusionner un catalogue / des bons serveur plus complets avec le local
                 if (key === 'libautoent_catalogue_produits' &&
                     Array.isArray(normalized) && Array.isArray(local) &&
                     local.length > 0 && normalized.length > local.length) {
@@ -173,22 +199,12 @@
                     return normalized;
                 }
 
-                // Suppressions locales non encore sur le serveur
                 if ((key === 'libautoent_bons_vente' || key === 'libautoent_bons_achat') &&
                     Array.isArray(normalized) && Array.isArray(local) &&
-                    local.length > 0 && local.length < normalized.length) {
-                    var remoteIds = {};
-                    normalized.forEach(function (b) {
-                        if (b && b.id) remoteIds[String(b.id)] = true;
-                    });
-                    var localAllOnRemote = local.every(function (b) {
-                        return b && b.id && remoteIds[String(b.id)];
-                    });
-                    if (localAllOnRemote) {
-                        return pushKeyRaw(key, local).then(function () {
-                            return local;
-                        });
-                    }
+                    local.length > 0 && normalized.length > local.length) {
+                    normalized = mergeBons(normalized, local);
+                    localStorage.setItem(key, JSON.stringify(normalized));
+                    return normalized;
                 }
 
                 if (key === 'libautoent_catalogue_produits' && Array.isArray(normalized)) {
@@ -218,7 +234,8 @@
         return data;
     }
 
-    function pushKeyRaw(key, data) {
+    function pushKeyRaw(key, data, options) {
+        options = options || {};
         if (key === 'libautoent_catalogue_produits' && Array.isArray(data)) {
             return fetchServerKeyOnly(key).then(function (remote) {
                 if (Array.isArray(remote) && remote.length > data.length) {
@@ -231,6 +248,41 @@
                         window.onCatalogueSynced();
                     }
                     return { ok: true, skipped: true };
+                }
+                var body = sanitizeForPush(key, data);
+                return fetch(API + '/' + encodeURIComponent(key), {
+                    method: 'PUT',
+                    headers: getSyncHeaders(true),
+                    credentials: 'same-origin',
+                    body: JSON.stringify(body)
+                }).then(function (r) {
+                    if (!r.ok) {
+                        return r.text().then(function () {
+                            return { ok: false, status: r.status };
+                        });
+                    }
+                    return { ok: true };
+                }).catch(function () {
+                    return { ok: false };
+                });
+            });
+        }
+
+        if ((key === 'libautoent_bons_vente' || key === 'libautoent_bons_achat') &&
+            Array.isArray(data) && !options.force) {
+            return fetchServerKeyOnly(key).then(function (remote) {
+                if (Array.isArray(remote) && remote.length > data.length) {
+                    var mergedBons = mergeBons(remote, data);
+                    try {
+                        localStorage.setItem(key, JSON.stringify(mergedBons));
+                    } catch (e) { /* ignore */ }
+                    if (mergedBons.length > data.length) {
+                        console.warn('Sync bons: copie locale incomplète fusionnée (' + data.length + ' → ' + mergedBons.length + ').');
+                        if (key === 'libautoent_bons_vente' && typeof window.onVentesSynced === 'function') {
+                            window.onVentesSynced();
+                        }
+                        return { ok: true, skipped: true };
+                    }
                 }
                 var body = sanitizeForPush(key, data);
                 return fetch(API + '/' + encodeURIComponent(key), {
@@ -275,9 +327,9 @@
         });
     }
 
-    function pushKey(key, data) {
+    function pushKey(key, data, options) {
         return enqueue(function () {
-            return pushKeyRaw(key, data);
+            return pushKeyRaw(key, data, options);
         });
     }
 
