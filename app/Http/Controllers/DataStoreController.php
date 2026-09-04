@@ -87,6 +87,47 @@ class DataStoreController extends Controller
         return array_values($byId);
     }
 
+    private function sortBonsNewestFirst(array $rows): array
+    {
+        usort($rows, function ($a, $b) {
+            $da = $this->bonDateTs(is_array($a) ? ($a['date'] ?? '') : '');
+            $db = $this->bonDateTs(is_array($b) ? ($b['date'] ?? '') : '');
+            if ($db !== $da) {
+                return $db <=> $da;
+            }
+            $na = $this->bonNumeroRank(is_array($a) ? ($a['numero'] ?? '') : '');
+            $nb = $this->bonNumeroRank(is_array($b) ? ($b['numero'] ?? '') : '');
+
+            return $nb <=> $na;
+        });
+
+        return array_values($rows);
+    }
+
+    private function bonDateTs(string $s): int
+    {
+        $s = trim($s);
+        if ($s === '') {
+            return 0;
+        }
+        if (str_contains($s, '-')) {
+            $p = explode('-', $s);
+
+            return count($p) >= 3 ? (int) strtotime(sprintf('%04d-%02d-%02d', (int) $p[0], (int) $p[1], (int) $p[2])) : 0;
+        }
+        $p = explode('/', $s);
+        if (count($p) < 3) {
+            return 0;
+        }
+
+        return (int) strtotime(sprintf('%04d-%02d-%02d', (int) $p[2], (int) $p[1], (int) $p[0]));
+    }
+
+    private function bonNumeroRank(string $numero): int
+    {
+        return preg_match('/^BL0*(\d+)$/i', trim($numero), $m) ? (int) $m[1] : 0;
+    }
+
     public function show(string $key)
     {
         $safe = $this->safeKey($key);
@@ -105,7 +146,12 @@ class DataStoreController extends Controller
             return response()->json(null);
         }
 
-        return response()->json($this->normalizePayload($safe, $data), 200, [
+        $payload = $this->normalizePayload($safe, $data);
+        if ($safe === 'libautoent_bons_vente' && is_array($payload)) {
+            $payload = $this->sortBonsNewestFirst($payload);
+        }
+
+        return response()->json($payload, 200, [
             'Cache-Control' => 'no-store, no-cache, must-revalidate, max-age=0',
             'Pragma' => 'no-cache',
         ]);
@@ -165,6 +211,10 @@ class DataStoreController extends Controller
                     $payload = $existing;
                 }
             }
+        }
+
+        if ($safe === 'libautoent_bons_vente' && is_array($payload)) {
+            $payload = $this->sortBonsNewestFirst($payload);
         }
 
         $dir = storage_path('app/libautoent');

@@ -108,7 +108,32 @@
     }
 
     function getBons() {
-        return read(KEY_BONS);
+        return sortBonsNewestFirst(read(KEY_BONS));
+    }
+
+    function bonNumeroRank(numero) {
+        var m = String(numero || '').trim().match(/^BL0*(\d+)$/i);
+        return m ? parseInt(m[1], 10) : 0;
+    }
+
+    function parseBonDateTs(s) {
+        s = String(s || '');
+        if (!s) return 0;
+        if (s.indexOf('-') !== -1) {
+            var a = s.split('-');
+            return new Date(Number(a[0]), Number(a[1]) - 1, Number(a[2])).getTime() || 0;
+        }
+        var p = s.split('/');
+        if (p.length !== 3) return 0;
+        return new Date(Number(p[2]), Number(p[1]) - 1, Number(p[0])).getTime() || 0;
+    }
+
+    function sortBonsNewestFirst(list) {
+        return (Array.isArray(list) ? list.slice() : []).sort(function (a, b) {
+            var td = parseBonDateTs(b && b.date) - parseBonDateTs(a && a.date);
+            if (td) return td;
+            return bonNumeroRank(b && b.numero) - bonNumeroRank(a && a.numero);
+        });
     }
 
     function saveBons(list) {
