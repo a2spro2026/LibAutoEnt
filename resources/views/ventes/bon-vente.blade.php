@@ -677,11 +677,11 @@
         </div>
     </div>
 
-    <script src="{{ asset('js/data-sync.js') }}?v=9"></script>
+    <script src="{{ asset('js/data-sync.js') }}?v=10"></script>
     <script src="{{ asset('js/seed-demo-local.js') }}?v=1"></script>
     <script src="{{ asset('js/table-actions.js') }}?v=7"></script>
     <script src="{{ asset('js/stock-store.js') }}?v=10"></script>
-    <script src="{{ asset('js/vente-store.js') }}?v=12"></script>
+    <script src="{{ asset('js/vente-store.js') }}?v=14"></script>
     <script>
 
         const sidebar = document.getElementById('sidebar');

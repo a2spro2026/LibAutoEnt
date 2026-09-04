@@ -1902,7 +1902,7 @@
         </div>
     </div>
 
-    <script src="{{ asset('js/data-sync.js') }}?v=9"></script>
+    <script src="{{ asset('js/data-sync.js') }}?v=10"></script>
     <script src="{{ asset('js/seed-demo-local.js') }}?v=1"></script>
     <script src="{{ asset('js/sidebar-menu.js') }}?v=3"></script>
     <script>window.__LIBAUTOENT_STATUT__=@json(strtolower((string) session('libautoent_statut', 'gerant')));</script>
@@ -1910,7 +1910,7 @@
     <script src="{{ asset('js/user-role.js') }}?v=2"></script>
     <script src="{{ asset('js/table-actions.js') }}?v=8"></script>
     <script src="{{ asset('js/stock-store.js') }}?v=11"></script>
-    <script src="{{ asset('js/vente-store.js') }}?v=13"></script>
+    <script src="{{ asset('js/vente-store.js') }}?v=14"></script>
     <script>
         const sidebar = document.getElementById('sidebar');
         const overlay = document.getElementById('overlay');

@@ -44,7 +44,7 @@
     <h2>Journal</h2>
     <div id="log"></div>
 
-    <script src="{{ asset('js/data-sync.js') }}?v=9"></script>
+    <script src="{{ asset('js/data-sync.js') }}?v=10"></script>
     <script>
         var KEY = 'libautoent_bons_vente';
         var logEl = document.getElementById('log');

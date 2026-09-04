@@ -320,26 +320,40 @@
 
         if (UNION_KEYS[key] && Array.isArray(data) && !options.force) {
             return fetchServerKeyOnly(key).then(function (remote) {
-                var toSend = data;
+                // Toujours relire le local au moment de l'envoi : un push plus ancien
+                // ne doit jamais écraser un bon ajouté pendant l'attente (ventes rapides).
+                var localNow = readLocal(key);
+                var toSend = Array.isArray(data) ? data.slice() : [];
+                if (Array.isArray(localNow) && localNow.length) {
+                    toSend = mergeById(toSend, localNow);
+                }
                 if (Array.isArray(remote) && remote.length) {
-                    toSend = mergeById(remote, data);
-                    try {
+                    toSend = mergeById(remote, toSend);
+                }
+                try {
+                    var prevLen = Array.isArray(localNow) ? localNow.length : 0;
+                    if (toSend.length >= prevLen) {
                         localStorage.setItem(key, JSON.stringify(toSend));
-                    } catch (e) { /* ignore */ }
-                    if (toSend.length > data.length) {
-                        console.warn('Sync ' + key + ': fusion avant envoi (' + data.length + ' → ' + toSend.length + ').');
-                        if (key === 'libautoent_bons_vente' && typeof window.onVentesSynced === 'function') {
-                            window.onVentesSynced();
-                        }
-                        if (key === 'libautoent_utilisateurs' && typeof window.onUsersSynced === 'function') {
-                            window.onUsersSynced();
-                        }
+                    }
+                } catch (e) { /* ignore */ }
+                if (Array.isArray(localNow) && toSend.length > localNow.length) {
+                    console.warn('Sync ' + key + ': fusion avant envoi (' + localNow.length + ' → ' + toSend.length + ').');
+                    if (key === 'libautoent_bons_vente' && typeof window.onVentesSynced === 'function') {
+                        window.onVentesSynced();
+                    }
+                    if (key === 'libautoent_utilisateurs' && typeof window.onUsersSynced === 'function') {
+                        window.onUsersSynced();
                     }
                 }
                 return putJson(key, toSend, options).then(function (res) {
                     if (res && res.ok && Array.isArray(toSend)) {
                         try {
-                            localStorage.setItem(key, JSON.stringify(toSend));
+                            var latest = readLocal(key);
+                            var finalList = toSend;
+                            if (Array.isArray(latest) && latest.length) {
+                                finalList = mergeById(toSend, latest);
+                            }
+                            localStorage.setItem(key, JSON.stringify(finalList));
                         } catch (e) { /* ignore */ }
                     }
                     return res;

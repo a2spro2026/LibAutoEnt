@@ -18,7 +18,7 @@
     }
 
     function write(key, data, options) {
-        var safe = Array.isArray(data) ? data : [];
+        var safe = Array.isArray(data) ? data.slice() : [];
         localStorage.setItem(key, JSON.stringify(safe));
         if (window.DataSync) {
             return DataSync.pushKey(key, safe, options);
