@@ -3,6 +3,8 @@
 .env
 .env.backup
 .env.production
+.vps_ssh_password
+.vps_ssh_password.txt
 .phpactor.json
 .phpunit.result.cache
 /.fleet
