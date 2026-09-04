@@ -3,6 +3,7 @@
 .env
 .env.backup
 .env.production
+.env.deploy
 .vps_ssh_password
 .vps_ssh_password.txt
 .phpactor.json

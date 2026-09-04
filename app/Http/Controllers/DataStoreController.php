@@ -105,7 +105,10 @@ class DataStoreController extends Controller
             return response()->json(null);
         }
 
-        return response()->json($this->normalizePayload($safe, $data));
+        return response()->json($this->normalizePayload($safe, $data), 200, [
+            'Cache-Control' => 'no-store, no-cache, must-revalidate, max-age=0',
+            'Pragma' => 'no-cache',
+        ]);
     }
 
     public function update(Request $request, string $key)

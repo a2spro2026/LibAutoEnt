@@ -1902,7 +1902,7 @@
         </div>
     </div>
 
-    <script src="{{ asset('js/data-sync.js') }}?v=10"></script>
+    <script src="{{ asset('js/data-sync.js') }}?v=11"></script>
     <script src="{{ asset('js/seed-demo-local.js') }}?v=1"></script>
     <script src="{{ asset('js/sidebar-menu.js') }}?v=3"></script>
     <script>window.__LIBAUTOENT_STATUT__=@json(strtolower((string) session('libautoent_statut', 'gerant')));</script>
@@ -1910,7 +1910,7 @@
     <script src="{{ asset('js/user-role.js') }}?v=2"></script>
     <script src="{{ asset('js/table-actions.js') }}?v=8"></script>
     <script src="{{ asset('js/stock-store.js') }}?v=11"></script>
-    <script src="{{ asset('js/vente-store.js') }}?v=14"></script>
+    <script src="{{ asset('js/vente-store.js') }}?v=15"></script>
     <script>
         const sidebar = document.getElementById('sidebar');
         const overlay = document.getElementById('overlay');
@@ -2769,16 +2769,18 @@
         document.getElementById('filterDe').value = '';
         document.getElementById('filterA').value = '';
 
-        // D'abord pousser le local (récupération), puis tirer le serveur
-        var bootDash = Promise.resolve();
-        if (window.DataSync && DataSync.pushKeyFromLocal) {
-            bootDash = DataSync.pushKeyFromLocal('libautoent_bons_vente');
-        }
+        // Pull serveur d'abord (évite d'afficher une vieille copie localStorage),
+        // puis push pour remonter d'éventuels bons locaux absents du serveur.
+        var bootDash = Promise.all([
+            (window.StockStore && StockStore.initCatalogFromServer) ? StockStore.initCatalogFromServer() : Promise.resolve(),
+            (window.VenteStore && VenteStore.initFromServer) ? VenteStore.initFromServer() : Promise.resolve()
+        ]);
         bootDash.then(function () {
-            return Promise.all([
-                (window.StockStore && StockStore.initCatalogFromServer) ? StockStore.initCatalogFromServer() : Promise.resolve(),
-                (window.VenteStore && VenteStore.initFromServer) ? VenteStore.initFromServer() : Promise.resolve()
-            ]);
+            if (window.DataSync && DataSync.pushKeyFromLocal) {
+                return DataSync.pushKeyFromLocal('libautoent_bons_vente');
+            }
+        }).then(function () {
+            return (window.VenteStore && VenteStore.initFromServer) ? VenteStore.initFromServer() : Promise.resolve();
         }).then(refreshDashboard);
         window.addEventListener('storage', refreshDashboard);
         window.addEventListener('focus', function () {

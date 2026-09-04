@@ -220,7 +220,17 @@
                             return mergedUnion;
                         });
                     }
-                    normalized = mergedUnion;
+                    // Toujours garder le plus grand ensemble (serveur plus riche que local)
+                    if (mergedUnion.length >= (Array.isArray(normalized) ? normalized.length : 0)) {
+                        normalized = mergedUnion;
+                    }
+                }
+
+                // Si le serveur a nettement plus d'éléments, forcer le local
+                if (PROTECTED_KEYS[key] && Array.isArray(normalized) && Array.isArray(local)
+                    && normalized.length > local.length) {
+                    localStorage.setItem(key, JSON.stringify(normalized));
+                    return normalized;
                 }
 
                 localStorage.setItem(key, JSON.stringify(normalized));
