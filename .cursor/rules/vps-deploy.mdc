@@ -6,8 +6,8 @@ alwaysApply: true
 # Déploiement VPS LibAutoEnt
 
 - Host: `51.255.162.99`, user: `ubuntu`, site: `https://libautoent.a2spr.com`
-- Mot de passe SSH: lire depuis le fichier local **gitignoré** `.vps_ssh_password` à la racine du projet (ou variable d’environnement `VPS_SSH_PASSWORD`).
-- Script: `_tmp_vps_deploy_libautoent.py` — il charge déjà ce fichier.
-- **Ne jamais** committer `.vps_ssh_password`, ni coller le mot de passe dans git / règles publiques / réponses inutiles.
-- Si le fichier manque, demander une seule fois et le réécrire dans `.vps_ssh_password`.
-- Ne pas redemander le mot de passe à chaque déploiement tant que le fichier existe.
+- Credentials: fichier local **gitignoré** `.env.deploy` (`VPS_SSH_HOST`, `VPS_SSH_USER`, `VPS_SSH_PASSWORD`) ou `.vps_ssh_password`.
+- Script: `_tmp_vps_deploy_libautoent.py` — charge `.env.deploy` automatiquement.
+- **Ne jamais** committer `.env.deploy` / `.vps_ssh_password`, ni coller le mot de passe dans git.
+- Si les fichiers manquent, demander une seule fois et les réécrire.
+- Ne pas redemander le mot de passe à chaque déploiement tant que `.env.deploy` existe.
