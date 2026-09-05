@@ -1902,7 +1902,7 @@
         </div>
     </div>
 
-    <script src="{{ asset('js/data-sync.js') }}?v=12"></script>
+    <script src="{{ asset('js/data-sync.js') }}?v=13"></script>
     <script src="{{ asset('js/seed-demo-local.js') }}?v=1"></script>
     <script src="{{ asset('js/sidebar-menu.js') }}?v=3"></script>
     <script>window.__LIBAUTOENT_STATUT__=@json(strtolower((string) session('libautoent_statut', 'gerant')));</script>
@@ -1910,7 +1910,7 @@
     <script src="{{ asset('js/user-role.js') }}?v=2"></script>
     <script src="{{ asset('js/table-actions.js') }}?v=8"></script>
     <script src="{{ asset('js/stock-store.js') }}?v=11"></script>
-    <script src="{{ asset('js/vente-store.js') }}?v=16"></script>
+    <script src="{{ asset('js/vente-store.js') }}?v=17"></script>
     <script>
         const sidebar = document.getElementById('sidebar');
         const overlay = document.getElementById('overlay');
@@ -2528,6 +2528,8 @@
 
         document.getElementById('btnBonValider').addEventListener('click', function () {
             if (viewMode || !window.VenteStore) return;
+            var btn = document.getElementById('btnBonValider');
+            if (btn && btn.getAttribute('data-saving') === '1') return;
             var client = document.getElementById('bonClient').value.trim();
             if (!client) {
                 alert('Veuillez renseigner le Nom Client.');
@@ -2557,6 +2559,10 @@
                 lignes: lignes
             };
             var id = document.getElementById('bonEditId').value;
+            if (btn) {
+                btn.setAttribute('data-saving', '1');
+                btn.disabled = true;
+            }
             var savePromise = id
                 ? VenteStore.updateBon(id, payload)
                 : VenteStore.addBon(payload);
@@ -2565,6 +2571,11 @@
                 refreshDashboard();
                 if (res && res.ok === false) {
                     alert('Le bon est enregistré ici, mais la sync serveur a échoué. Gardez cette page ouverte et réessayez dans un instant.');
+                }
+            }).finally(function () {
+                if (btn) {
+                    btn.removeAttribute('data-saving');
+                    btn.disabled = false;
                 }
             });
         });

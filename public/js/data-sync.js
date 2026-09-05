@@ -137,8 +137,32 @@
         return merged;
     }
 
+    function bonIdRank(b) {
+        var id = String((b && b.id) || '');
+        var m = id.match(/^bonv_(\d+)_/);
+        return m ? parseInt(m[1], 10) : 0;
+    }
+
+    function dedupeBonsByNumero(list) {
+        if (!Array.isArray(list)) return [];
+        var byNum = {};
+        var without = [];
+        list.forEach(function (b) {
+            if (!b || typeof b !== 'object') return;
+            var num = String(b.numero || '').trim().toUpperCase();
+            if (!num) {
+                without.push(b);
+                return;
+            }
+            if (!byNum[num] || bonIdRank(b) >= bonIdRank(byNum[num])) {
+                byNum[num] = b;
+            }
+        });
+        return Object.keys(byNum).map(function (k) { return byNum[k]; }).concat(without);
+    }
+
     function mergeBons(remote, local) {
-        return mergeById(remote, local);
+        return dedupeBonsByNumero(mergeById(remote, local));
     }
 
     function fetchServerKeyOnly(key) {
@@ -213,7 +237,12 @@
                 }
 
                 if (UNION_KEYS[key] && Array.isArray(normalized) && Array.isArray(local) && local.length > 0) {
-                    var mergedUnion = mergeById(normalized, local);
+                    var mergedUnion = key === 'libautoent_bons_vente'
+                        ? mergeBons(normalized, local)
+                        : mergeById(normalized, local);
+                    if (key === 'libautoent_bons_vente') {
+                        mergedUnion = dedupeBonsByNumero(mergedUnion);
+                    }
                     if (mergedUnion.length > normalized.length) {
                         localStorage.setItem(key, JSON.stringify(mergedUnion));
                         return pushKeyRaw(key, mergedUnion).then(function () {
@@ -224,6 +253,10 @@
                     if (mergedUnion.length >= (Array.isArray(normalized) ? normalized.length : 0)) {
                         normalized = mergedUnion;
                     }
+                }
+
+                if (key === 'libautoent_bons_vente' && Array.isArray(normalized)) {
+                    normalized = dedupeBonsByNumero(normalized);
                 }
 
                 // Si le serveur a nettement plus d'éléments, forcer le local
@@ -335,14 +368,21 @@
                 var localNow = readLocal(key);
                 var toSend = Array.isArray(data) ? data.slice() : [];
                 if (Array.isArray(localNow) && localNow.length) {
-                    toSend = mergeById(toSend, localNow);
+                    toSend = key === 'libautoent_bons_vente'
+                        ? mergeBons(toSend, localNow)
+                        : mergeById(toSend, localNow);
                 }
                 if (Array.isArray(remote) && remote.length) {
-                    toSend = mergeById(remote, toSend);
+                    toSend = key === 'libautoent_bons_vente'
+                        ? mergeBons(remote, toSend)
+                        : mergeById(remote, toSend);
+                }
+                if (key === 'libautoent_bons_vente') {
+                    toSend = dedupeBonsByNumero(toSend);
                 }
                 try {
                     var prevLen = Array.isArray(localNow) ? localNow.length : 0;
-                    if (toSend.length >= prevLen) {
+                    if (toSend.length >= prevLen || key === 'libautoent_bons_vente') {
                         localStorage.setItem(key, JSON.stringify(toSend));
                     }
                 } catch (e) { /* ignore */ }
@@ -361,7 +401,12 @@
                             var latest = readLocal(key);
                             var finalList = toSend;
                             if (Array.isArray(latest) && latest.length) {
-                                finalList = mergeById(toSend, latest);
+                                finalList = key === 'libautoent_bons_vente'
+                                    ? mergeBons(toSend, latest)
+                                    : mergeById(toSend, latest);
+                            }
+                            if (key === 'libautoent_bons_vente') {
+                                finalList = dedupeBonsByNumero(finalList);
                             }
                             localStorage.setItem(key, JSON.stringify(finalList));
                         } catch (e) { /* ignore */ }

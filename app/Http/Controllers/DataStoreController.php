@@ -128,6 +128,40 @@ class DataStoreController extends Controller
         return preg_match('/^BL0*(\d+)$/i', trim($numero), $m) ? (int) $m[1] : 0;
     }
 
+    private function bonIdRank(array $row): int
+    {
+        $id = (string) ($row['id'] ?? '');
+        if (preg_match('/^bonv_(\d+)_/', $id, $m)) {
+            return (int) $m[1];
+        }
+
+        return 0;
+    }
+
+    /**
+     * Un seul bon par numéro BL (garde le plus récent en cas de double-clic / multi-id).
+     */
+    private function dedupeBonsByNumero(array $rows): array
+    {
+        $byNum = [];
+        $withoutNum = [];
+        foreach ($rows as $row) {
+            if (! is_array($row)) {
+                continue;
+            }
+            $num = strtoupper(trim((string) ($row['numero'] ?? '')));
+            if ($num === '') {
+                $withoutNum[] = $row;
+                continue;
+            }
+            if (! isset($byNum[$num]) || $this->bonIdRank($row) >= $this->bonIdRank($byNum[$num])) {
+                $byNum[$num] = $row;
+            }
+        }
+
+        return array_values(array_merge(array_values($byNum), $withoutNum));
+    }
+
     public function show(string $key)
     {
         $safe = $this->safeKey($key);
@@ -148,7 +182,7 @@ class DataStoreController extends Controller
 
         $payload = $this->normalizePayload($safe, $data);
         if ($safe === 'libautoent_bons_vente' && is_array($payload)) {
-            $payload = $this->sortBonsNewestFirst($payload);
+            $payload = $this->sortBonsNewestFirst($this->dedupeBonsByNumero($payload));
         }
 
         return response()->json($payload, 200, [
@@ -214,7 +248,7 @@ class DataStoreController extends Controller
         }
 
         if ($safe === 'libautoent_bons_vente' && is_array($payload)) {
-            $payload = $this->sortBonsNewestFirst($payload);
+            $payload = $this->sortBonsNewestFirst($this->dedupeBonsByNumero($payload));
         }
 
         $dir = storage_path('app/libautoent');

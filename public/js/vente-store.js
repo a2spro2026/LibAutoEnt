@@ -152,10 +152,18 @@
 
     function addBon(bon) {
         var list = read(KEY_BONS);
+        var numero = String(bon.numero || '').trim() || nextBonNumero();
+        var existing = null;
+        for (var i = 0; i < list.length; i++) {
+            if (String(list[i].numero || '').trim().toUpperCase() === numero.toUpperCase()) {
+                existing = list[i];
+                break;
+            }
+        }
         var item = {
-            id: bon.id || ('bonv_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7)),
+            id: (existing && existing.id) || bon.id || ('bonv_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7)),
             date: bon.date || formatDateFR(),
-            numero: String(bon.numero || '').trim() || nextBonNumero(),
+            numero: numero,
             client: bon.client || '',
             montant: Number(bon.montant) || 0,
             typePaie: bon.typePaie || 'Crédit',
@@ -163,7 +171,13 @@
             solde: Number(bon.solde) || 0,
             lignes: bon.lignes || []
         };
-        list.unshift(item);
+        if (existing) {
+            list = list.map(function (b) {
+                return String(b.id) === String(existing.id) ? item : b;
+            });
+        } else {
+            list.unshift(item);
+        }
         return write(KEY_BONS, list).then(function (res) {
             return { item: item, ok: !res || res.ok !== false, sync: res };
         });
